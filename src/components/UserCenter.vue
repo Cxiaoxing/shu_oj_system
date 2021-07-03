@@ -287,6 +287,7 @@ export default {
         url: "/users/" + this.userId,
       })
         .then(function (response) {
+          console.log(response.data)
           that.userInfo = response.data;
         })
         .catch(function (error) {

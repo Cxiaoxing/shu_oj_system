@@ -132,7 +132,7 @@ export default {
       problem_info: {}, //题目基础信息
       problem_contents: {}, //题目描述
       dialogVisible: false, //控制查看题目详情弹窗
-      code: "", // 代码编辑器绑定的值
+      code: "\n\n\n\n\n\n", // 代码编辑器绑定的值
       // 代码编辑器默认配置
       options: {
         tabSize: 2, // 缩进格式
