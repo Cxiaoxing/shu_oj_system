@@ -26,6 +26,154 @@
         <el-table-column prop="address" label=""> </el-table-column>
       </el-table>
     </el-card>
+
+    <!--新增部分：“帮助” from 30 to 176-->
+    <el-card>
+      <div
+        style="
+          font-family: PingFang SC;
+          font-size: 18px;
+          font-weight: 400;
+          color: #303133;
+        "
+      >
+        帮助
+      </div>
+      <br /> 
+      <div
+        style="
+          font-family: PingFang SC;
+          font-size: 17px;
+          font-weight: 400;
+          color: #303133;">
+        一、判题系统
+      </div> 
+      <!--
+      <div class="helpTextStyle">
+        Accepted: 你的答案符合判题标准
+      </div>
+      <div class="helpTextStyle">
+        Runtime Error: 你的程序运行时出现错误（指针越界，栈溢出，有未处理的异常，主函数返回值非零等）
+      </div>
+      <div class="helpTextStyle">
+        Time Limit Exceeded: 你的程序执行时间超出题目要求
+      </div>
+      <div class="helpTextStyle">
+        Memory Limit Exceeded: 你的程序内存使用超出题目要求
+      </div>
+      <div class="helpTextStyle">
+        Compile Error: 你的程序在编译（包括链接）时出现错误
+      </div>
+      <div class="helpTextStyle">
+        Wrong Answer: 你的程序输出的答案不符合判题标准
+      </div>
+      <div class="helpTextStyle">
+        System Error: 判题系统发生故障，请等待重判
+      </div>
+      <div class="helpTextStyle">
+        Waiting: 你的提交正在等待处理
+      </div>
+      -->
+      <div class="helpTextStyle">
+        <table border="0">
+          <tr>
+            <td>Accepted</td>
+            <td>你的答案符合判题标准</td>
+          </tr>
+          <tr>
+            <td>Runtime Error</td>
+            <td>你的程序运行时出现错误（指针越界，栈溢出，有未处理的异常，主函数返回值非零等）</td>
+          </tr>
+          <tr>
+            <td>Time Limit Exceeded</td>
+            <td>你的程序执行时间超出题目要求</td>
+          </tr>
+          <tr>
+            <td>Memory Limit Exceeded</td>
+            <td>你的程序内存使用超出题目要求</td>
+          </tr>
+          <tr>
+            <td>Compile Error</td>
+            <td>你的程序在编译（包括链接）时出现错误</td>
+          </tr>
+          <tr>
+            <td>Wrong Answer</td>
+            <td>你的程序输出的答案不符合判题标准</td>
+          </tr>
+          <tr>
+            <td>System Error</td>
+            <td>判题系统发生故障，请等待重判</td>
+          </tr>
+          <tr>
+            <td>Waiting</td>
+            <td>你的提交正在等待处理</td>
+          </tr>
+        </table>
+      </div>
+
+      <br /> 
+      <div
+        style="
+          font-family: PingFang SC;
+          font-size: 17px;
+          font-weight: 400;
+          color: #303133;">
+       二、 编译参数
+      </div>
+      <div class="helpTextStyle">
+        <table border="0">
+          <tr>
+            <td>C（GCC 4.8）</td>
+            <td></td>
+            <td>gcc -DONLINE_JUDGE -O2 -w -std=c99 {src_path} -lm -o {exe_path}main</td>
+          </tr>
+          <tr>
+            <td>C++（G++ 4.3）</td>
+            <td></td>
+            <td>g++ -DONLINE_JUDGE -O2 -w -std=c++11 {src_path} -lm -o {exe_path}main</td>
+          </tr>
+          <tr>
+            <td>Java（Oracle JDK 1.7）</td>
+            <td></td>
+            <td>javac {src_path} -d {exe_path} //编译</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td>java -cp {exe_path} Main //运行</td>
+          </tr>
+        </table>
+      </div>
+
+      <br /> 
+      <div
+        style="
+          font-family: PingFang SC;
+          font-size: 17px;
+          font-weight: 400;
+          color: #303133;">
+       三、 常见问题
+      </div>
+      <div class="helpTextStyle">
+        <table border="0">
+          <tr>
+            1、无特殊说明，请使用标准输入输出。
+          </tr>
+          <tr>
+            2、Java 代码需使用 Main 作为主类名。C/C++代码使用int main()，并且需要return 0;。
+          </tr>
+          <tr>
+            3、C/C++ 的64位整数类型，请使用 long long 声明，使用 cin/cout 或 %lld 输入输出。 使用__int64会导致编译错误。
+          </tr>
+          <tr>
+            4、程序执行时间指CPU时间，占用内存按执行过程中内存消耗的峰值计，有多组测试数据时以最大的时间和内存消耗为准
+          </tr>
+          <tr>
+            5、判题的时候会去除你的输出的最后的换行和空格，然后与去除最后的换行和空格的答案做比较，如果不一致就是 Wrong Answer。 其余的行末空格和空行不去除，看清楚题目的要求。没有格式错误。
+          </tr>
+        </table>
+      </div>
+    </el-card>
     <div class="onboard">
       <img class="guideIcon" src="../img/guide.svg" @click.prevent.stop="guide" />
     </div>
@@ -136,5 +284,12 @@ export default {
 .guideIcon{
   width: 25px;
   height: 25px;
+}
+
+.helpTextStyle{
+  font-family: PingFang SC;
+  font-size: 15px;
+  font-weight: 240;
+  color: #303133;
 }
 </style>
