@@ -2,7 +2,10 @@
   <div class="login_container">
     <div class="login_box">
       <!-- 左侧插画 -->
-      <img class="login_picture" src="https://cxx-1258119840.cos.ap-shanghai.myqcloud.com/login.svg" />
+      <img
+        class="login_picture"
+        src="https://cxx-1258119840.cos.ap-shanghai.myqcloud.com/login.svg"
+      />
       <!-- 登录表单区域 -->
       <div class="login_form" v-if="showLoginForm">
         <div class="login_word">SHUOJ</div>
@@ -93,7 +96,9 @@
           </el-form-item>
           <!-- 按钮 -->
           <el-form-item class="register_button">
-            <el-button type="primary" @click="submitRegisterForm()">注册</el-button>
+            <el-button type="primary" @click="submitRegisterForm()"
+              >注册</el-button
+            >
           </el-form-item>
           <!-- 登录入口 -->
           <div
@@ -120,6 +125,7 @@
 </template>
 
 <script>
+import { userLoginRequest, userRegisterRequest } from "../request/userRequest";
 export default {
   name: "login",
   data() {
@@ -152,9 +158,7 @@ export default {
       },
       // 登录表单验证规则
       loginFormRules: {
-        account: [
-          { required: true, message: "请输入账号", trigger: "blur" },
-        ],
+        account: [{ required: true, message: "请输入账号", trigger: "blur" }],
         password: [{ required: true, message: "请输入密码", trigger: "blur" }],
       },
 
@@ -167,9 +171,7 @@ export default {
       },
       // 注册表达验证规则
       registerFormRules: {
-        account: [
-          { required: true, message: "请输入账号", trigger: "blur" },
-        ],
+        account: [{ required: true, message: "请输入账号", trigger: "blur" }],
         password: [{ required: true, message: "请输入密码", trigger: "blur" }],
         mobile: [
           { required: false, message: "请输入手机号", trigger: "blur" },
@@ -200,20 +202,9 @@ export default {
         account: loginForm.account,
         password: loginForm.password,
       };
-      const myHeaders = {
-        "Content-Type": "application/json",
-      };
       let that = this;
-      this.$axios({
-        method: "post",
-        url: "/users/login",
-        headers: myHeaders,
-        data: JSON.stringify(data),
-      })
+      userLoginRequest(data)
         .then(function (response) {
-          // window.localStorage.setItem('isLogin',true)
-          // window.localStorage.setItem('id',response.data.id)
-          // window.localStorage.setItem('role',response.data.role)
           that.$message({
             message: "登陆成功！",
             type: "success",
@@ -253,16 +244,8 @@ export default {
         mobile: this.registerForm.mobile,
         role: this.registerForm.role,
       };
-      const myHeaders = {
-        "Content-Type": "application/json",
-      };
       let that = this;
-      this.$axios({
-        method: "post",
-        url: "/users",
-        headers: myHeaders,
-        data: JSON.stringify(data),
-      })
+      userRegisterRequest(data)
         .then(function (response) {
           //展示登录界面
           that.showLoginForm = true;
@@ -281,7 +264,6 @@ export default {
           console.log(error);
         });
     },
-
   },
 };
 </script>

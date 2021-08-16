@@ -296,9 +296,7 @@
       <el-tab-pane label="提交状态" name="fourth">
         <el-card>
           <div class="tableBar">
-            <el-button size="small" @click="getStateList()"
-              >刷新列表</el-button
-            >
+            <el-button size="small" @click="getStateList()">刷新列表</el-button>
           </div>
           <!-- 列表区域 -->
           <el-table :data="statelist" @row-click="handleClickSubmission">
@@ -406,6 +404,13 @@
 </template>
 <script>
 import moment from "moment";
+import {
+  contestListRequest,
+  contestRankRequest,
+  contestRegisterRequest,
+  contestProblemListRequest
+} from "../request/contestRequest";
+import { submissionListRequest } from "../request/submissonRequest";
 export default {
   data() {
     return {
@@ -444,18 +449,15 @@ export default {
     // 获取竞赛信息
     getContest() {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/contests",
-        params: {
-          title_filter: this.ctitle,
-          limit: 1,
-          offset: 0,
-        },
-      })
+      const params = {
+        title_filter: this.ctitle,
+        limit: 1,
+        offset: 0,
+      };
+      contestListRequest(params)
         .then(function (response) {
-          that.contest = response.data.list[0];
-          let contest = response.data.list[0];
+          that.contest = response.list[0];
+          let contest = response.list[0];
           that.judgeCanRegister();
           if (
             contest.state === "Running" ||
@@ -471,14 +473,11 @@ export default {
     // 获取排名
     getRankList() {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/contests/" + this.region + "/rank_acm",
-      })
+      contestRankRequest(this.region)
         .then(function (response) {
-          that.ranklist = response.data.columns;
-          that.problem_block = response.data.columns[0].problem_block;
-          that.rankUpdatedTime = response.data.last_updated_time;
+          that.ranklist = response.columns;
+          that.problem_block = response.columns[0].problem_block;
+          that.rankUpdatedTime = response.last_updated_time;
           that.ACLPermissions = true;
         })
         .catch(function (error) {
@@ -519,21 +518,11 @@ export default {
 
     // 报名
     goRegister() {
-      // 判断是否登陆（待做）
-      if (this.contest.need_pass == true) {
+      if (this.contest.need_pass === true) {
         this.showPasswordDialog = true;
       } else {
-        const myHeaders = {
-          "Content-Type": "application/json",
-          cache: "false",
-        };
         var that = this;
-        this.$axios({
-          method: "post",
-          url: "/contests/" + this.contest.region + "/register",
-          headers: myHeaders,
-          data: {},
-        })
+        contestRegisterRequest(this.contest.region)
           .then(function (response) {
             that.contest.is_registered = true;
             that.getRankList();
@@ -556,19 +545,11 @@ export default {
     },
 
     registerRequest() {
-      const myHeaders = {
-        "Content-Type": "application/json",
-        cache: "false",
-      };
       var that = this;
-      this.$axios({
-        method: "post",
-        url: "/contests/" + this.contest.region + "/register",
-        headers: myHeaders,
-        data: JSON.stringify({
-          password: that.password,
-        }),
-      })
+      const data = {
+        password: that.password,
+      };
+      contestRegisterRequest(this.contest.region, data)
         .then(function (response) {
           that.showPasswordDialog = false;
           that.contest.is_registered = true;
@@ -619,19 +600,16 @@ export default {
     // 获取提交状态列表
     getStateList(currentPage = 1) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/submissions",
-        params: {
-          limit: this.pageSize,
-          offset: this.pageSize * (currentPage - 1),
-          region_filter: this.region,
-        },
-      })
+      const params = {
+        limit: this.pageSize,
+        offset: this.pageSize * (currentPage - 1),
+        region_filter: this.region,
+      };
+      submissionListRequest(params)
         .then(function (response) {
           that.currentPage = currentPage;
-          that.statelist = response.data.list;
-          that.submissionTotal = response.data.total;
+          that.statelist = response.list;
+          that.submissionTotal = response.total;
         })
         .catch(function (error) {
           console.log(error);
@@ -664,19 +642,16 @@ export default {
     // 获取该竞赛的题目列表
     getContestProblemList(re, currentPage = 1) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/regions/" + re,
-        params: {
+      const params = {
           inner_id_order: true,
           limit: this.pageSize,
           offset: this.pageSize * (currentPage - 1),
-        },
-      })
+        }
+      contestProblemListRequest(re, params)
         .then(function (response) {
           that.currentPage = currentPage;
-          that.contestSubmissionList = response.data.list;
-          that.problemTotal = response.data.total;
+          that.contestSubmissionList = response.list;
+          that.problemTotal = response.total;
         })
         .catch(function (error) {
           console.log(error);

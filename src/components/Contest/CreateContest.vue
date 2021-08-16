@@ -188,6 +188,7 @@
   </div>
 </template>
 <script>
+import {contestCreateRequest} from '../../request/contestRequest'
 export default {
   data() {
     return {
@@ -255,16 +256,8 @@ export default {
           },
         };
       }
-      const myHeaders = {
-        "Content-Type": "application/json",
-      };
       var that = this;
-      this.$axios({
-        method: "post",
-        url: "/contests",
-        headers: myHeaders,
-        data: JSON.stringify(data),
-      })
+      contestCreateRequest(data)
         .then(function (response) {
           // 提示用户创建成功
           that.$message({

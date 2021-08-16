@@ -35,7 +35,10 @@
               <img class="trophy" src="../img/trophy.svg" />
               <el-col :span="18" class="contest-main">
                 <div class="title">
-                  <a class="entry" @click.stop="goContest(contest.title,contest.region)">
+                  <a
+                    class="entry"
+                    @click.stop="goContest(contest.title, contest.region)"
+                  >
                     {{ contest.title }}
                   </a>
                 </div>
@@ -69,10 +72,30 @@
                 </div>
               </el-col>
               <el-col :span="4" style="text-align: center">
-                <el-tag effect="dark" v-if="contest.state === 'Preparing'" type="info">{{ contest.state}}</el-tag>
-                <el-tag effect="dark" v-if="contest.state === 'Running'" type="success">{{ contest.state}}</el-tag>
-                <el-tag effect="dark" v-if="contest.state === 'SealedRunning'" type="success">{{ contest.state}}</el-tag>
-                <el-tag effect="dark" v-if="contest.state === 'Ended'" type="danger">{{ contest.state}}</el-tag>
+                <el-tag
+                  effect="dark"
+                  v-if="contest.state === 'Preparing'"
+                  type="info"
+                  >{{ contest.state }}</el-tag
+                >
+                <el-tag
+                  effect="dark"
+                  v-if="contest.state === 'Running'"
+                  type="success"
+                  >{{ contest.state }}</el-tag
+                >
+                <el-tag
+                  effect="dark"
+                  v-if="contest.state === 'SealedRunning'"
+                  type="success"
+                  >{{ contest.state }}</el-tag
+                >
+                <el-tag
+                  effect="dark"
+                  v-if="contest.state === 'Ended'"
+                  type="danger"
+                  >{{ contest.state }}</el-tag
+                >
               </el-col>
             </el-row>
           </li>
@@ -80,23 +103,24 @@
       </div>
 
       <!-- 分页 -->
-          <el-pagination
-            background
-            hide-on-single-page
-            @current-change="getContestList"
-            :page-size="pageSize"
-            :current-page="currentPage"
-            layout="prev, pager, next, jumper"
-            :total="total"
-            style="margin-top: 30px; text-align: center"
-          >
-          </el-pagination>
+      <el-pagination
+        background
+        hide-on-single-page
+        @current-change="getContestList"
+        :page-size="pageSize"
+        :current-page="currentPage"
+        layout="prev, pager, next, jumper"
+        :total="total"
+        style="margin-top: 30px; text-align: center"
+      >
+      </el-pagination>
     </el-card>
   </div>
 </template>
 <script>
 import time from "@/utils/time";
 import moment from "moment";
+import { contestListRequest } from "../request/contestRequest.js";
 
 export default {
   data() {
@@ -123,19 +147,16 @@ export default {
     // 获取竞赛列表
     getContestList(currentPage = 1) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/contests",
-        params: {
-          title_filter: this.searchInput,
-          limit: this.pageSize,
-          offset: this.pageSize * (currentPage - 1),
-        },
-      })
+      const params = {
+        title_filter: this.searchInput,
+        limit: this.pageSize,
+        offset: this.pageSize * (currentPage - 1),
+      };
+      contestListRequest(params)
         .then(function (response) {
           that.currentPage = currentPage;
-          that.contestlist = response.data.list;
-          that.total = response.data.total;
+          that.contestlist = response.list;
+          that.total = response.total;
         })
         .catch(function (error) {
           console.log(error);
@@ -146,13 +167,13 @@ export default {
       return moment(time).format("YYYY-MM-DD HH:mm:ss");
     },
     // 跳转至竞赛详情页
-    goContest(contestTitle,re) {
+    goContest(contestTitle, re) {
       let title = contestTitle;
       let region = re;
       let that = this;
       that.$router.push({
         name: "contestDetail",
-        params: { title: title,region:region},
+        params: { title: title, region: region },
       });
     },
   },

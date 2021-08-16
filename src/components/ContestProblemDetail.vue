@@ -13,11 +13,14 @@
         type="primary"
         icon="el-icon-arrow-left"
         @click="previous_problem()"
-        v-if="inner_id!=1"
+        v-if="inner_id != 1"
         >上一题</el-button
       >
-      <el-button class="after_problem" type="primary" @click="after_problem()"
-      v-if="inner_id!=total"
+      <el-button
+        class="after_problem"
+        type="primary"
+        @click="after_problem()"
+        v-if="inner_id != total"
         >下一题<i class="el-icon-arrow-right el-icon--right"></i
       ></el-button>
     </div>
@@ -104,16 +107,13 @@
       </el-col>
     </el-row>
     <!-- 提交结束后引导查看提交详情弹窗 -->
-    
+
     <el-dialog title="" :visible.sync="dialogVisible" width="30%">
       <span>提交成功！</span>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="closeDialog"
-          >知道了</el-button
-        >
+        <el-button type="primary" @click="closeDialog">知道了</el-button>
       </span>
     </el-dialog>
-
   </div>
 </template>
 
@@ -129,7 +129,8 @@ import "codemirror/theme/idea.css"; // 白色
 // 代码高亮
 import "codemirror/mode/python/python.js"; // python
 // import "codemirror/mode/clike/clike.js"; //java
-
+import { problemPrivateInfoRequest } from "../request/problemRequest";
+import { submissionRequest } from "../request/submissonRequest";
 export default {
   name: "problemDetail",
   data() {
@@ -195,13 +196,10 @@ export default {
     // 获取题目详情
     getProblem: function () {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/regions/" + this.region + "/" + this.inner_id,
-      })
+      problemPrivateInfoRequest(this.region, this.inner_id)
         .then(function (response) {
-          that.problem_info = response.data.info;
-          that.problem_contents = response.data.contents;
+          that.problem_info = response.info;
+          that.problem_contents = response.contents;
         })
         .catch(function (error) {
           console.log(error);
@@ -213,23 +211,15 @@ export default {
     },
     // 提交代码
     submitCode: function () {
-      const myHeaders = {
-        "Content-Type": "application/json",
-        cache: "false",
-      };
       var that = this;
-      this.$axios({
-        method: "post",
-        url: "/regions/" + this.region + "/" + this.inner_id + "/submission",
-        headers: myHeaders,
-        data: JSON.stringify({
-          src: this.code,
-          language: this.language,
-        }),
-      })
+      const data = {
+        src: this.code,
+        language: this.language,
+      };
+      submissionRequest(this.region, this.inner_id, data)
         .then(function (response) {
           that.dialogVisible = true;
-          that.uuid = response.data;
+          that.uuid = response;
         })
         .catch(function (error) {
           console.log(error);
@@ -251,7 +241,8 @@ export default {
     previous_problem() {
       var that = this;
       var previous = new Promise(function (resolve, reject) {
-        var inner_id = parseInt(that.inner_id) > 1 ? parseInt(that.inner_id) - 1 : 1;
+        var inner_id =
+          parseInt(that.inner_id) > 1 ? parseInt(that.inner_id) - 1 : 1;
         that.inner_id = inner_id;
         resolve(inner_id);
       });
@@ -264,7 +255,10 @@ export default {
     after_problem() {
       var that = this;
       var after = new Promise(function (resolve, reject) {
-        let inner_id = parseInt(that.inner_id) < parseInt(that.total) ? parseInt(that.inner_id) + 1 : parseInt(that.total);
+        let inner_id =
+          parseInt(that.inner_id) < parseInt(that.total)
+            ? parseInt(that.inner_id) + 1
+            : parseInt(that.total);
         that.inner_id = inner_id;
         resolve(inner_id);
       });
@@ -273,9 +267,9 @@ export default {
       });
     },
 
-    closeDialog(){
-        this.dialogVisible=false;
-    }
+    closeDialog() {
+      this.dialogVisible = false;
+    },
   },
   components: {
     codemirror,

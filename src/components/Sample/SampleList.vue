@@ -29,24 +29,24 @@
           <el-table :data="sampleList" style="margin-top: 20px">
             <el-table-column prop="submit_time" label="提交时间">
             </el-table-column>
-            <el-table-column  label="判题状态">
-          <template slot-scope="scope">
-            <el-tag
-              :type="
-                scope.row.submission_state == 'Finished'
-                  ? 'success'
-                  : scope.row.submission_state == 'Pending'
-                  ? ''
-                  : scope.row.submission_state == 'Wainting'
-                  ? 'info'
-                  : ''
-              "
-              size="small"
-            >
-              {{ scope.row.submission_state }}</el-tag
-            >
-          </template>
-        </el-table-column>
+            <el-table-column label="判题状态">
+              <template slot-scope="scope">
+                <el-tag
+                  :type="
+                    scope.row.submission_state == 'Finished'
+                      ? 'success'
+                      : scope.row.submission_state == 'Pending'
+                      ? ''
+                      : scope.row.submission_state == 'Wainting'
+                      ? 'info'
+                      : ''
+                  "
+                  size="small"
+                >
+                  {{ scope.row.submission_state }}</el-tag
+                >
+              </template>
+            </el-table-column>
             <el-table-column label="判题结果">
               <template slot-scope="scope">
                 <el-tag
@@ -94,6 +94,11 @@
 </template>
 
 <script>
+import { problemPublicInfoRequest } from "../../request/problemRequest";
+import {
+  sampleListRequest,
+  sampleDeleteRequest,
+} from "../../request/sampleRequest";
 export default {
   data() {
     return {
@@ -112,12 +117,9 @@ export default {
     // 获取题目信息
     getProblem: function (region) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/problems/" + region,
-      })
+      problemPublicInfoRequest(region)
         .then(function (response) {
-          that.problemtitle = response.data.info.title;
+          that.problemtitle = response.info.title;
         })
         .catch(function (error) {
           console.log(error);
@@ -127,14 +129,10 @@ export default {
     // 获取标程列表
     getSampleList: function (id) {
       let that = this;
-      this.$axios({
-        method: "get",
-        url: "/samples",
-        params: { problem_id_filter: id, limit: 100, offset: 0 },
-      })
+      const params = { problem_id_filter: id, limit: 100, offset: 0 };
+      sampleListRequest(params)
         .then(function (response) {
-          console.log(response.data);
-          that.sampleList = response.data.list;
+          that.sampleList = response.list;
         })
         .catch(function (error) {
           console.log(error);
@@ -163,10 +161,7 @@ export default {
       })
         .then(() => {
           let that = this;
-          this.$axios({
-            method: "delete",
-            url: "/samples/" + uuid,
-          })
+          sampleDeleteRequest(uuid)
             .then(function (response) {
               //重新获取标程列表
               that.getSampleList(that.id);

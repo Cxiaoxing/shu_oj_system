@@ -78,7 +78,7 @@
             <el-button
               type="danger"
               size="small"
-              @click="deleteProblemSet(scope.row.region,scope.row.title)"
+              @click="deleteProblemSet(scope.row.region, scope.row.title)"
               >删除</el-button
             >
           </template>
@@ -158,7 +158,7 @@
         size="medium"
       >
         <el-form-item label="域" prop="region">
-          <div style="padding-left:16px;">{{ addProblemSetForm.region }}</div>
+          <div style="padding-left: 16px">{{ addProblemSetForm.region }}</div>
         </el-form-item>
         <el-form-item label="名称" prop="title">
           <el-input
@@ -262,6 +262,13 @@
 </template>
 
 <script>
+import { contestCreateRequest } from "../../request/contestRequest";
+import {
+  problemSetCreateRequest,
+  problemSetListRequest,
+  problemSetEditRequest,
+  problemSetDeleteRequest,
+} from "../../request/problemSetRequest";
 export default {
   data() {
     return {
@@ -329,20 +336,17 @@ export default {
     // 获取题集列表
     getProblemSetList: function (currentPage = 1) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/problem_sets",
-        params: {
-          title_filter: this.searchInput,
-          
-          limit: this.pageSize,
-          offset: this.pageSize * (currentPage - 1),
-        },
-      })
+      const params = {
+        title_filter: this.searchInput,
+
+        limit: this.pageSize,
+        offset: this.pageSize * (currentPage - 1),
+      };
+      problemSetListRequest(params)
         .then(function (response) {
           that.currentPage = currentPage;
-          that.problemSetList = response.data.list;
-          that.total = response.data.total;
+          that.problemSetList = response.list;
+          that.total = response.total;
         })
         .catch(function (error) {
           console.log(error);
@@ -367,16 +371,8 @@ export default {
         title: this.addProblemSetForm.title,
         introduction: this.addProblemSetForm.introduction,
       };
-      const myHeaders = {
-        "Content-Type": "application/json",
-      };
       let that = this;
-      this.$axios({
-        method: "post",
-        url: "/problem_sets",
-        headers: myHeaders,
-        data: JSON.stringify(data),
-      })
+      problemSetCreateRequest(data)
         .then(function (response) {
           //关闭对话框
           that.addProblemSetDialogVisible = false;
@@ -403,16 +399,8 @@ export default {
         new_title: this.addProblemSetForm.title,
         new_introduction: this.addProblemSetForm.introduction,
       };
-      const myHeaders = {
-        "Content-Type": "application/json",
-      };
       let that = this;
-      this.$axios({
-        method: "put",
-        url: "/problem_sets/" + this.addProblemSetForm.region,
-        headers: myHeaders,
-        data: JSON.stringify(data),
-      })
+      problemSetEditRequest(this.addProblemSetForm.region, data)
         .then(function (response) {
           //关闭对话框
           that.modifyProblemSetDialogVisible = false;
@@ -447,16 +435,8 @@ export default {
         title: this.addContestForm.title,
         introduction: this.addContestForm.introduction,
       };
-      const myHeaders = {
-        "Content-Type": "application/json",
-      };
       let that = this;
-      this.$axios({
-        method: "post",
-        url: "/contests",
-        headers: myHeaders,
-        data: JSON.stringify(data),
-      })
+      contestCreateRequest(data)
         .then(function (response) {
           //关闭对话框
           that.addContestDialogVisible = false;
@@ -486,18 +466,19 @@ export default {
     },
 
     // 删除题目
-    deleteProblemSet(problemSetId,title) {
-      this.$confirm("此操作将永久删除题集 【"+ title +"】 , 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
+    deleteProblemSet(problemSetId, title) {
+      this.$confirm(
+        "此操作将永久删除题集 【" + title + "】 , 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
         .then(() => {
           let that = this;
-          this.$axios({
-            method: "delete",
-            url: "/problem_sets/" + problemSetId,
-          })
+          problemSetDeleteRequest(problemSetId)
             .then(function (response) {
               //重新获取题集列表
               that.getProblemSetList();
@@ -536,10 +517,10 @@ export default {
     // 修改创建题集对话框的关闭事件
     modifyProblemSetDialogClosed() {
       this.addProblemSetForm = {
-        region:"",
-        title:"",
-        introduction:""
-      }
+        region: "",
+        title: "",
+        introduction: "",
+      };
     },
 
     //  根据困难度筛选

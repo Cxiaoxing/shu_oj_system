@@ -96,7 +96,7 @@
               >When
             </span>
             <span
-              style="font-family: PingFang SC; font-size: 14px; color: #606A78"
+              style="font-family: PingFang SC; font-size: 14px; color: #606a78"
               >{{ formatTime(subTime) }}</span
             >
           </div>
@@ -128,21 +128,33 @@
         >
           <div class="timeLineLeft">
             <div class="timeLineCircle">
-              <img v-if="testCase.result === 'SUCCESS'" class="timeLineImage" src="../../img/right.svg" />
-              <img v-if="testCase.result !== 'SUCCESS'" class="timeLineImage" src="../../img/wrong.svg" />
+              <img
+                v-if="testCase.result === 'SUCCESS'"
+                class="timeLineImage"
+                src="../../img/right.svg"
+              />
+              <img
+                v-if="testCase.result !== 'SUCCESS'"
+                class="timeLineImage"
+                src="../../img/wrong.svg"
+              />
             </div>
             <div class="timeLineLine"></div>
           </div>
           <div class="timeLineRight">
-            <div class="timeLineTitle">Case {{ index+1 }}</div>
+            <div class="timeLineTitle">Case {{ index + 1 }}</div>
             <div class="timeLineContext">
-              <span class="timeLineContextTitle">{{
-                testCase.result
-              }}</span>
+              <span class="timeLineContextTitle">{{ testCase.result }}</span>
               <el-row style="margin-top: 8px">
-                <el-col class="timeLineContextWord" :span="8">CPU Time: {{ testCase.cpu_time }} ms</el-col>
-                <el-col class="timeLineContextWord" :span="8">Memory: {{ testCase.memory }} B</el-col>
-                <el-col class="timeLineContextWord" :span="8">Output: {{ testCase.output }}</el-col>
+                <el-col class="timeLineContextWord" :span="8"
+                  >CPU Time: {{ testCase.cpu_time }} ms</el-col
+                >
+                <el-col class="timeLineContextWord" :span="8"
+                  >Memory: {{ testCase.memory }} B</el-col
+                >
+                <el-col class="timeLineContextWord" :span="8"
+                  >Output: {{ testCase.output }}</el-col
+                >
               </el-row>
             </div>
           </div>
@@ -165,6 +177,8 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/theme/idea.css"; // 白色
 import "codemirror/mode/python/python.js"; // python
 
+import { sampleResultRequest } from "../../request/sampleRequest";
+import { problemPublicInfoRequest } from '../../request/problemRequest';
 export default {
   name: "sampleResultDetail",
   data() {
@@ -213,12 +227,9 @@ export default {
     // 获取题目信息
     getProblem: function (region) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/problems/" + region,
-      })
+      problemPublicInfoRequest(region)
         .then(function (response) {
-          that.problemtitle = response.data.info.title;
+          that.problemtitle = response.info.title;
         })
         .catch(function (error) {
           console.log(error);
@@ -233,28 +244,25 @@ export default {
     // 获取结果
     getResult: function (uuid) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/samples/" + uuid,
-      })
+      sampleResultRequest(uuid)
         .then(function (response) {
-          console.log(response.data);
-          that.getProblem(response.data.submission.problem_id);
-          that.subTime = response.data.submission.submit_time;
-          that.code = response.data.submission.settings.src;
-          that.state = response.data.submission.state;
-          that.language = response.data.submission.language;
-          if (response.data.submission.state === "Finished") {
-            that.testCase = response.data.submission.result.details;
-            if (response.data.submission.err !== null) {
+          console.log(response);
+          that.getProblem(response.submission.problem_id);
+          that.subTime = response.submission.submit_time;
+          that.code = response.submission.settings.src;
+          that.state = response.submission.state;
+          that.language = response.submission.language;
+          if (response.submission.state === "Finished") {
+            that.testCase = response.submission.result.details;
+            if (response.submission.err !== null) {
               // 编译失败
               that.subResult = 2;
-              that.err = response.data.submission.err;
-              that.error_reason = response.data.submission.result.err_reason;
+              that.err = response.submission.err;
+              that.error_reason = response.submission.result.err_reason;
             } else {
               // 编译成功
-              that.err = response.data.submission.err;
-              if (response.data.submission.is_accepted === true) {
+              that.err = response.submission.err;
+              if (response.submission.is_accepted === true) {
                 // 提交通过
                 that.subResult = 0;
               } else {
@@ -360,17 +368,17 @@ export default {
 }
 .timeLineTitle {
   font-family: PingFang SC;
-font-size: 16px;
-font-style: normal;
-font-weight: 600;
-line-height: 24px;
-letter-spacing: 0px;
-text-align: left;
-color: #081023;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0px;
+  text-align: left;
+  color: #081023;
 }
 
 .timeLineContext {
-  background-color: #F5f6f7;
+  background-color: #f5f6f7;
   margin-top: 12px;
   padding: 16px 24px 16px 24px;
   width: 954px;
@@ -379,28 +387,23 @@ color: #081023;
 
 .timeLineContextTitle {
   font-family: PingFang SC;
-font-size: 14px;
-font-style: normal;
-font-weight: 600;
-line-height: 22px;
-letter-spacing: 0px;
-text-align: left;
-color: #081023;
-
-
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: 0px;
+  text-align: left;
+  color: #081023;
 }
 
 .timeLineContextWord {
   font-family: PingFang SC;
-font-size: 12px;
-font-style: normal;
-font-weight: 400;
-line-height: 14px;
-letter-spacing: 0px;
-text-align: left;
-color: #606A78;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 14px;
+  letter-spacing: 0px;
+  text-align: left;
+  color: #606a78;
 }
-
-
-
 </style>

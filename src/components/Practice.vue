@@ -121,6 +121,8 @@
 </template>
 
 <script>
+import { problemPrivateListRequest } from "../request/problemRequest";
+import { userCheckOnlineRequest } from "../request/userRequest";
 export default {
   data() {
     return {
@@ -138,21 +140,18 @@ export default {
     // 搜索题目列表
     getProblemList: function (currentPage = 1) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/regions/set_main",
-        params: {
-          problem_id_order: true,
-          title_filter: this.searchInput,
-          release_filter: true,
-          limit: this.pageSize,
-          offset: this.pageSize * (currentPage - 1),
-        },
-      })
+      const params = {
+        problem_id_order: true,
+        title_filter: this.searchInput,
+        release_filter: true,
+        limit: this.pageSize,
+        offset: this.pageSize * (currentPage - 1),
+      };
+      problemPrivateListRequest("set_main", params)
         .then(function (response) {
           that.currentPage = currentPage;
-          that.problemlist = response.data.list;
-          that.total = response.data.total;
+          that.problemlist = response.list;
+          that.total = response.total;
         })
         .catch(function (error) {
           console.log(error);
@@ -164,12 +163,9 @@ export default {
       let id = row.inner_id;
       var that = this;
       // 调用 me 接口获取用户状态
-      this.$axios({
-        method: "get",
-        url: "/users/me",
-      })
+      userCheckOnlineRequest()
         .then(function (response) {
-          if (response.data) {
+          if (response) {
             that.$router.push({ name: "problemDetail", params: { id: id } });
           }
         })
@@ -185,9 +181,11 @@ export default {
 
     //  根据困难度筛选
     filterDifficulty(value, row) {
-      return row.out_problem.info.difficulty >= value && row.out_problem.info.difficulty < value + 2.5;
+      return (
+        row.out_problem.info.difficulty >= value &&
+        row.out_problem.info.difficulty < value + 2.5
+      );
     },
-
 
     // 计算通过率，返回对应文字
     passingRateFormtype(row, column, cellValue) {

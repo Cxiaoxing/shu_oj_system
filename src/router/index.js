@@ -23,8 +23,6 @@ const QuestionBank = () => import(/* webpackChunkName: "ProblemManagement" */ '.
 const ProblemSet = () => import(/* webpackChunkName: "ProblemManagement" */ '../components/Problem/ProblemSet.vue')
 // import ProblemSetDetailList from '../components/Problem/ProblemSetDetailList.vue'
 const ProblemSetDetailList = () => import(/* webpackChunkName: "ProblemManagement" */ '../components/Problem/ProblemSetDetailList.vue')
-// import ProblemResultDetail from '../components/Problem/ProblemResultDetail.vue'
-const ProblemResultDetail = () => import(/* webpackChunkName: "ProblemManagement" */ '../components/Problem/ProblemResultDetail.vue')
 // import CreateProblem from '../components/Problem/CreateProblem.vue'
 const CreateProblem = () => import(/* webpackChunkName: "ProblemManagement" */ '../components/Problem/CreateProblem.vue')
 
@@ -49,8 +47,6 @@ const Live = () => import(/* webpackChunkName: "LiveManagement" */ '../component
 const Practice = () => import(/* webpackChunkName: "Problem" */ '../components/Practice.vue')
 // import ProblemSetDetail from '../components/ProblemDetail.vue'
 const ProblemSetDetail = () => import(/* webpackChunkName: "Problem" */ '../components/ProblemDetail.vue')
-// import ProblemResult from '../components/ProblemResult.vue'
-const ProblemResult = () => import(/* webpackChunkName: "Problem" */ '../components/ProblemResult.vue')
 
 // 外部【竞赛】
 // import Contest from '../components/Contest.vue'
@@ -97,12 +93,10 @@ const router = new VueRouter({
         { path: '/welcome', component: Welcome }, // 外部
         { path: '/practice', component: Practice }, // 外部
         { name: 'problem', path: '/problem/:id', component: ProblemDetail },  // 内部
-        { name: 'problemResult', path: '/problemResult/:id', component: ProblemResult },  // 内部
         { path: '/questionBank', component: QuestionBank },// 内部
         { path: '/problemSet', component: ProblemSet },// 内部
         { name: 'problemSetDetailList', path: '/problemSetDetailList/:region', component: ProblemSetDetailList },//内部
         { name: 'problemDetail', path: '/problemDetail/:id', component: ProblemSetDetail },  // 外部
-        { name: 'problemResultDetail', path: '/problemResultDetail/:id', component: ProblemResultDetail },  // 外部
         { path: '/createProblem', component: CreateProblem },// 内部
         { path: '/contest', component: Contest },// 外部
         { name: 'contestDetail', path: '/contestDetail/:region/:title', component: ContestDetail },// 外部
@@ -127,7 +121,7 @@ const router = new VueRouter({
 // 无需登录的即可访问的路由列表
 const whiteList = ['/login','/welcome','/practice','/contest']
 // 需登录且需管理员或超级管理员才可访问的路由列表
-const adminList = ['/userList','/questionBank','/createProblem','problemResult','problem','/problemSet','problemSetDetailList','/contestBank','/createContest', 'contestDetailList','sampleList','sampleResultDetail','/live']
+const adminList = ['/userList','/questionBank','/createProblem','problem','/problemSet','problemSetDetailList','/contestBank','/createContest', 'contestDetailList','sampleList','sampleResultDetail','/live']
 router.beforeEach((to, from, next) => {
   // to: 即将要进入的目标 路由对象
   // from: 当前导航正要离开的路由

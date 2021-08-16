@@ -245,6 +245,12 @@
 </template>
 
 <script>
+import {
+  problemPrivateDeleteRequest,
+  problemPrivateListRequest,
+  problemPublicListRequest,
+  ProblemAddRegionRequest
+} from "../../request/problemRequest";
 export default {
   name: "problemSetDetailList",
   data() {
@@ -281,20 +287,17 @@ export default {
     // 搜索题目列表
     getProblemList() {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/problems",
-        params: {
-          id_order: true,
-          title_filter: this.searchInput1,
-          limit: 100,
-          offset: 0,
-        },
-      })
+      const params = {
+        id_order: true,
+        title_filter: this.searchInput1,
+        limit: 100,
+        offset: 0,
+      };
+      problemPublicListRequest(params)
         .then(function (response) {
-          console.log(response.data);
-          that.addProblemList = response.data.list;
-          that.total = response.data.total;
+          console.log(response);
+          that.addProblemList = response.list;
+          that.total = response.total;
         })
         .catch(function (error) {
           console.log(error);
@@ -303,20 +306,17 @@ export default {
     // 获取该题集的题目列表
     getProblemSetDetailList(currentPage = 1) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/regions/" + this.region,
-        params: {
-          inner_id_order: true,
-          title_filter: this.searchInput,
-          limit: this.pageSize,
-          offset: this.pageSize * (currentPage - 1),
-        },
-      })
+      const params = {
+        inner_id_order: true,
+        title_filter: this.searchInput,
+        limit: this.pageSize,
+        offset: this.pageSize * (currentPage - 1),
+      };
+      problemPrivateListRequest(this.region, params)
         .then(function (response) {
           that.currentPage = currentPage;
-          that.problemSetDetailList = response.data.list;
-          that.total = response.data.total;
+          that.problemSetDetailList = response.list;
+          that.total = response.total;
         })
         .catch(function (error) {
           console.log(error);
@@ -347,10 +347,7 @@ export default {
       )
         .then(() => {
           let that = this;
-          this.$axios({
-            method: "delete",
-            url: "/regions/" + this.region + "/" + id,
-          })
+          problemPrivateDeleteRequest(this.region, id)
             .then(function (response) {
               that.getProblemSetDetailList(that.currentPage);
               that.$message({
@@ -410,21 +407,13 @@ export default {
         problem_ids: this.problem_ids,
       };
       console.log(this.multipleSelection);
-      const myHeaders = {
-        "Content-Type": "application/json",
-      };
       let that = this;
-      this.$axios({
-        method: "post",
-        url: "/regions/" + that.region,
-        headers: myHeaders,
-        data: JSON.stringify(data),
-      })
+      ProblemAddRegionRequest(this.region, data)
         .then(function (response) {
           //关闭对话框
           that.addProblemDialogVisible = false;
           //重新获取用户列表
-          that.getProblemSetDetailList(that.currentPage = 1);
+          that.getProblemSetDetailList((that.currentPage = 1));
           // 提示用户修改成功
           that.$message({
             message: "添加题目成功！",

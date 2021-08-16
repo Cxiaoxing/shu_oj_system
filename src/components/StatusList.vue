@@ -8,8 +8,16 @@
 
     <el-card>
       <div class="tableBar">
-        <el-switch class="margin-right-20" v-model="switchValue" active-text="仅自己" inactive-text="全部" :active-value = id :inactive-value = null @change="getStateList()"></el-switch>
-        <el-button  size="small" @click="getStateList()">刷新列表</el-button>
+        <el-switch
+          class="margin-right-20"
+          v-model="switchValue"
+          active-text="仅自己"
+          inactive-text="全部"
+          :active-value="id"
+          :inactive-value="null"
+          @change="getStateList()"
+        ></el-switch>
+        <el-button size="small" @click="getStateList()">刷新列表</el-button>
       </div>
       <!-- 列表区域 -->
       <el-table :data="statelist" @row-click="handleClickSubmission">
@@ -92,6 +100,7 @@
 </template>
 <script>
 import moment from "moment";
+import { submissionListRequest } from "../request/submissonRequest";
 export default {
   data() {
     return {
@@ -101,33 +110,30 @@ export default {
       currentPage: 1,
       pageSize: 10,
       total: null,
-      switchValue:null,
-      id:"",
+      switchValue: null,
+      id: "",
     };
   },
   created() {
     this.getStateList();
-    this.id = window.localStorage.getItem('id');
+    this.id = window.localStorage.getItem("id");
   },
   methods: {
     // 获取提交状态列表
     getStateList(currentPage = 1) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/submissions",
-        params: {
-          region_filter: "set_main",
-          user_id_filter: this.switchValue,
-          limit: this.pageSize,
-          offset: this.pageSize * (currentPage - 1),
-        },
-      })
+      const params = {
+        region_filter: "set_main",
+        user_id_filter: this.switchValue,
+        limit: this.pageSize,
+        offset: this.pageSize * (currentPage - 1),
+      };
+      submissionListRequest(params)
         .then(function (response) {
-          console.log(response.data);
+          console.log(response);
           that.currentPage = currentPage;
-          that.statelist = response.data.list;
-          that.total = response.data.total;
+          that.statelist = response.list;
+          that.total = response.total;
         })
         .catch(function (error) {
           console.log(error);
@@ -185,7 +191,7 @@ export default {
   align-items: center;
   margin-bottom: 15px;
 }
-.margin-right-20{
+.margin-right-20 {
   margin-right: 20px;
 }
 </style>

@@ -15,8 +15,12 @@
       <!-- 搜索与添加区域 -->
       <el-row :gutter="40">
         <el-col :span="8">
-          <el-input size="medium" placeholder="请输入你想要搜索的题目名称" v-model="searchInput"
-            @keyup.enter.native="getContestDetailList()">
+          <el-input
+            size="medium"
+            placeholder="请输入你想要搜索的题目名称"
+            v-model="searchInput"
+            @keyup.enter.native="getContestDetailList()"
+          >
             <el-button slot="append" icon="el-icon-search"></el-button>
           </el-input>
         </el-col>
@@ -238,6 +242,13 @@
 </template>
 
 <script>
+import {
+  problemPublicListRequest,
+  problemPrivateListRequest,
+  problemPrivateDeleteRequest,
+  ProblemAddRegionRequest
+} from "../../request/problemRequest";
+
 export default {
   name: "contestDetailList",
   data() {
@@ -272,20 +283,17 @@ export default {
     // 搜索题目列表
     getProblemList: function () {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/problems",
-        params: {
-          id_order: true,
-          title_filter: this.searchInput1,
-          limit: 100,
-          offset: 0,
-        },
-      })
+      const params = {
+        id_order: true,
+        title_filter: this.searchInput1,
+        limit: 100,
+        offset: 0,
+      };
+      problemPublicListRequest(params)
         .then(function (response) {
-          console.log(response.data);
-          that.addProblemList = response.data.list;
-          that.total = response.data.total;
+          console.log(response);
+          that.addProblemList = response.list;
+          that.total = response.total;
         })
         .catch(function (error) {
           console.log(error);
@@ -294,20 +302,17 @@ export default {
     // 获取该竞赛的题目列表
     getContestDetailList(currentPage = 1) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/regions/" + this.region,
-        params: {
-          inner_id_order: true,
-          title_filter: this.searchInput,
-          limit: this.pageSize,
-          offset: this.pageSize * (currentPage - 1),
-        },
-      })
+      const params = {
+        inner_id_order: true,
+        title_filter: this.searchInput,
+        limit: this.pageSize,
+        offset: this.pageSize * (currentPage - 1),
+      };
+      problemPrivateListRequest(this.region, params)
         .then(function (response) {
           that.currentPage = currentPage;
-          that.contestDetailList = response.data.list;
-          that.total = response.data.total;
+          that.contestDetailList = response.list;
+          that.total = response.total;
         })
         .catch(function (error) {
           console.log(error);
@@ -324,10 +329,7 @@ export default {
     // 删除竞赛中的题目
     goDeleteProblem(id) {
       var that = this;
-      this.$axios({
-        method: "delete",
-        url: "/regions/" + this.region + "/" + id,
-      })
+      problemPrivateDeleteRequest(this.region, id)
         .then(function (response) {
           that.getContestDetailList(that.currentPage);
           that.$message({
@@ -353,7 +355,7 @@ export default {
       }
     },
 
-     //  根据困难度筛选
+    //  根据困难度筛选
     filterDifficulty(value, row) {
       return (
         row.out_problem.info.difficulty >= value &&
@@ -381,21 +383,13 @@ export default {
         problem_ids: this.problem_ids,
       };
       console.log(this.multipleSelection);
-      const myHeaders = {
-        "Content-Type": "application/json",
-      };
       let that = this;
-      this.$axios({
-        method: "post",
-        url: "/regions/" + that.region,
-        headers: myHeaders,
-        data: JSON.stringify(data),
-      })
+      ProblemAddRegionRequest(that.region, data)
         .then(function (response) {
           //关闭对话框
           that.addProblemDialogVisible = false;
           //重新获取竞赛题目列表
-          that.getContestDetailList(that.currentPage = 1);
+          that.getContestDetailList((that.currentPage = 1));
           // 提示添加题目成功
           that.$message({
             message: "添加题目成功！",

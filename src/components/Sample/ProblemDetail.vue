@@ -17,9 +17,7 @@
           <div>
             <div style="display: flex; justify-content: space-between">
               <span class="problemTitle">{{ problem_info.title }}</span>
-              <el-button
-                size="medium"
-                @click="goSampleList()"
+              <el-button size="medium" @click="goSampleList()"
                 >管理标程</el-button
               >
             </div>
@@ -120,6 +118,8 @@ import "codemirror/theme/elegant.css"; // 白色
 import "codemirror/theme/idea.css"; // 白色
 // 代码高亮
 import "codemirror/mode/python/python.js"; // python
+import { sampleRequest } from "../../request/sampleRequest";
+import { problemPublicInfoRequest } from '../../request/problemRequest';
 // import "codemirror/mode/clike/clike.js"; //java
 
 export default {
@@ -127,7 +127,7 @@ export default {
   data() {
     return {
       id: 0, //接受前一个页面传来的id值
-      region:"",
+      region: "",
       uuid: "",
       problem_info: {}, //题目基础信息
       problem_contents: {}, //题目描述
@@ -177,19 +177,16 @@ export default {
   created() {
     this.id = this.$route.params.id;
     this.region = this.$route.params.region;
-    this.getProblem(this.id,this.region);
+    this.getProblem(this.id, this.region);
   },
   methods: {
     // 获取题目详情
     getProblem: function (id) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/problems/" + id,
-      })
+      problemPublicInfoRequest(id)
         .then(function (response) {
-          that.problem_info = response.data.info;
-          that.problem_contents = response.data.contents;
+          that.problem_info = response.info;
+          that.problem_contents = response.contents;
         })
         .catch(function (error) {
           console.log(error);
@@ -201,24 +198,16 @@ export default {
     },
     // 提交代码
     submitCode: function (pid) {
-      const myHeaders = {
-        "Content-Type": "application/json",
-        cache: "false",
-      };
       var that = this;
-      this.$axios({
-        method: "post",
-        url: "/samples",
-        headers: myHeaders,
-        data: JSON.stringify({
-          problem_id: pid,
-          src: this.code,
-          language: this.language,
-        }),
-      })
+      const data = {
+        problem_id: pid,
+        src: this.code,
+        language: this.language,
+      };
+      sampleRequest(data)
         .then(function (response) {
           that.dialogVisible = true;
-          that.uuid = response.data;
+          that.uuid = response;
         })
         .catch(function (error) {
           console.log(error);
@@ -240,54 +229,6 @@ export default {
       let that = this;
       let uuid = that.uuid;
       that.$router.push({ name: "sampleResultDetail", params: { uuid: uuid } });
-    },
-
-    getResult: function (uuid) {
-      var that = this;
-      this.$axios({
-        method: "get",
-        url: "/samples/" + uuid,
-      })
-        .then(function (response) {
-          console.log(response.data);
-          if (response.data.submission.state !== "Finished") {
-            that.$message({
-              message: "判题未完成！",
-            });
-          } else {
-            // 判题完成
-            clearInterval(that.timer);
-            that.timer = null;
-            if (response.data.submission.result.err) {
-              that.$message({
-                message: response.data.submission.result.err,
-                type: "warning",
-              });
-            } else {
-              that.$message({
-                message: "编译成功，跳转到判题结果页面！",
-              });
-              var setTestCases = new Promise(function (resolve, reject) {
-                sessionStorage.setItem(
-                  "test_cases",
-                  JSON.stringify(response.data.submission.result.details)
-                );
-                resolve("problemResult");
-              });
-              setTestCases.then(function (path) {
-                let id = that.id;
-                let title = that.problem_info.title;
-                that.$router.push({
-                  name: path,
-                  params: { id: id, title: title },
-                });
-              });
-            }
-          }
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
     },
   },
   components: {

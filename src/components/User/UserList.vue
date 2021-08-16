@@ -12,7 +12,7 @@
       <div>
         <!-- 搜索区域与添加区域 -->
         <div>
-          <el-row >
+          <el-row>
             <el-col :span="8">
               <el-input
                 size="medium"
@@ -33,13 +33,22 @@
               >
             </el-col>
             <el-col :span="1" :offset="11">
-              <el-button v-if="multipleSelection.length != 0" type="primary" @click="handleExport()" >导出数据</el-button>
+              <el-button
+                v-if="multipleSelection.length != 0"
+                type="primary"
+                @click="handleExport()"
+                >导出数据</el-button
+              >
             </el-col>
           </el-row>
         </div>
         <!-- 列表区域 -->
         <div>
-          <el-table :data="userlist" style="margin-top: 20px" @selection-change="handleSelectionChange">
+          <el-table
+            :data="userlist"
+            style="margin-top: 20px"
+            @selection-change="handleSelectionChange"
+          >
             <el-table-column type="selection" width="55"> </el-table-column>
             <el-table-column prop="id" label="ID" width="80"> </el-table-column>
             <el-table-column prop="account" label="账号"> </el-table-column>
@@ -60,13 +69,15 @@
                   type="primary"
                   size="small"
                   @click="showEditDialog(scope.row.id)"
-                >编辑</el-button>
+                  >编辑</el-button
+                >
                 <!-- 删除按钮 -->
                 <el-button
                   type="danger"
                   size="small"
-                  @click="deleteUser(scope.row.id,scope.row.account)"
-                >删除</el-button>
+                  @click="deleteUser(scope.row.id, scope.row.account)"
+                  >删除</el-button
+                >
               </template>
             </el-table-column>
           </el-table>
@@ -173,6 +184,13 @@
 </template>
 
 <script>
+import {
+  userInfoRequest,
+  userListRequest,
+  userRegisterRequest,
+  userEditRequest,
+  userDeleteRequest,
+} from "../../request/userRequest";
 export default {
   data() {
     // 自定义邮箱规则
@@ -186,7 +204,8 @@ export default {
     };
     // 自定义手机号规则
     var checkMobile = (rule, value, callback) => {
-      const regMobile = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
+      const regMobile =
+        /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
       if (regMobile.test(value)) {
         return callback();
       }
@@ -272,34 +291,36 @@ export default {
     // 导出数据
     handleExport() {
       if (this.multipleSelection.length) {
-        this.downloadLoading = true
-        import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['用户ID', '用户名', '手机号', '用户角色']
-          const filterVal = ['id', 'account', 'mobile', 'role']
-          const list = this.multipleSelection
-          const data = this.formatJson(filterVal, list)
+        this.downloadLoading = true;
+        import("@/vendor/Export2Excel").then((excel) => {
+          const tHeader = ["用户ID", "用户名", "手机号", "用户角色"];
+          const filterVal = ["id", "account", "mobile", "role"];
+          const list = this.multipleSelection;
+          const data = this.formatJson(filterVal, list);
           excel.export_json_to_excel({
             header: tHeader,
             data,
-            filename: this.filename
-          })
-          this.downloadLoading = false
-        })
+            filename: this.filename,
+          });
+          this.downloadLoading = false;
+        });
       } else {
         this.$message({
-          message: '请至少选一项数据',
-          type: 'warning'
-        })
+          message: "请至少选一项数据",
+          type: "warning",
+        });
       }
     },
     formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
-          return v[j]
-        }
-      }))
+      return jsonData.map((v) =>
+        filterVal.map((j) => {
+          if (j === "timestamp") {
+            return parseTime(v[j]);
+          } else {
+            return v[j];
+          }
+        })
+      );
     },
 
     // 监听 添加用户对话框的关闭事件
@@ -310,20 +331,17 @@ export default {
     // 获取用户列表
     getUserList: function (currentPage = 1) {
       let that = this;
-      this.$axios({
-        method: "get",
-        url: "/users",
-        params: {
-          id_order: true,
-          account_filter: this.searchInput,
-          limit: this.pageSize,
-          offset: this.pageSize * (currentPage - 1),
-        },
-      })
+      const params = {
+        id_order: true,
+        account_filter: this.searchInput,
+        limit: this.pageSize,
+        offset: this.pageSize * (currentPage - 1),
+      };
+      userListRequest(params)
         .then(function (response) {
           that.currentPage = currentPage;
-          that.userlist = response.data.list;
-          that.total = response.data.total;
+          that.userlist = response.list;
+          that.total = response.total;
         })
         .catch(function (error) {
           console.log(error);
@@ -339,12 +357,9 @@ export default {
     //获取某个用户的具体信息
     getUserInfo(region) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/users/" + region,
-      })
+      userInfoRequest(region)
         .then(function (response) {
-          that.userInfo = response.data;
+          that.userInfo = response;
         })
         .catch(function (error) {
           console.log(error);
@@ -371,16 +386,8 @@ export default {
         mobile: this.addUserForm.mobile,
         role: this.addUserForm.role,
       };
-      const myHeaders = {
-        "Content-Type": "application/json",
-      };
       let that = this;
-      this.$axios({
-        method: "post",
-        url: "/users",
-        headers: myHeaders,
-        data: JSON.stringify(data),
-      })
+      userRegisterRequest(data)
         .then(function (response) {
           //关闭对话框
           that.addDialogVisible = false;
@@ -420,16 +427,8 @@ export default {
         new_mobile: this.userInfo.mobile,
         new_role: this.userInfo.role,
       };
-      const myHeaders = {
-        "Content-Type": "application/json",
-      };
       let that = this;
-      this.$axios({
-        method: "put",
-        url: "/users/" + this.userInfo.id,
-        headers: myHeaders,
-        data: JSON.stringify(data),
-      })
+      userEditRequest(this.userInfo.id, data)
         .then(function (response) {
           //关闭对话框
           that.editDialogVisible = false;
@@ -451,18 +450,19 @@ export default {
     },
 
     // 逐个删除用户
-    deleteUser (id,account) {
-      this.$confirm("此操作将永久删除用户 【"+ account +"】 , 是否继续?", "提示", {
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
+    deleteUser(id, account) {
+      this.$confirm(
+        "此操作将永久删除用户 【" + account + "】 , 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "删除",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
         .then(() => {
           let that = this;
-          this.$axios({
-            method: "delete",
-            url: "/users/" + id,
-          })
+          userDeleteRequest(id)
             .then(function (response) {
               //重新获取用户列表
               that.getUserList(that.currentPage);
@@ -489,6 +489,7 @@ export default {
     },
     // 批量删除用户
     mulDeleteUser() {
+      // todo
       this.$confirm("此操作将永久删除所选中的用户, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -498,7 +499,7 @@ export default {
           let that = this;
           this.$axios({
             method: "delete",
-            url: "/proble/" ,
+            url: "/proble/",
           })
             .then(function (response) {
               //重新获取用户列表
@@ -523,7 +524,6 @@ export default {
             message: "已取消删除",
           });
         });
-
     },
     // 判断角色类型，返回对应文字
     roleFormtype(row, column, cellValue) {

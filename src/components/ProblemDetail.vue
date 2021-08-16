@@ -9,7 +9,7 @@
     <el-row :gutter="20">
       <el-col :span="12">
         <!-- 题目展示区域 -->
-        <el-card >
+        <el-card>
           <!-- 题目区域 -->
           <div>
             <div style="display: flex; justify-content: space-between">
@@ -111,6 +111,9 @@ import "codemirror/theme/idea.css"; // 白色
 import "codemirror/mode/python/python.js"; // python
 // import "codemirror/mode/clike/clike.js"; //java
 
+import { problemPublicInfoRequest } from "../request/problemRequest";
+import { submissionRequest } from "../request/submissonRequest";
+
 export default {
   name: "problemDetail",
   data() {
@@ -130,7 +133,7 @@ export default {
         lineWrapping: true, //代码折叠
         styleActiveLine: true, // 高亮选中行
         showCursorWhenSelecting: true,
-        autofocus:true,
+        autofocus: true,
         hintOptions: {
           completeSingle: true, // 当匹配只有一项的时候是否自动补全
         },
@@ -172,14 +175,11 @@ export default {
     // 获取题目详情
     getProblem: function (region) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/regions/set_main/" + region,
-      })
+      problemPublicInfoRequest(region)
         .then(function (response) {
-          console.log(response.data);
-          that.problem_info = response.data.info;
-          that.problem_contents = response.data.contents;
+          console.log(response);
+          that.problem_info = response.info;
+          that.problem_contents = response.contents;
         })
         .catch(function (error) {
           console.log(error);
@@ -191,23 +191,15 @@ export default {
     },
     // 提交代码
     submitCode: function (region) {
-      const myHeaders = {
-        "Content-Type": "application/json",
-        cache: "false",
-      };
       var that = this;
-      this.$axios({
-        method: "post",
-        url: "/regions/set_main/" + region + "/submission",
-        headers: myHeaders,
-        data: JSON.stringify({
-          src: this.code,
-          language: this.language,
-        }),
-      })
+      const data = {
+        src: this.code,
+        language: this.language,
+      };
+      submissionRequest("set_main", region, data)
         .then(function (response) {
           that.dialogVisible = true;
-          that.uuid = response.data;
+          that.uuid = response;
         })
         .catch(function (error) {
           console.log(error);

@@ -323,6 +323,7 @@
   </div>
 </template>
 <script>
+import { problemCreateRequest } from '../../request/problemRequest'
 export default {
   data() {
     return {
@@ -458,17 +459,8 @@ export default {
           test_case_count: 0,
         },
       };
-      const myHeaders = {
-        "Content-Type": "application/json",
-      };
-      console.log(data);
       let that = this;
-      this.$axios({
-        method: "post",
-        url: "/problems/create",
-        headers: myHeaders,
-        data: JSON.stringify(data),
-      })
+      problemCreateRequest(data)
         .then(function (response) {
           // 提示用户创建成功
           that.$message({

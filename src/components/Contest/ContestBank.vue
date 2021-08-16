@@ -27,10 +27,7 @@
         </el-col>
       </el-row>
       <!-- 列表区域 -->
-      <el-table
-        :data="contestlist"
-        style="margin-top: 20px"
-      >
+      <el-table :data="contestlist" style="margin-top: 20px">
         <el-table-column prop="region" label="域"> </el-table-column>
         <el-table-column prop="title" label="竞赛名称"></el-table-column>
         <el-table-column prop="start_time" label="开始时间">
@@ -62,7 +59,7 @@
             <el-button
               type="danger"
               size="small"
-              @click="deleteContest(scope.row.region,scope.row.title)"
+              @click="deleteContest(scope.row.region, scope.row.title)"
               >删除</el-button
             >
           </template>
@@ -263,6 +260,7 @@
 
 <script>
 import moment from "moment";
+import { contestListRequest, contestEditRequest, contestDeleteRequest } from "../../request/contestRequest";
 export default {
   data() {
     return {
@@ -303,19 +301,16 @@ export default {
     // 获取竞赛列表
     getContestList(currentPage = 1) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/contests",
-        params: {
-          title_filter: this.searchInput,
-          limit: this.pageSize,
-          offset: this.pageSize * (currentPage - 1),
-        },
-      })
+      const params = {
+        title_filter: this.searchInput,
+        limit: this.pageSize,
+        offset: this.pageSize * (currentPage - 1),
+      };
+      contestListRequest(params)
         .then(function (response) {
           that.currentPage = currentPage;
-          that.contestlist = response.data.list;
-          that.total = response.data.total;
+          that.contestlist = response.list;
+          that.total = response.total;
         })
         .catch(function (error) {
           console.log(error);
@@ -390,16 +385,8 @@ export default {
           },
         };
       }
-      const myHeaders = {
-        "Content-Type": "application/json",
-      };
       let that = this;
-      this.$axios({
-        method: "put",
-        url: "/contests/" + this.modify_region,
-        headers: myHeaders,
-        data: JSON.stringify(data),
-      })
+      contestEditRequest(this.modify_region, data)
         .then(function (response) {
           // 提示用户创建成功
           that.$message({
@@ -418,18 +405,19 @@ export default {
         });
     },
     // 删除竞赛
-    deleteContest(contestid,title) {
-      this.$confirm("此操作将永久删除竞赛 【"+ title +"】 , 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
+    deleteContest(contestid, title) {
+      this.$confirm(
+        "此操作将永久删除竞赛 【" + title + "】 , 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
         .then(() => {
           let that = this;
-          this.$axios({
-            method: "delete",
-            url: "/contests/" + contestid,
-          })
+          contestDeleteRequest(contestid)
             .then(function (response) {
               //重新获取竞赛列表
               that.getContestList();

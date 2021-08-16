@@ -45,10 +45,7 @@
       </el-row>
 
       <!-- 列表区域 -->
-      <el-table
-        :data="problemlist"
-        style="margin-top: 20px"
-      >
+      <el-table :data="problemlist" style="margin-top: 20px">
         <el-table-column prop="id" width="80" label="ID"> </el-table-column>
         <el-table-column prop="info.title" label="题目"> </el-table-column>
         <el-table-column prop="info.tags" label="标签">
@@ -488,17 +485,66 @@
           <span style="font-family: PingFang SC">样例</span>
         </div>
         <!-- 动态表单 -->
-        <el-form ref="createSampleFormRef" :hide-required-asterisk="true" :inline="true" :model="createSampleForm" label-position="left" style="margin-left: 10px; margin-top: 10px">
-          <div v-for="(item, index) in createSampleForm.dynamicItem" :key="index">
-            <el-form-item label="输入" :prop="'dynamicItem.' + index + '.input'" :rules="{required: true,message: '输入不能为空',trigger: 'blur'}">
-              <el-input class="inputWord" type="textarea" v-model="item.input" placeholder="请输入输入样例"></el-input>
+        <el-form
+          ref="createSampleFormRef"
+          :hide-required-asterisk="true"
+          :inline="true"
+          :model="createSampleForm"
+          label-position="left"
+          style="margin-left: 10px; margin-top: 10px"
+        >
+          <div
+            v-for="(item, index) in createSampleForm.dynamicItem"
+            :key="index"
+          >
+            <el-form-item
+              label="输入"
+              :prop="'dynamicItem.' + index + '.input'"
+              :rules="{
+                required: true,
+                message: '输入不能为空',
+                trigger: 'blur',
+              }"
+            >
+              <el-input
+                class="inputWord"
+                type="textarea"
+                v-model="item.input"
+                placeholder="请输入输入样例"
+              ></el-input>
             </el-form-item>
-            <el-form-item label="输出" :prop="'dynamicItem.' + index + '.output'" :rules="{ required: true, message: '输出不能为空',trigger: 'blur',}" class="marginLeft30">
-              <el-input type="textarea" class="inputWord" v-model="item.output" placeholder="请输入输出样例"></el-input>
+            <el-form-item
+              label="输出"
+              :prop="'dynamicItem.' + index + '.output'"
+              :rules="{
+                required: true,
+                message: '输出不能为空',
+                trigger: 'blur',
+              }"
+              class="marginLeft30"
+            >
+              <el-input
+                type="textarea"
+                class="inputWord"
+                v-model="item.output"
+                placeholder="请输入输出样例"
+              ></el-input>
             </el-form-item>
             <el-form-item class="marginLeft30">
-              <el-button plain v-if="index + 1 == createSampleForm.dynamicItem.length" @click="addSampleItem()" type="primary">增加</el-button>
-              <el-button plain v-if="index !== 0" @click="deleteSampleItem(item, index)" type="danger">删除</el-button>
+              <el-button
+                plain
+                v-if="index + 1 == createSampleForm.dynamicItem.length"
+                @click="addSampleItem()"
+                type="primary"
+                >增加</el-button
+              >
+              <el-button
+                plain
+                v-if="index !== 0"
+                @click="deleteSampleItem(item, index)"
+                type="danger"
+                >删除</el-button
+              >
             </el-form-item>
           </div>
         </el-form>
@@ -511,6 +557,13 @@
 </template>
 
 <script>
+import {
+  problemPublicInfoRequest,
+  problemPublicListRequest,
+  problemStatusChangeRequest,
+  problemEditRequest,
+  problemPublicDeleteRequest,
+} from "../../request/problemRequest";
 export default {
   data() {
     return {
@@ -648,21 +701,18 @@ export default {
     // 获取题目列表
     getProblemList: function (currentPage = 1) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/problems",
-        params: {
-          id_order: true,
-          title_filter: this.searchInput,
-          limit: this.pageSize,
-          offset: this.pageSize * (currentPage - 1),
-        },
-      })
+      const params = {
+        id_order: true,
+        title_filter: this.searchInput,
+        limit: this.pageSize,
+        offset: this.pageSize * (currentPage - 1),
+      };
+      problemPublicListRequest(params)
         .then(function (response) {
-          console.log(response.data);
+          console.log(response);
           that.currentPage = currentPage;
-          that.problemlist = response.data.list;
-          that.total = response.data.total;
+          that.problemlist = response.list;
+          that.total = response.total;
         })
         .catch(function (error) {
           console.log(error);
@@ -673,16 +723,8 @@ export default {
     problrmStatusChange(probleminfo) {
       console.log(probleminfo);
       const data = { target_state: probleminfo.is_released };
-      const myHeaders = {
-        "Content-Type": "application/json",
-      };
       var that = this;
-      this.$axios({
-        method: "post",
-        url: "/problems/" + probleminfo.id + "/change_release_state",
-        headers: myHeaders,
-        data: JSON.stringify(data),
-      })
+      problemStatusChangeRequest(probleminfo.id, data)
         .then(function (response) {
           that.$message({
             message: "修改成功！",
@@ -720,30 +762,26 @@ export default {
     // 展示修改题目弹窗
     showEditDialog(problemid) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/problems/" + problemid,
-      })
+      problemPublicInfoRequest(problemid)
         .then(function (response) {
-          console.log(response.data);
+          console.log(response);
           var setProblemInfo = new Promise(function (resolve, reject) {
             that.modify_id = problemid;
-            that.input_title = response.data.info.title;
-            that.input_tags = response.data.info.tags;
-            that.difficultyValue = response.data.info.difficulty;
-            that.input_description = response.data.contents.description;
-            if (response.data.contents.example_count != 0) {
-              that.createSampleForm.dynamicItem =
-                response.data.contents.examples;
+            that.input_title = response.info.title;
+            that.input_tags = response.info.tags;
+            that.difficultyValue = response.info.difficulty;
+            that.input_description = response.contents.description;
+            if (response.contents.example_count != 0) {
+              that.createSampleForm.dynamicItem = response.contents.examples;
             }
-            that.judgeValue = response.data.settings.is_spj;
+            that.judgeValue = response.settings.is_spj;
             that.high_performance_max_cpu_time =
-              response.data.settings.high_performance_max_cpu_time;
+              response.settings.high_performance_max_cpu_time;
             that.high_performance_max_memory =
-              response.data.settings.high_performance_max_memory;
-            that.other_max_cpu_time = response.data.settings.other_max_cpu_time;
-            that.other_max_memory = response.data.settings.other_max_memory;
-            that.opaque_output = response.data.settings.opaque_output;
+              response.settings.high_performance_max_memory;
+            that.other_max_cpu_time = response.settings.other_max_cpu_time;
+            that.other_max_memory = response.settings.other_max_memory;
+            that.opaque_output = response.settings.opaque_output;
             resolve();
           });
           setProblemInfo.then(function () {
@@ -788,17 +826,8 @@ export default {
           test_case_count: 0,
         },
       };
-      const myHeaders = {
-        "Content-Type": "application/json",
-      };
-      console.log(data);
       let that = this;
-      this.$axios({
-        method: "put",
-        url: "/problems/" + that.modify_id,
-        headers: myHeaders,
-        data: JSON.stringify(data),
-      })
+      problemEditRequest(that.modify_id, data)
         .then(function (response) {
           that.modifyProblemDialogVisible = false;
           that.getProblemList();
@@ -820,7 +849,7 @@ export default {
     // 删除题目
     deleteProblem(problemid, title) {
       this.$confirm(
-        "此操作将永久删除题集 【" + title + "】 , 是否继续?",
+        "此操作将永久删除题目 【" + title + "】 , 是否继续?",
         "提示",
         {
           confirmButtonText: "删除",
@@ -830,10 +859,7 @@ export default {
       )
         .then(() => {
           let that = this;
-          this.$axios({
-            method: "delete",
-            url: "/problems/" + problemid,
-          })
+          problemPublicDeleteRequest(problemid)
             .then(function (response) {
               //重新获取题目列表
               that.getProblemList();
@@ -911,7 +937,9 @@ export default {
   margin-top: 40px;
 }
 .inputWord {
-  width: 400px; font-family: PingFang SC; font-size: 14px
+  width: 400px;
+  font-family: PingFang SC;
+  font-size: 14px;
 }
 .marginLeft30 {
   margin-left: 30px;

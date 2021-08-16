@@ -7,20 +7,20 @@
           <img class="logoImage" src="../img/logo.svg" />
         </div>
         <div id="userCenter">
-        <el-dropdown @command="handleCommand">
-          <img class="user" src="../img/home/user.svg" />
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="user" v-if="isLogin"
-              >个人中心</el-dropdown-item
-            >
-            <el-dropdown-item command="login" v-if="isLogin === false"
-              >登录</el-dropdown-item
-            >
-            <el-dropdown-item command="logout" v-if="isLogin"
-              >退出</el-dropdown-item
-            >
-          </el-dropdown-menu>
-        </el-dropdown>
+          <el-dropdown @command="handleCommand">
+            <img class="user" src="../img/home/user.svg" />
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="user" v-if="isLogin"
+                >个人中心</el-dropdown-item
+              >
+              <el-dropdown-item command="login" v-if="isLogin === false"
+                >登录</el-dropdown-item
+              >
+              <el-dropdown-item command="logout" v-if="isLogin"
+                >退出</el-dropdown-item
+              >
+            </el-dropdown-menu>
+          </el-dropdown>
         </div>
       </el-header>
       <!-- 页面主体 -->
@@ -38,8 +38,8 @@
             "
             @click="toggleCollapse"
           >
-            <i v-if="isCollapse === false" class="el-icon-s-fold icon" ></i>
-            <i v-if="isCollapse === true" class="el-icon-s-unfold icon" ></i>
+            <i v-if="isCollapse === false" class="el-icon-s-fold icon"></i>
+            <i v-if="isCollapse === true" class="el-icon-s-unfold icon"></i>
           </div>
           <el-menu
             class="el-menu-vertical-demo"
@@ -65,12 +65,16 @@
             <!-- 提交状态（对外） -->
             <el-menu-item index="/statusList" id="submission">
               <i class="el-icon-s-order"></i>
-              <span slot="title" style="font-family: PingFang SC">提交状态</span>
+              <span slot="title" style="font-family: PingFang SC"
+                >提交状态</span
+              >
             </el-menu-item>
             <!-- 观看直播（对外） -->
             <el-menu-item index="/liveCard">
               <i class="el-icon-s-platform"></i>
-              <span slot="title" style="font-family: PingFang SC">观看直播</span>
+              <span slot="title" style="font-family: PingFang SC"
+                >观看直播</span
+              >
             </el-menu-item>
             <!-- 用户管理 -->
             <el-submenu
@@ -99,9 +103,7 @@
                 style="font-family: PingFang SC"
                 >题目列表</el-menu-item
               >
-              <el-menu-item
-                index="/problemSet"
-                style="font-family: PingFang SC"
+              <el-menu-item index="/problemSet" style="font-family: PingFang SC"
                 >题集列表</el-menu-item
               >
               <el-menu-item
@@ -130,8 +132,8 @@
                 >创建竞赛</el-menu-item
               >
             </el-submenu>
-             <!-- 直播管理 -->
-             <el-submenu
+            <!-- 直播管理 -->
+            <el-submenu
               index="4"
               v-if="userRole === 'sup' || userRole === 'admin'"
             >
@@ -181,7 +183,11 @@
   </div>
 </template>
 <script>
-
+import {
+  userCheckOnlineRequest,
+  userInfoRequest,
+  userLogoutRequest,
+} from "../request/userRequest";
 export default {
   data() {
     return {
@@ -197,21 +203,18 @@ export default {
       userRole: "",
     };
   },
- 
+
   created() {
     var that = this;
-    this.$axios({
-      method: "get",
-      url: "/users/me",
-    })
+    userCheckOnlineRequest()
       .then(function (response) {
-        if (response.data) {
+        if (response) {
           that.isLogin = true;
-          that.userId = response.data.id;
-          that.userRole = response.data.role;
-          window.localStorage.setItem('isLogin',true)
-          window.localStorage.setItem('id',response.data.id)
-          window.localStorage.setItem('role',response.data.role)
+          that.userId = response.id;
+          that.userRole = response.role;
+          window.localStorage.setItem("isLogin", true);
+          window.localStorage.setItem("id", response.id);
+          window.localStorage.setItem("role", response.role);
         }
       })
       .catch(function (error) {
@@ -220,7 +223,6 @@ export default {
       });
   },
   methods: {
-
     // 菜单栏的折叠与展开
     toggleCollapse() {
       this.isCollapse = !this.isCollapse;
@@ -229,13 +231,9 @@ export default {
     // 获取用户信息
     getUserInfo(region) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/users/" + region,
-      })
+      userInfoRequest(region)
         .then(function (response) {
-          console.log(response.data);
-          that.userInfo = response.data;
+          that.userInfo = response;
         })
         .catch(function (error) {
           console.log(error);
@@ -246,14 +244,11 @@ export default {
     handleCommand(command) {
       let that = this;
       if (command === "logout") {
-        this.$axios({
-          method: "post",
-          url: "/users/logout",
-        })
+        userLogoutRequest()
           .then(function () {
             window.localStorage.clear();
             that.$router.push("/home");
-            window.location.reload();  
+            window.location.reload();
             that.$message({
               message: "退出登陆成功！",
               type: "success",
@@ -322,11 +317,10 @@ export default {
   color: #3370ff;
 }
 .icon {
-  color: #86909C;
+  color: #86909c;
 }
 
 .logoImage {
   width: 300px;
 }
-
 </style>

@@ -35,9 +35,7 @@
               <span v-if="userInfo.role === 'sup'" class="infoWord"
                 >超级管理员</span
               >
-              <span v-if="userInfo.role === null" class="infoWord"
-                >普通用户</span
-              >
+              <span v-if="!userInfo.role" class="infoWord">普通用户</span>
               <span v-if="userInfo.role === 'admin'" class="infoWord"
                 >管理员</span
               >
@@ -240,6 +238,14 @@
 <script>
 import moment from "moment";
 import echarts from "../utils/initEcharts";
+import {
+  userCheckOnlineRequest,
+  userEditRequest,
+  userInfoRequest,
+  userSubmitDiffcultyInfoRequest,
+  userSubmitNumberInfoRequest,
+  userSubmitListRequest,
+} from "../request/userRequest";
 require("echarts/theme/macarons"); //引入饼图主题
 export default {
   data() {
@@ -260,13 +266,10 @@ export default {
   created() {
     this.myDate = new Date();
     var that = this;
-    this.$axios({
-      method: "get",
-      url: "/users/me",
-    })
+    userCheckOnlineRequest()
       .then(function (response) {
-        if (response.data) {
-          that.userId = response.data.id;
+        if (response) {
+          that.userId = response.id;
           that.getUserInfo();
           that.getDifficultyInfo();
           that.getSubmissionsList();
@@ -282,13 +285,9 @@ export default {
     // 获取用户信息
     getUserInfo() {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/users/" + this.userId,
-      })
+      userInfoRequest(this.userId)
         .then(function (response) {
-          console.log(response.data)
-          that.userInfo = response.data;
+          that.userInfo = response;
         })
         .catch(function (error) {
           console.log(error);
@@ -298,12 +297,9 @@ export default {
     // 获取题目难度信息
     getDifficultyInfo() {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/users/" + that.userId + "/submissions_count",
-      })
+      userSubmitDiffcultyInfoRequest(that.userId)
         .then(function (response) {
-          that.submitCounts = response.data;
+          that.submitCounts = response;
           that.$nextTick(function () {
             that.getDifficultyPie();
             that.getDifficultyColumn();
@@ -317,12 +313,9 @@ export default {
     // 获取题目提交次数统计
     getSubmissionsTime() {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/users/" + this.userId + "/submissions_time",
-      })
+      userSubmitNumberInfoRequest(this.userId)
         .then(function (response) {
-          that.submissionsTime = response.data;
+          that.submissionsTime = response;
         })
         .catch(function (error) {
           console.log(error);
@@ -336,16 +329,8 @@ export default {
         new_mobile: this.userInfo.mobile,
         new_password: this.userInfo.password,
       };
-      const myHeaders = {
-        "Content-Type": "application/json",
-      };
       let that = this;
-      this.$axios({
-        method: "put",
-        url: "/users/" + this.userInfo.id,
-        headers: myHeaders,
-        data: JSON.stringify(data),
-      })
+      userEditRequest(this.userInfo.id, data)
         .then(function (response) {
           //关闭对话框
           that.userDialogVisible = false;
@@ -367,19 +352,16 @@ export default {
     // 个人提交记录
     getSubmissionsList(currentPage = 1) {
       var that = this;
-      this.$axios({
-        method: "get",
-        url: "/submissions",
-        params: {
-          user_id_filter: this.userId,
-          limit: this.pageSize,
-          offset: this.pageSize * (currentPage - 1),
-        },
-      })
+      const params = {
+        user_id_filter: this.userId,
+        limit: this.pageSize,
+        offset: this.pageSize * (currentPage - 1),
+      };
+      userSubmitListRequest(params)
         .then(function (response) {
           that.currentPage = currentPage;
-          that.total = response.data.total;
-          that.submissionslist = response.data.list;
+          that.total = response.total;
+          that.submissionslist = response.list;
         })
         .catch(function (error) {
           console.log(error);
