@@ -35,7 +35,7 @@
               <span v-if="userInfo.role === 'sup'" class="infoWord"
                 >超级管理员</span
               >
-              <span v-if="userInfo.role === null" class="infoWord"
+              <span v-if="userInfo.role === ''" class="infoWord"
                 >普通用户</span
               >
               <span v-if="userInfo.role === 'admin'" class="infoWord"
@@ -76,7 +76,7 @@
               <div class="TopRightSmallWord">通过率</div>
               <div class="TopRightContext">
                 <img src="../img/Subtract3.svg" />
-                <span class="TopRightBigWord">
+                <span v-if="submitCounts.total_submit_times !== 0" class="TopRightBigWord">
                   {{
                     (
                       (submitCounts.total_accept_times /
@@ -85,6 +85,9 @@
                     ).toFixed(2)
                   }}%</span
                 >
+                <span v-if="submitCounts.total_submit_times === 0" class="TopRightBigWord">
+                 0%
+                </span>
               </div>
             </div>
           </div>
