@@ -111,8 +111,8 @@ import "codemirror/theme/idea.css"; // 白色
 import "codemirror/mode/python/python.js"; // python
 // import "codemirror/mode/clike/clike.js"; //java
 
-import { problemPublicInfoRequest } from "../request/problemRequest";
-import { submissionRequest } from "../request/submissonRequest";
+import { problemPublicInfoRequest } from "../../request/problemRequest";
+import { submissionRequest } from "../../request/submissonRequest";
 
 export default {
   name: "problemDetail",

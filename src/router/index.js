@@ -1,75 +1,76 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-// import login from '../components/login.vue'
-const login = () => import(/* webpackChunkName: "login_home_welcome" */ '../components/login.vue')
-// import Welcome from '../components/Welcome.vue'
-const Welcome = () => import(/* webpackChunkName: "login_home_welcome" */ '../components/Welcome.vue')
 // import Home from '../components/Home.vue'
 const Home = () => import(/* webpackChunkName: "login_home_welcome" */ '../components/Home.vue')
+// import Login from '../pages/Login.vue'
+const Login = () => import(/* webpackChunkName: "login_home_welcome" */ '../pages/Login.vue')
+// import Welcome from '../pages/Welcome.vue'
+const Welcome = () => import(/* webpackChunkName: "login_home_welcome" */ '../pages/Welcome.vue')
+
 
 // 内部【标程管理】
-// import ProblemDetail from '../components/Sample/ProblemDetail.vue'
-const ProblemDetail = () => import(/* webpackChunkName: "Sample" */ '../components/Sample/ProblemDetail.vue')
-// import SampleResultDetail from '../components/Sample/SampleResultDetail.vue'
-const SampleResultDetail = () => import(/* webpackChunkName: "Sample" */ '../components/Sample/SampleResultDetail.vue')
-// import SampleList from '../components/Sample/SampleList.vue'
-const SampleList = () => import(/* webpackChunkName: "Sample" */ '../components/Sample/SampleList.vue')
+// import ProblemDetail from '../components/sample/ProblemDetail.vue'
+const ProblemDetail = () => import(/* webpackChunkName: "Sample" */ '../components/sample/ProblemDetail.vue')
+// import SampleResultDetail from '../components/sample/SampleResultDetail.vue'
+const SampleResultDetail = () => import(/* webpackChunkName: "Sample" */ '../components/sample/SampleResultDetail.vue')
+// import SampleList from '../components/sample/SampleList.vue'
+const SampleList = () => import(/* webpackChunkName: "Sample" */ '../components/sample/SampleList.vue')
 
 // 内部【题库管理】
-// import QuestionBank from '../components/Problem/QuestionBank.vue'
-const QuestionBank = () => import(/* webpackChunkName: "ProblemManagement" */ '../components/Problem/QuestionBank.vue')
-// import ProblemSet from '../components/Problem/ProblemSet.vue'
-const ProblemSet = () => import(/* webpackChunkName: "ProblemManagement" */ '../components/Problem/ProblemSet.vue')
-// import ProblemSetDetailList from '../components/Problem/ProblemSetDetailList.vue'
-const ProblemSetDetailList = () => import(/* webpackChunkName: "ProblemManagement" */ '../components/Problem/ProblemSetDetailList.vue')
-// import CreateProblem from '../components/Problem/CreateProblem.vue'
-const CreateProblem = () => import(/* webpackChunkName: "ProblemManagement" */ '../components/Problem/CreateProblem.vue')
+// import QuestionBank from '../pages/problemManagement/QuestionBank.vue'
+const QuestionBank = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/QuestionBank.vue')
+// import ProblemSet from '../pages/problemManagement/ProblemSet.vue'
+const ProblemSet = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/ProblemSet.vue')
+// import ProblemSetDetailList from '../pages/problemManagement/ProblemSetDetailList.vue'
+const ProblemSetDetailList = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/ProblemSetDetailList.vue')
+// import CreateProblem from '../pages/problemManagement/CreateProblem.vue'
+const CreateProblem = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/CreateProblem.vue')
 
 // 内部【用户管理】
-// import UserList from '../components/User/UserList.vue'
-const UserList = () => import(/* webpackChunkName: "UserManagement" */ '../components/User/UserList.vue')
+// import UserList from '../pages/User/UserList.vue'
+const UserList = () => import(/* webpackChunkName: "UserManagement" */ '../pages/userManagement/UserList.vue')
 
 // 内部【竞赛管理】
-// import ContestBank from '../components/Contest/ContestBank.vue'
-const ContestBank = () => import(/* webpackChunkName: "ContestManagement" */ '../components/Contest/ContestBank.vue')
-// import ContestDetailList from '../components/Contest/ContestDetailList.vue'
-const ContestDetailList = () => import(/* webpackChunkName: "ContestManagement" */ '../components/Contest/ContestDetailList.vue')
-// import CreateContest from '../components/Contest/CreateContest.vue'
-const CreateContest = () => import(/* webpackChunkName: "ContestManagement" */ '../components/Contest/CreateContest.vue')
+// import ContestBank from '../pages/contestManagement/ContestBank.vue'
+const ContestBank = () => import(/* webpackChunkName: "ContestManagement" */ '../pages/contestManagement/ContestBank.vue')
+// import ContestDetailList from '../pages/contestManagement/ContestDetailList.vue'
+const ContestDetailList = () => import(/* webpackChunkName: "ContestManagement" */ '../pages/contestManagement/ContestDetailList.vue')
+// import CreateContest from '../pages/contestManagement/CreateContest.vue'
+const CreateContest = () => import(/* webpackChunkName: "ContestManagement" */ '../pages/contestManagement/CreateContest.vue')
 
 // 内部【直播管理】
-// import Live from '../components/Live.vue'
-const Live = () => import(/* webpackChunkName: "LiveManagement" */ '../components/Live.vue')
+// import Live from '../pages/Live.vue'
+const Live = () => import(/* webpackChunkName: "LiveManagement" */ '../pages/liveManagement/Live.vue')
 
 // 外部【题集】
-// import Practice from '../components/Practice.vue'
-const Practice = () => import(/* webpackChunkName: "Problem" */ '../components/Practice.vue')
-// import ProblemSetDetail from '../components/ProblemDetail.vue'
-const ProblemSetDetail = () => import(/* webpackChunkName: "Problem" */ '../components/ProblemDetail.vue')
+// import Practice from '../pages/Practice.vue'
+const Practice = () => import(/* webpackChunkName: "Problem" */ '../pages/problem/Practice.vue')
+// import ProblemSetDetail from '../pages/ProblemDetail.vue'
+const ProblemSetDetail = () => import(/* webpackChunkName: "Problem" */ '../pages/problem/ProblemDetail.vue')
 
 // 外部【竞赛】
-// import Contest from '../components/Contest.vue'
-const Contest = () => import(/* webpackChunkName: "Contest" */ '../components/Contest.vue')
-// import ContestDetail from '../components/ContestDetail.vue'
-const ContestDetail = () => import(/* webpackChunkName: "Contest" */ '../components/ContestDetail.vue')
-// import ContestProblemDetail from '../components/ContestProblemDetail.vue'
-const ContestProblemDetail = () => import(/* webpackChunkName: "Contest" */ '../components/ContestProblemDetail.vue')
+// import Contest from '../pages/contest/Contest.vue'
+const Contest = () => import(/* webpackChunkName: "Contest" */ '../pages/contest/Contest.vue')
+// import ContestDetail from '../pages/contest/ContestDetail.vue'
+const ContestDetail = () => import(/* webpackChunkName: "Contest" */ '../pages/contest/ContestDetail.vue')
+// import ContestProblemDetail from '../pages/contest/ContestProblemDetail.vue'
+const ContestProblemDetail = () => import(/* webpackChunkName: "Contest" */ '../pages/contest/ContestProblemDetail.vue')
 
 // 外部【提交状态】
-// import StatusList from '../components/StatusList.vue'
-const StatusList = () => import(/* webpackChunkName: "Submission" */ '../components/StatusList.vue')
+// import StatusList from '../pages/StatusList.vue'
+const StatusList = () => import(/* webpackChunkName: "Submission" */ '../pages/StatusList.vue')
 // import SubmissionDetail from '../components/SubmissionDetail.vue'
 const SubmissionDetail = () => import(/* webpackChunkName: "Submission" */ '../components/SubmissionDetail.vue')
 
 // 外部【观看直播】
-// import PlayerLive from '../components/PlayerLive.vue'
-const LiveCard = () => import(/* webpackChunkName: "Live" */ '../components/LiveCard.vue')
-const PlayerLive = () => import(/* webpackChunkName: "Live" */ '../components/PlayerLive.vue')
+// import PlayerLive from '../pages/PlayerLive.vue'
+const LiveCard = () => import(/* webpackChunkName: "Live" */ '../pages/live/LiveCard.vue')
+const PlayerLive = () => import(/* webpackChunkName: "Live" */ '../pages/live/PlayerLive.vue')
 
 // 外部【个人中心】
-// import UserCenter from '../components/UserCenter.vue'
-const UserCenter = () => import(/* webpackChunkName: "UserCenter" */ '../components/UserCenter.vue')
+// import UserCenter from '../pages/UserCenter.vue'
+const UserCenter = () => import(/* webpackChunkName: "UserCenter" */ '../pages/UserCenter.vue')
 
 
 
@@ -83,7 +84,7 @@ const router = new VueRouter({
   routes: [
     /* 路由重定向 ，用户访问根路径就自动方位登录 */
     { path: '/', redirect: '/home' }, /* 重定向至home */
-    { path: '/login', component: login },
+    { path: '/login', component: Login },
     {
       path: '/home',
       component: Home,

@@ -127,7 +127,7 @@
 <script>
 import { userLoginRequest, userRegisterRequest } from "../request/userRequest";
 export default {
-  name: "login",
+  name: "Login",
   data() {
     // 自定义邮箱规则
     var checkEmail = (rule, value, callback) => {

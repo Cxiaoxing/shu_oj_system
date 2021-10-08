@@ -18,7 +18,7 @@
         </div>
       </div>
       <div v-else>
-        <img class="empty-img" src="../img/live/live-empty.png" />
+        <img class="empty-img" src="../../img/live/live-empty.png" />
         <p class="empty-text">
           当前没有直播,请稍后再来~
         </p>

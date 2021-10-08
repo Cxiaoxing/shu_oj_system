@@ -121,8 +121,8 @@
 </template>
 
 <script>
-import { problemPrivateListRequest } from "../request/problemRequest";
-import { userCheckOnlineRequest } from "../request/userRequest";
+import { problemPrivateListRequest } from "../../request/problemRequest";
+import { userCheckOnlineRequest } from "../../request/userRequest";
 export default {
   data() {
     return {

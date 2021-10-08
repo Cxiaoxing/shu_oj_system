@@ -71,7 +71,7 @@
                 <div>
                   <div class="rankItem margin-top-10">
                     <div class="flex-row" v-if="contest.start_time !== null">
-                      <img class="itemIcon" src="../img/time.svg" />
+                      <img class="itemIcon" src="../../img/time.svg" />
                       <div class="itemContentTimeTitle">开始:</div>
                       <div class="itemContentTime">
                         {{ formatTime(contest.start_time) }}
@@ -81,7 +81,7 @@
                       v-if="contest.end_time !== null"
                       class="flex-row margin-left-30"
                     >
-                      <img class="itemIcon" src="../img/time.svg" />
+                      <img class="itemIcon" src="../../img/time.svg" />
                       <div class="itemContentTimeTitle">结束:</div>
                       <div class="itemContentTime">
                         {{ formatTime(contest.end_time) }}
@@ -92,7 +92,7 @@
                     v-if="contest.seal_time !== null"
                     class="flex-row margin-top-5"
                   >
-                    <img class="itemIcon" src="../img/time.svg" />
+                    <img class="itemIcon" src="../../img/time.svg" />
                     <div class="itemContentTimeTitle">封榜:</div>
                     <div class="itemContentTime">
                       {{ formatTime(contest.seal_time) }}
@@ -125,13 +125,13 @@
           <el-card class="rightCard">
             <div class="rightCardTop">
               <div class="rightCardTop">
-                <img class="rankIcon" src="../img/trophy.svg" />
+                <img class="rankIcon" src="../../img/trophy.svg" />
                 <span class="contestTitle" style="margin-left: 10px"
                   >排行榜</span
                 >
               </div>
               <div class="flex-row">
-                <img class="itemIcon" src="../img/time.svg" />
+                <img class="itemIcon" src="../../img/time.svg" />
                 <span class="itemContentTimeTitle">更新: </span>
                 <span class="itemContentTime">{{
                   formatTime(contest.start_time)
@@ -142,11 +142,11 @@
               v-if="ranklist.length === 1 && ACLPermissions === true"
               class="rightCardBody flex-col"
             >
-              <img class="noContextPic" src="../img/nocontext.svg" />
+              <img class="noContextPic" src="../../img/nocontext.svg" />
               <span class="itemContent margin-top-10">暂无排名</span>
             </div>
             <div v-if="ACLPermissions === false" class="rightCardBody flex-col">
-              <img class="noContextPic" src="../img/noPermissions.svg" />
+              <img class="noContextPic" src="../../img/noPermissions.svg" />
               <span class="itemContent margin-top-10"
                 >未报名，暂无查看权限</span
               >
@@ -180,14 +180,14 @@
                 v-if="ACLPermissions === true"
                 class="rightCardBody flex-col"
               >
-                <img class="noContextPic" src="../img/nocontext.svg" />
+                <img class="noContextPic" src="../../img/nocontext.svg" />
                 <span class="itemContent margin-top-10">暂无数据</span>
               </div>
               <div
                 v-if="ACLPermissions === false"
                 class="rightCardBody flex-col"
               >
-                <img class="noContextPic" src="../img/noPermissions.svg" />
+                <img class="noContextPic" src="../../img/noPermissions.svg" />
                 <span class="itemContent margin-top-10"
                   >未报名，暂无查看权限</span
                 >
@@ -243,7 +243,7 @@
                 v-if="ACLPermissions === false"
                 class="rightCardBody flex-col"
               >
-                <img class="noContextPic" src="../img/noPermissions.svg" />
+                <img class="noContextPic" src="../../img/noPermissions.svg" />
                 <span class="itemContent margin-top-10"
                   >未报名，暂无查看权限</span
                 >
@@ -302,7 +302,7 @@
           <el-table :data="statelist" @row-click="handleClickSubmission">
             <template slot="empty">
               <div v-if="submissionTotal === 0" class="rightCardBody flex-col">
-                <img class="noContextPic" src="../img/nocontext.svg" />
+                <img class="noContextPic" src="../../img/nocontext.svg" />
                 <span class="itemContent margin-top-10">暂无数据</span>
               </div>
             </template>
@@ -409,8 +409,8 @@ import {
   contestRankRequest,
   contestRegisterRequest,
   contestProblemListRequest
-} from "../request/contestRequest";
-import { submissionListRequest } from "../request/submissonRequest";
+} from "../../request/contestRequest";
+import { submissionListRequest } from "../../request/submissonRequest";
 export default {
   data() {
     return {

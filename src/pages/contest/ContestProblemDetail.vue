@@ -129,8 +129,8 @@ import "codemirror/theme/idea.css"; // 白色
 // 代码高亮
 import "codemirror/mode/python/python.js"; // python
 // import "codemirror/mode/clike/clike.js"; //java
-import { problemPrivateInfoRequest } from "../request/problemRequest";
-import { submissionRequest } from "../request/submissonRequest";
+import { problemPrivateInfoRequest } from "../../request/problemRequest";
+import { submissionRequest } from "../../request/submissonRequest";
 export default {
   name: "problemDetail",
   data() {

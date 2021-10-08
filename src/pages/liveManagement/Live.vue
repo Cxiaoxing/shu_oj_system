@@ -11,23 +11,23 @@
             v-if="isStartCamera"
             @click="startCamera"
           >
-            <img class="pusher-icon" src="../img/live/mutevideo.svg" />
+            <img class="pusher-icon" src="../../img/live/mutevideo.svg" />
           </div>
           <div class="pusher-mic cursor" v-else @click="stopCamera">
-            <img class="pusher-icon" src="../img/live/video.svg" />
+            <img class="pusher-icon" src="../../img/live/video.svg" />
           </div>
         </div>
         <div>
           <div class="pusher-mic cursor" v-if="isMute" @click="startMicrophone">
-            <img class="pusher-icon" src="../img/live/mutevoice.svg" />
+            <img class="pusher-icon" src="../../img/live/mutevoice.svg" />
           </div>
           <div class="pusher-mic cursor" v-else @click="stopMicrophone">
-            <img class="pusher-icon" src="../img/live/voice.svg" />
+            <img class="pusher-icon" src="../../img/live/voice.svg" />
           </div>
         </div>
         <div>
           <div class="pusher-mic cursor" @click="endLive">
-            <img class="pusher-icon" src="../img/live/endlive.svg" />
+            <img class="pusher-icon" src="../../img/live/endlive.svg" />
           </div>
         </div>
       </div>
