@@ -21,7 +21,7 @@
       <el-divider></el-divider>
       <el-upload
         ref="upload"
-        action="http://115.29.177.136:8080/problems"
+        :action="BASE_URL + '/problems'"
         accept=".zip"
         :show-file-list="true"
         :file-list="fileList"
@@ -324,9 +324,11 @@
 </template>
 <script>
 import { problemCreateRequest } from '../../request/problemRequest'
+import { BASE_URL } from '../../utils/utils'
 export default {
   data() {
     return {
+      BASE_URL: BASE_URL,
       // 上传的文件列表
       fileList: [],
       problemList: [],

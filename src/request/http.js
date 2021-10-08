@@ -1,9 +1,10 @@
 import axios from 'axios'; // 引入axios
 import QS from 'qs'; // 引入qs模块，用来序列化post类型的数据
+import { BASE_URL } from '../utils/utils';
 // 1. 根据环境配置默认请求地址
 if (process.env.NODE_ENV == 'development') { axios.defaults.baseURL = '/api'; }
-else if (process.env.NODE_ENV == 'debug') { axios.defaults.baseURL = 'http://111.229.161.159:8000'; }
-else if (process.env.NODE_ENV == 'production') { axios.defaults.baseURL = 'http://111.229.161.159:8000'; }
+else if (process.env.NODE_ENV == 'debug') { axios.defaults.baseURL = BASE_URL; }
+else if (process.env.NODE_ENV == 'production') { axios.defaults.baseURL = BASE_URL; }
 // 2. 设置请求超时
 axios.defaults.timeout = 10000
 // 3. 自动携带cookie
