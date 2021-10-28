@@ -1,6 +1,5 @@
 import { _get, _post, _put, _delete } from './http.js'
 
-// todo, 改api
 export function announceCreateRequest(data) {
     return _post('/announcements/create', data)
 }

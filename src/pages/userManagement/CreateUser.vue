@@ -7,7 +7,7 @@
       <el-breadcrumb-item>添加用户</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡片视图区域，展示批量导入入口 -->
-    <el-card class="firstCard">
+    <el-card class="firstCard" v-if="false">
       <div
         style="
           font-family: PingFang SC;
@@ -19,7 +19,7 @@
         批量添加用户
       </div>
       <el-divider></el-divider>
-      <!-- todo: 用户api，action="BASE_URL + '/problems'" -->
+      <!-- todo: 改接口，展现 -->
       <el-upload
         ref="upload"
         action="http://111.229.161.159:8000/users"

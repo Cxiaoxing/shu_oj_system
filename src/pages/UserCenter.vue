@@ -568,7 +568,7 @@ export default {
   .userImage {
     // width: 125px;
     // height: 125px;
-    font-size: 125px; //todo: 删除假数据
+    font-size: 125px; //todo: 上传头像，删除假数据
     border-radius: 50%;
     overflow: hidden;
   }

@@ -1,5 +1,5 @@
 import axios from 'axios'; // 引入axios
-import { BASE_URL } from "@/assets/config";  // todo
+import { BASE_URL } from "@/assets/config";
 // 1. 根据环境配置默认请求地址
 if (process.env.NODE_ENV == 'development') { axios.defaults.baseURL = '/api'; }
 else if (process.env.NODE_ENV == 'debug') { axios.defaults.baseURL = BASE_URL; }

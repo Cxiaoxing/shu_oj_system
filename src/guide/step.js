@@ -12,7 +12,8 @@ const steps = [
           title: '用户中心',
           description: '这里可以登录/登出，还可以进入个人中心',
           position: 'left'
-        }
+        },
+        stageBackground: '#a581a0',
     },
     {
         element: '#problemSet',

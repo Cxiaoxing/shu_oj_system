@@ -10,11 +10,10 @@
       <div class="header">
         <!-- 搜索竞赛 -->
         <el-row>
-          <el-col :span="5">
+          <el-col :span="10">
             <el-input
               placeholder="请输入竞赛名称"
               v-model="searchInput"
-              size="medium"
               @keyup.enter.native="getContestList()"
             >
               <el-button

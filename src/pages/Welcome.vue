@@ -2,11 +2,8 @@
   <div>
     <el-carousel :interval="4000" type="card" height="200px">
       <el-carousel-item v-for="item in imgList" :key="item">
-        <img
-          :src="item.src"
-          style="width: 100%"
-          @click="jumpToAnnounceDetail(item)"
-        />
+        <img :src="item.src" style="width: 100%" />
+        <!-- todo: 上传图片公告，点击跳转 @click="jumpToAnnounceDetail(item)" -->
       </el-carousel-item>
     </el-carousel>
     <el-card style="margin-top: 10px">
@@ -49,29 +46,8 @@ export default {
       // 公告列表
       currentPage: 1,
       pageSize: 4,
-      total: 19, // todo: 删除假数据
-      announceList: [
-        {
-          id: "1",
-          title: "标题题题题题题题1111",
-          release_time: "2021-10-24T17:23:11",
-        },
-        {
-          id: "2",
-          title: "标题题题题题题题2222",
-          release_time: "2021-10-24T17:23:11",
-        },
-        {
-          id: "3",
-          title: "标题题题题题题题3333",
-          release_time: "2021-10-24T17:23:11",
-        },
-        {
-          id: "4",
-          title: "标题题题题题题题44444",
-          release_time: "2021-10-24T17:23:11",
-        },
-      ],
+      total: null,
+      announceList: [],
       imgList: [
         {
           id: "1",
@@ -93,7 +69,7 @@ export default {
     this.getAnnounceList();
   },
   mounted() {
-    this.driver = new Driver();
+    this.driver = new Driver({});
   },
   methods: {
     guide() {

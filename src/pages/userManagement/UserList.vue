@@ -485,7 +485,7 @@ export default {
     },
     // 批量删除用户
     mulDeleteUser() {
-      // todo
+      // todo: 批量删除用户功能
       this.$confirm("此操作将永久删除所选中的用户, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
