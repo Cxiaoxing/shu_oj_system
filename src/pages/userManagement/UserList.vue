@@ -190,7 +190,7 @@ import {
   userRegisterRequest,
   userEditRequest,
   userDeleteRequest,
-} from "../../request/userRequest";
+} from "@/request/userRequest";
 export default {
   data() {
     // 自定义邮箱规则
@@ -206,7 +206,7 @@ export default {
     var checkMobile = (rule, value, callback) => {
       const regMobile =
         /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
-      if (regMobile.test(value)) {
+      if (!value || regMobile.test(value)) {
         return callback();
       }
       // 返回一个错误提示
@@ -249,11 +249,7 @@ export default {
       addUserFormRules: {
         account: [{ required: true, message: "请输入账号", trigger: "blur" }],
         password: [{ required: true, message: "请输入密码", trigger: "blur" }],
-        mobile: [
-          { required: false, message: "请输入手机号", trigger: "blur" },
-          { validator: checkMobile, trigger: "blur" },
-        ],
-        role: [{ required: false, message: "请输入用户角色", trigger: "blur" }],
+        mobile: [{ validator: checkMobile, trigger: "blur" }],
       },
       // 搜索输入内容
       searchInput: "",

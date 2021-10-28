@@ -4,7 +4,7 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>题库管理</el-breadcrumb-item>
-      <el-breadcrumb-item :to="{ path: '/questionBank' }"
+      <el-breadcrumb-item :to="{ path: '/problemManage/list' }"
         >题目列表</el-breadcrumb-item
       >
       <el-breadcrumb-item>{{ problem_info.title }}</el-breadcrumb-item>
@@ -94,16 +94,6 @@
         </el-card>
       </el-col>
     </el-row>
-    <!-- 提交结束后引导查看提交详情弹窗 -->
-    <el-dialog title="" :visible.sync="dialogVisible" width="30%">
-      <span>提交成功！</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="goProblemResult()"
-          >查看详情</el-button
-        >
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -118,8 +108,8 @@ import "codemirror/theme/elegant.css"; // 白色
 import "codemirror/theme/idea.css"; // 白色
 // 代码高亮
 import "codemirror/mode/python/python.js"; // python
-import { sampleRequest } from "../../request/sampleRequest";
-import { problemPublicInfoRequest } from '../../request/problemRequest';
+import { sampleRequest } from "@/request/sampleRequest";
+import { problemPublicInfoRequest } from "@/request/problemRequest";
 // import "codemirror/mode/clike/clike.js"; //java
 
 export default {
@@ -128,10 +118,8 @@ export default {
     return {
       id: 0, //接受前一个页面传来的id值
       region: "",
-      uuid: "",
       problem_info: {}, //题目基础信息
       problem_contents: {}, //题目描述
-      dialogVisible: false, //控制查看题目详情弹窗
       code: "\n\n\n\n\n\n", // 代码编辑器绑定的值
       // 代码编辑器默认配置
       options: {
@@ -206,8 +194,14 @@ export default {
       };
       sampleRequest(data)
         .then(function (response) {
-          that.dialogVisible = true;
-          that.uuid = response;
+          that.$confirm("提交成功", {
+            confirmButtonText: "查看详情",
+            cancelButtonText: "知道了",
+            type: "success",
+          })
+            .then(() => {
+              that.$router.push({ name: "sampleResultDetail", params: { uuid: response } });
+            })
         })
         .catch(function (error) {
           console.log(error);
@@ -223,13 +217,6 @@ export default {
       let id = this.id;
       that.$router.push({ name: "sampleList", params: { id: id } });
     },
-
-    // 跳转至题目结果详情
-    goProblemResult() {
-      let that = this;
-      let uuid = that.uuid;
-      that.$router.push({ name: "sampleResultDetail", params: { uuid: uuid } });
-    },
   },
   components: {
     codemirror,
@@ -237,7 +224,7 @@ export default {
 };
 </script>
 
-<style lang="less" >
+<style lang="scss" >
 .problemTitle {
   font-family: PingFang SC;
   font-size: 30px;

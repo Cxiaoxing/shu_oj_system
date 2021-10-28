@@ -55,7 +55,7 @@
         >
           {{ problemtitle }}
         </div>
-        <div v-if="hasPermission == true">
+        <div>
           <!-- 状态显示 -->
           <div>
             <span
@@ -103,33 +103,35 @@
         </div>
       </div>
       <el-divider></el-divider>
-      <!-- 无权查看完成判题 -->
-      <div class="noContextBlock" v-if="hasPermission == false">
-        <div>
-          <img class="noContextPic" src="../img/nocontext.svg" />
-        </div>
-        <div style="font-size: 14px">无权查看</div>
-      </div>
       <!-- 暂未完成判题 -->
-      <div
-        class="noContextBlock"
-        v-if="state != 'Finished' && hasPermission == true"
-      >
+      <div class="noContextBlock" v-if="state != 'Finished'">
         <div>
-          <img class="noContextPic" src="../img/nocontext.svg" />
+          <img class="noContextPic" src="@/assets/img/nocontext.svg" />
         </div>
         <div style="font-size: 14px">暂未完成判题，请稍后查看</div>
       </div>
+      <!-- 已完成判题，但比赛期间不能查看提交详情 -->
+      <div
+        class="noContextBlock"
+        v-if="state == 'Finished' && contestRunning === true"
+      >
+        <div>
+          <img class="noContextPic" src="@/assets/img/nocontext.svg" />
+        </div>
+        <div style="font-size: 14px">比赛期间不能查看提交详情</div>
+      </div>
       <!-- 已完成判题，编译错误，展示编译错误信息 -->
-      <div v-if="state == 'Finished' && err !== null">
+      <div
+        v-if="state == 'Finished' && err !== null && contestRunning === false"
+      >
         <div style="color: #f54a45">错误原因：</div>
         <div style="font-size: 14px; margin-top: 5px">{{ error_reason }}</div>
       </div>
-
       <!-- 已完成判题&编译正确，展示测试点信息 -->
-      <div v-if="state == 'Finished' && err === null">
+      <div
+        v-if="state == 'Finished' && err === null && contestRunning === false"
+      >
         <div style="font-size: 16px; font-weight: 500">测试点详情</div>
-
         <div
           v-for="(testCase, index) in testCase"
           :index="index + ''"
@@ -141,12 +143,12 @@
               <img
                 v-if="testCase.result === 'SUCCESS'"
                 class="timeLineImage"
-                src="../img/right.svg"
+                src="@/assets/img/right.svg"
               />
               <img
                 v-if="testCase.result !== 'SUCCESS'"
                 class="timeLineImage"
-                src="../img/wrong.svg"
+                src="@/assets/img/wrong.svg"
               />
             </div>
             <div class="timeLineLine"></div>
@@ -172,10 +174,7 @@
       </div>
     </el-card>
     <!-- 代码展示区域 -->
-    <el-card
-      v-if="hasPermission === true"
-      style="margin-top: 20px; padding: 20px"
-    >
+    <el-card style="margin-top: 20px; padding: 20px">
       <div style="font-size: 16px; font-weight: 500">语言: {{ language }}</div>
       <el-divider></el-divider>
       <codemirror v-model="code" :options="options"></codemirror>
@@ -189,8 +188,11 @@ import moment from "moment";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/idea.css"; // 白色
 import "codemirror/mode/python/python.js"; // python
-import { problemPublicInfoRequest } from "../request/problemRequest";
-import { submissionResultRequest } from "../request/submissonRequest";
+import { problemPublicInfoRequest } from "@/request/problemRequest";
+import {
+  submissionLimitedResultRequest,
+  submissionResultRequest,
+} from "@/request/submissonRequest";
 
 export default {
   name: "submissionDetail",
@@ -227,7 +229,7 @@ export default {
       },
       // 题目提交结果
       submission: [],
-      hasPermission: false,
+      contestRunning: false, // 比赛进行中
     };
   },
   created() {
@@ -268,16 +270,19 @@ export default {
     // 获取结果
     getResult: function (uuid) {
       var that = this;
-      submissionResultRequest(uuid)
+      const requestFunction = this.contestRunning
+        ? submissionLimitedResultRequest
+        : submissionResultRequest;
+      // 比赛已结束
+      requestFunction(uuid)
         .then(function (response) {
           console.log(response);
-          that.hasPermission = true;
           that.getProblem(response.problem_id);
           that.subTime = response.submit_time;
           that.code = response.settings.src;
           that.state = response.state;
           that.language = response.language;
-          if (response.state === "Finished") {
+          if (response.state === "Finished" && !that.contestRunning) {
             that.testCase = response.result.details;
             if (response.err !== null) {
               // 编译失败
@@ -314,7 +319,7 @@ export default {
   },
 };
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 /deep/ .el-alert__title {
   font-size: 20px !important;
   font-weight: 500;

@@ -4,7 +4,7 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>竞赛管理</el-breadcrumb-item>
-      <el-breadcrumb-item :to="{ path: '/contestBank' }"
+      <el-breadcrumb-item :to="{ path: '/contestManage/list' }"
         >竞赛列表</el-breadcrumb-item
       >
       <el-breadcrumb-item>{{ region }}</el-breadcrumb-item>
@@ -167,7 +167,18 @@
         <el-table-column type="selection" width="55"> </el-table-column>
         <el-table-column prop="id" label="ID" width="80"> </el-table-column>
         <el-table-column prop="info.title" label="题目"> </el-table-column>
-        <el-table-column prop="info.tags" label="标签">
+        <el-table-column
+          prop="info.tags"
+          label="标签"
+          :filters="[
+            { text: '栈', value: '栈' },
+            { text: '堆', value: '堆' },
+            { text: '贪心算法', value: '贪心算法' },
+            { text: '数学', value: '数学' },
+          ]"
+          :filter-method="filterDifficulty1"
+          filter-placement="bottom-end"
+        >
           <template slot-scope="scope">
             <el-tag
               class="tagsLayout"
@@ -177,6 +188,7 @@
             >
           </template>
         </el-table-column>
+        <!-- tode: 难度浮动后筛选逻辑需重写 -->
         <el-table-column
           prop="info.difficulty"
           label="难度"
@@ -246,8 +258,8 @@ import {
   problemPublicListRequest,
   problemPrivateListRequest,
   problemPrivateDeleteRequest,
-  ProblemAddRegionRequest
-} from "../../request/problemRequest";
+  ProblemAddRegionRequest,
+} from "@/request/problemRequest";
 
 export default {
   name: "contestDetailList",
@@ -291,7 +303,6 @@ export default {
       };
       problemPublicListRequest(params)
         .then(function (response) {
-          console.log(response);
           that.addProblemList = response.list;
           that.total = response.total;
         })
@@ -355,14 +366,12 @@ export default {
       }
     },
 
-    //  根据困难度筛选
-    filterDifficulty(value, row) {
-      return (
-        row.out_problem.info.difficulty >= value &&
-        row.out_problem.info.difficulty < value + 2.5
-      );
+    //  根据标签筛选
+    filterDifficulty1(value, row) {
+      return row.info.tags.indexOf(value) !== -1;
     },
 
+    //  根据难度筛选
     filterDifficulty2(value, row) {
       return row.info.difficulty >= value && row.info.difficulty < value + 2.5;
     },

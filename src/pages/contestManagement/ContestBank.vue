@@ -89,14 +89,14 @@
       <el-row :gutter="30" style="margin-top: 20px">
         <el-col :span="12">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">域</span>
           </div>
           <div style="padding-left: 16px">{{ modify_region }}</div>
         </el-col>
         <el-col :span="12">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">竞赛名称</span>
           </div>
           <el-input
@@ -126,7 +126,7 @@
         <!-- 开始时间 -->
         <el-col :span="6">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">开始时间</span>
           </div>
           <div class="block">
@@ -144,7 +144,7 @@
         <!-- 结束时间 -->
         <el-col :span="6">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">结束时间</span>
           </div>
           <el-date-picker
@@ -160,7 +160,7 @@
         <!-- 封榜时间 -->
         <el-col :span="6">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">封榜时间</span>
           </div>
           <el-date-picker
@@ -260,7 +260,7 @@
 
 <script>
 import moment from "moment";
-import { contestListRequest, contestEditRequest, contestDeleteRequest } from "../../request/contestRequest";
+import { contestListRequest, contestEditRequest, contestDeleteRequest } from "@/request/contestRequest";
 export default {
   data() {
     return {

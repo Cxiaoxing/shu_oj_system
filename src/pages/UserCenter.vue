@@ -5,13 +5,8 @@
         <!-- 个人信息展示卡片 -->
         <el-card class="userInfoCard userCenterTopLeft">
           <!-- 头像区域 -->
-          <div class="userImageBlock">
-            <div class="userImageBackground">
-              <img
-                class="userImage"
-                src="https://cxx-1258119840.cos.ap-shanghai.myqcloud.com/Oval.svg"
-              />
-            </div>
+          <div class="userImageBackground">
+            <i class="el-icon-user-solid userImage system_key_color" />
           </div>
           <!-- 编辑个人信息 -->
           <div class="editInfoButton" @click="userDialogVisible = true">
@@ -20,25 +15,25 @@
           <!-- 个人信息展示区域 -->
           <div class="userInfoBlock">
             <div class="infoDetail">
-              <img class="infoIcon" src="../img/account.svg" />
+              <i class="el-icon-user-solid system_key_color" />
               <span class="infoWordRight">账号</span>
               <span class="infoWord"> {{ userInfo.account }}</span>
             </div>
             <div class="infoDetail">
-              <img class="infoIcon" src="../img/account.svg" />
+              <i class="el-icon-phone system_key_color" />
               <span class="infoWordRight">手机</span>
               <span class="infoWord"> {{ userInfo.mobile }}</span>
             </div>
             <div class="infoDetail">
-              <img class="infoIcon" src="../img/account.svg" />
+              <i class="el-icon-s-help system_key_color" />
               <span class="infoWordRight">角色</span>
               <span v-if="userInfo.role === 'sup'" class="infoWord"
                 >超级管理员</span
               >
-              <span v-if="!userInfo.role" class="infoWord">普通用户</span>
-              <span v-if="userInfo.role === 'admin'" class="infoWord"
+              <span v-else-if="userInfo.role === 'admin'" class="infoWord"
                 >管理员</span
               >
+              <span v-else class="infoWord">普通用户</span>
             </div>
           </div>
         </el-card>
@@ -53,42 +48,54 @@
             "
           >
             <div>
-              <div class="TopRightSmallWord">提交次数</div>
+              <div class="TopRightSmallWord">
+                提交次数
+                <i class="el-icon-d-caret system_key_color" />
+              </div>
               <div class="TopRightContext">
-                <img src="../img/Subtract2.svg" />
-                <span class="TopRightBigWord">
-                  {{ submitCounts.total_submit_times }}</span
-                >
+                {{ submitCounts.total_submit_times }}
               </div>
             </div>
             <div>
-              <div class="TopRightSmallWord">通过次数</div>
+              <div class="TopRightSmallWord">
+                通过次数
+                <i class="el-icon-d-caret system_key_color" />
+              </div>
               <div class="TopRightContext">
-                <img src="../img/Subtract.svg" />
-                <span class="TopRightBigWord">
-                  {{ submitCounts.total_accept_times }}</span
-                >
+                {{ submitCounts.total_accept_times }}
               </div>
             </div>
             <div>
-              <div class="TopRightSmallWord">通过率</div>
+              <div class="TopRightSmallWord">
+                通过率
+                <i class="el-icon-d-caret system_key_color" />
+              </div>
               <div class="TopRightContext">
-                <img src="../img/Subtract3.svg" />
-                <span class="TopRightBigWord">
-                  {{
-                    (
-                      (submitCounts.total_accept_times /
-                        submitCounts.total_submit_times) *
-                      100
-                    ).toFixed(2)
-                  }}%</span
-                >
+                {{
+                  submitCounts.total_submit_times
+                    ? (
+                        (submitCounts.total_accept_times /
+                          submitCounts.total_submit_times) *
+                        100
+                      ).toFixed(2)
+                    : 0
+                }}%
               </div>
             </div>
           </div>
           <!-- 热力图展示区域 -->
           <div class="heetmap">
-            <calendar-heatmap :end-date="myDate" :values="submissionsTime" />
+            <calendar-heatmap
+              :end-date="myDate"
+              :values="submissionsTime"
+              :range-color="[
+                '#f7f2f6',
+                '#e7d5e4',
+                '#dabad2',
+                '#bd9bb7',
+                '#a581a0',
+              ]"
+            />
           </div>
         </el-card>
       </div>
@@ -237,6 +244,7 @@
 
 <script>
 import moment from "moment";
+import {CalendarHeatmap} from "vue-calendar-heatmap"; //热力图
 import echarts from "../utils/initEcharts";
 import {
   userCheckOnlineRequest,
@@ -247,7 +255,9 @@ import {
   userSubmitListRequest,
 } from "../request/userRequest";
 require("echarts/theme/macarons"); //引入饼图主题
+
 export default {
+  components: { CalendarHeatmap },
   data() {
     return {
       userDialogVisible: false,
@@ -509,7 +519,7 @@ export default {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 /deep/ .el-tag--mini {
   height: 25px !important;
   padding: 0 15px;
@@ -545,26 +555,27 @@ export default {
   align-items: center;
 }
 
-.userImageBlock {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
 .userImageBackground {
-  width: 125px;
-  height: 125px;
+  margin: auto;
+  width: 130px;
+  height: 130px;
   background: #ffffff;
-  border: 1px solid #e9eaed;
+  border: 1px solid $key_color_4;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
+  .userImage {
+    // width: 125px;
+    // height: 125px;
+    font-size: 125px; //todo: 删除假数据
+    border-radius: 50%;
+    overflow: hidden;
+  }
 }
 
-.userImage {
-  width: 120px;
+.system_key_color {
+  color: $key_color;
 }
 
 .userInfoBlock {
@@ -592,7 +603,7 @@ export default {
   line-height: 20px;
   letter-spacing: 0em;
   text-align: left;
-  color: #4e5969;
+  color: $ordinary_font_color;
 }
 
 .infoDetail {
@@ -609,15 +620,15 @@ export default {
   margin-left: 5px;
   font-family: PingFang SC;
   font-size: 14px;
-  color: #606a78;
+  color: $ordinary_font_color;
 }
 
 .infoWord {
   margin-left: 15px;
   font-family: PingFang SC;
   font-size: 14px;
-  color: #505050;
-  font-weight: 500;
+  color: $important_font_color;
+  font-weight: 450;
 }
 
 .tabWord {
@@ -659,25 +670,16 @@ export default {
 
 .TopRightContext {
   margin-top: 8px;
-  display: flex;
-  flex-direction: row;
-}
-
-.TopRightBigWord {
-  margin-left: 8.8px;
-  font-family: Nunito Sans;
+  margin-left: 2px;
   font-size: 26px;
-  font-style: normal;
   font-weight: 600;
   line-height: 34px;
   letter-spacing: 0px;
-  text-align: left;
   font-family: PingFang SC;
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
   line-height: 24px;
-  letter-spacing: 0em;
   text-align: left;
 }
 

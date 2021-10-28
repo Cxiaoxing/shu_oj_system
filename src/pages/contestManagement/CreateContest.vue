@@ -23,7 +23,7 @@
       <el-row :gutter="30" style="margin-top: 20px">
         <el-col :span="12">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">域</span>
           </div>
           <el-input
@@ -37,7 +37,7 @@
         </el-col>
         <el-col :span="12">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">竞赛名称</span>
           </div>
           <el-input
@@ -67,7 +67,7 @@
         <!-- 开始时间 -->
         <el-col :span="6">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">开始时间</span>
           </div>
           <div class="block">
@@ -85,7 +85,7 @@
         <!-- 结束时间 -->
         <el-col :span="6">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">结束时间</span>
           </div>
           <el-date-picker
@@ -101,7 +101,7 @@
         <!-- 封榜时间 -->
         <el-col :span="6">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">封榜时间</span>
           </div>
           <el-date-picker
@@ -188,7 +188,7 @@
   </div>
 </template>
 <script>
-import {contestCreateRequest} from '../../request/contestRequest'
+import {contestCreateRequest} from '@/request/contestRequest'
 export default {
   data() {
     return {
@@ -281,7 +281,7 @@ export default {
   },
 };
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .secondCard {
   margin-top: 20px;
 }

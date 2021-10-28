@@ -1,14 +1,8 @@
 <template>
-  <div class="login_container">
     <div class="login_box">
-      <!-- 左侧插画 -->
-      <img
-        class="login_picture"
-        src="https://cxx-1258119840.cos.ap-shanghai.myqcloud.com/login.svg"
-      />
       <!-- 登录表单区域 -->
       <div class="login_form" v-if="showLoginForm">
-        <div class="login_word">SHUOJ</div>
+        <div class="login_head">SHUOJ</div>
         <el-form
           :model="loginForm"
           :rules="loginFormRules"
@@ -18,6 +12,7 @@
           <!-- 账号 -->
           <el-form-item class="login_input_item" prop="account">
             <el-input
+              style="width: 208px"
               placeholder="请输入账号"
               prefix-icon="el-icon-user"
               v-model="loginForm.account"
@@ -30,6 +25,7 @@
               placeholder="请输入密码"
               prefix-icon="el-icon-lock"
               v-model="loginForm.password"
+              show-password
             ></el-input>
           </el-form-item>
           <!-- 按钮 -->
@@ -37,7 +33,7 @@
             <el-button type="primary" @click="submitLoginForm()"
               >登录</el-button
             >
-            <el-button>取消</el-button>
+            <el-button @click="jumpToHome()">取消</el-button>
           </el-form-item>
           <!-- 注册入口 -->
           <div
@@ -61,7 +57,7 @@
       </div>
       <!-- 注册区域表单 -->
       <div class="register_form" v-if="showLoginForm === false">
-        <div class="login_word">SHUOJ</div>
+        <div class="login_head">SHUOJ</div>
         <el-form
           :model="registerForm"
           :rules="registerFormRules"
@@ -71,6 +67,7 @@
           <!-- 账号 -->
           <el-form-item class="register_input_item" prop="account">
             <el-input
+              style="width: 208px"
               placeholder="请输入账号"
               prefix-icon="el-icon-user"
               v-model="registerForm.account"
@@ -83,14 +80,15 @@
               placeholder="请输入密码"
               prefix-icon="el-icon-lock"
               v-model="registerForm.password"
+              show-password
             ></el-input>
           </el-form-item>
           <!-- 手机号 -->
           <el-form-item class="register_input_item" prop="mobile">
             <el-input
-              type="password"
+              style="width: 208px"
               placeholder="请输入手机号"
-              prefix-icon="el-icon-lock"
+              prefix-icon="el-icon-phone"
               v-model="registerForm.mobile"
             ></el-input>
           </el-form-item>
@@ -99,6 +97,7 @@
             <el-button type="primary" @click="submitRegisterForm()"
               >注册</el-button
             >
+            <el-button @click="jumpToHome()">取消</el-button>
           </el-form-item>
           <!-- 登录入口 -->
           <div
@@ -121,11 +120,10 @@
         </el-form>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
-import { userLoginRequest, userRegisterRequest } from "../request/userRequest";
+import { userLoginRequest, userRegisterRequest } from "@/request/userRequest";
 export default {
   name: "Login",
   data() {
@@ -158,8 +156,8 @@ export default {
       },
       // 登录表单验证规则
       loginFormRules: {
-        account: [{ required: true, message: "请输入账号", trigger: "blur" }],
-        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        account: [{ required: true, message: "请输入账号!", trigger: "blur" }],
+        password: [{ required: true, message: "请输入密码!", trigger: "blur" }],
       },
 
       // 注册表单
@@ -171,10 +169,10 @@ export default {
       },
       // 注册表达验证规则
       registerFormRules: {
-        account: [{ required: true, message: "请输入账号", trigger: "blur" }],
-        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        account: [{ required: true, message: "请输入账号!", trigger: "blur" }],
+        password: [{ required: true, message: "请输入密码!", trigger: "blur" }],
         mobile: [
-          { required: false, message: "请输入手机号", trigger: "blur" },
+          // { required: true, message: "请输入手机号!", trigger: "blur" },
           { validator: checkMobile, trigger: "blur" },
         ],
       },
@@ -213,11 +211,15 @@ export default {
         })
         .catch(function (error) {
           that.$message({
-            message: "用户名或密码错误！",
+            message: "登陆失败！",
             type: "warning",
           });
           console.log(error);
         });
+    },
+
+    jumpToHome() {
+      this.$router.push("/home");
     },
 
     // 预验证注册表单
@@ -227,7 +229,7 @@ export default {
           this.registerRequest(this.registerForm);
         } else {
           this.$message({
-            message: "请输入用户名或密码！",
+            message: "请合法完整的填写信息！",
             type: "warning",
           });
           console.log("error submit!!");
@@ -239,19 +241,17 @@ export default {
     // 发起注册请求
     registerRequest: function (registerForm) {
       const data = {
-        account: this.registerForm.account,
-        password: this.registerForm.password,
-        mobile: this.registerForm.mobile,
-        role: this.registerForm.role,
+        account: registerForm.account,
+        password: registerForm.password,
+        mobile: registerForm.mobile,
+        role: "",
       };
       let that = this;
       userRegisterRequest(data)
         .then(function (response) {
-          //展示登录界面
-          that.showLoginForm = true;
           // 提示用户注册成功
           that.$message({
-            message: "注册成功！",
+            message: "注册成功，自动登录中...",
             type: "success",
           });
           that.loginRequest(that.registerForm);
@@ -268,19 +268,14 @@ export default {
 };
 </script>
 
-<style lang="less" scoped>
-.login_container {
-  width: 100%;
-  background-size: 100%;
-  font-family: PingFang SC;
-}
+<style lang="scss" scoped>
 
 .login_box {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  width: 600px;
+  width: 300px;
   height: 400px;
   background-color: #fff;
   border-radius: 20px;
@@ -290,37 +285,11 @@ export default {
   transform: translate(-50%, -50%);
   box-shadow: 0 0 10px rgb(184, 182, 182);
 }
-.login_picture {
-  width: 350px;
-  // margin-left: -50px;
-}
 
-.login_form {
-  margin-right: 50px;
-}
-.login_word {
+.login_head {
   font-family: PingFang SC;
   font-size: 30px;
   font-weight: 400;
-}
-.login_input {
-  margin-top: 20px;
-}
-.login_input_item {
-  display: flex;
-  flex-direction: row;
-}
-
-.register_form {
-  margin-right: 50px;
-}
-
-.register_input {
-  margin-top: 20px;
-}
-
-.register_input_item {
-  display: flex;
-  flex-direction: row;
+  margin-bottom: 10px;
 }
 </style>

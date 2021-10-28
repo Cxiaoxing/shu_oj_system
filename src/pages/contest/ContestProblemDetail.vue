@@ -106,14 +106,6 @@
         </el-card>
       </el-col>
     </el-row>
-    <!-- 提交结束后引导查看提交详情弹窗 -->
-
-    <el-dialog title="" :visible.sync="dialogVisible" width="30%">
-      <span>提交成功！</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="closeDialog">知道了</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -129,8 +121,8 @@ import "codemirror/theme/idea.css"; // 白色
 // 代码高亮
 import "codemirror/mode/python/python.js"; // python
 // import "codemirror/mode/clike/clike.js"; //java
-import { problemPrivateInfoRequest } from "../../request/problemRequest";
-import { submissionRequest } from "../../request/submissonRequest";
+import { problemPrivateInfoRequest } from "@/request/problemRequest";
+import { submissionRequest } from "@/request/submissonRequest";
 export default {
   name: "problemDetail",
   data() {
@@ -139,10 +131,8 @@ export default {
       total: 0, //题目总数
       region: "",
       inner_id: "",
-      uuid: "",
       problem_info: {}, //题目基础信息
       problem_contents: {}, //题目描述
-      dialogVisible: false, //控制查看题目详情弹窗
       code: "", // 代码编辑器绑定的值
       // 代码编辑器默认配置
       options: {
@@ -218,8 +208,18 @@ export default {
       };
       submissionRequest(this.region, this.inner_id, data)
         .then(function (response) {
-          that.dialogVisible = true;
-          that.uuid = response;
+          that
+            .$confirm("提交成功", {
+              confirmButtonText: "查看结果",
+              cancelButtonText: "知道了",
+              type: "success",
+            })
+            .then(() => {
+              that.$router.push({
+                name: "submissionDetail",
+                params: { uuid: response },
+              });
+            });
         })
         .catch(function (error) {
           console.log(error);
@@ -228,13 +228,6 @@ export default {
             type: "warning",
           });
         });
-    },
-
-    // 跳转至题目结果详情
-    goProblemResult() {
-      let that = this;
-      let uuid = that.uuid;
-      that.$router.push({ name: "sampleResultDetail", params: { uuid: uuid } });
     },
 
     // 上一题
@@ -266,10 +259,6 @@ export default {
         that.getProblem(that.region, inner_id);
       });
     },
-
-    closeDialog() {
-      this.dialogVisible = false;
-    },
   },
   components: {
     codemirror,
@@ -277,7 +266,7 @@ export default {
 };
 </script>
 
-<style lang="less" >
+<style lang="scss" >
 .problem_turning {
   margin-bottom: 10px;
   background-color: rgb(255, 255, 255);

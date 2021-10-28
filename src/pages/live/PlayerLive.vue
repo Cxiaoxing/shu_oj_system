@@ -46,7 +46,7 @@ export default {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .titleWord {
   font-family: PingFang SC;
   font-size: 16px;

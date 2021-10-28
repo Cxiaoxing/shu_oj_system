@@ -1,122 +1,136 @@
 <template>
   <div>
-    <el-carousel :interval="4000" height="400px">
-      <el-carousel-item v-for="(item,index) in imgList" :key="index">
-        <img :src="item.src" style="width:100%;" />
+    <el-carousel :interval="4000" type="card" height="200px">
+      <el-carousel-item v-for="item in imgList" :key="item">
+        <img
+          :src="item.src"
+          style="width: 100%"
+          @click="jumpToAnnounceDetail(item)"
+        />
       </el-carousel-item>
     </el-carousel>
-    <el-card class="card">
-      <div
-        style="
-          font-family: PingFang SC;
-          font-size: 18px;
-          font-weight: 400;
-          color: #303133;
-        "
-      >
-        公告
-      </div>
-      <el-table class="noticeTable" :data="tableData">
-        <el-table-column prop="name" label="" width="600px">
-          <template slot-scope="scope">
-            <el-link>{{ scope.row.name }}</el-link>
-          </template>
-        </el-table-column>
-        <el-table-column prop="date" label="" > </el-table-column>
-        <el-table-column prop="address" label=""> </el-table-column>
+    <el-card style="margin-top: 10px">
+      <el-table :data="announceList" @row-click="jumpToAnnounceDetail">
+        <el-table-column prop="title" label="公告" />
+        <el-table-column
+          prop="release_time"
+          :formatter="formatTime"
+          label="发布时间"
+        />
       </el-table>
+      <el-pagination
+        background
+        hide-on-single-page
+        @current-change="getAnnounceList"
+        :page-size="pageSize"
+        :current-page="currentPage"
+        layout="prev, pager, next, jumper"
+        :total="total"
+        style="margin-top: 30px; text-align: center"
+      >
+      </el-pagination>
     </el-card>
+    <!-- 新手指引 -->
     <div class="onboard">
-      <img class="guideIcon" src="../img/guide.svg" @click.prevent.stop="guide" />
+      <i class="el-icon-question guideIcon" @click.prevent.stop="guide" />
     </div>
   </div>
 </template>
 
 <script>
-import Driver from 'driver.js' 
-import 'driver.js/dist/driver.min.css' 
-import steps from '../guide/step'
+import Driver from "driver.js";
+import "driver.js/dist/driver.min.css";
+import steps from "../guide/step";
+import moment from "moment";
+import { announceListRequest } from "@/request/announceRequest";
 export default {
   data() {
     return {
-      tableData: [
+      // 公告列表
+      currentPage: 1,
+      pageSize: 4,
+      total: 19, // todo: 删除假数据
+      announceList: [
         {
-          date: "2016-05-02",
-          name: "上海大学程序设计大赛",
-          address: "上海大学计算机学院",
+          id: "1",
+          title: "标题题题题题题题1111",
+          release_time: "2021-10-24T17:23:11",
         },
         {
-          date: "2016-05-04",
-          name: "上海大学程序设计大赛",
-          address: "上海大学计算机学院",
+          id: "2",
+          title: "标题题题题题题题2222",
+          release_time: "2021-10-24T17:23:11",
         },
         {
-          date: "2016-05-01",
-          name: "上海大学程序设计大赛",
-          address: "上海大学计算机学院",
+          id: "3",
+          title: "标题题题题题题题3333",
+          release_time: "2021-10-24T17:23:11",
         },
         {
-          date: "2016-05-03",
-          name: "上海大学程序设计大赛",
-          address: "上海大学计算机学院",
+          id: "4",
+          title: "标题题题题题题题44444",
+          release_time: "2021-10-24T17:23:11",
         },
       ],
       imgList: [
         {
-          name: "1",
+          id: "1",
           src: "https://cxx-1258119840.cos.ap-shanghai.myqcloud.com/homepic.png",
         },
         {
-          name: "2",
+          id: "2",
           src: "https://cxx-1258119840.cos.ap-shanghai.myqcloud.com/homepic.png",
-        }
+        },
+        {
+          id: "3",
+          src: "https://cxx-1258119840.cos.ap-shanghai.myqcloud.com/homepic.png",
+        },
       ],
-       driver: null
+      driver: null,
     };
   },
-  created(){
-
+  created() {
+    this.getAnnounceList();
   },
-   mounted() {
-      this.driver = new Driver()
+  mounted() {
+    this.driver = new Driver();
   },
-  methods:{
+  methods: {
     guide() {
-      this.driver.defineSteps(steps)
-      this.driver.start()
+      this.driver.defineSteps(steps);
+      this.driver.start();
     },
-}
+    formatTime: function (row) {
+      return moment(row.release_time).format("YYYY-MM-DD HH:mm:ss");
+    },
+    getAnnounceList(currentPage = 1) {
+      const that = this;
+      const params = {
+        id_order: true,
+        limit: this.pageSize,
+        offset: this.pageSize * (currentPage - 1),
+      };
+      announceListRequest(params)
+        .then(function (response) {
+          that.currentPage = currentPage;
+          that.announceList = response.list;
+          that.total = response.total;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
+    jumpToAnnounceDetail(row) {
+      this.$router.push(`/announceDetail/${row.id}`);
+    },
+  },
 };
 </script>
 
-<style lang="less" scoped>
-.el-carousel__item h3 {
-  color: #475669;
-  font-size: 14px;
-  opacity: 0.75;
-  line-height: 150px;
-  margin: 0;
-}
-
-.el-carousel__item:nth-child(2n) {
-  background-color: #99a9bf;
-}
-
-.el-carousel__item:nth-child(2n + 1) {
-  background-color: #d3dce6;
-}
-
-.card {
-  margin-top: 30px;
-}
-
-.noticeTable {
-  width: 100%;
-}
-
+<style lang="scss" scoped>
 .onboard {
-  position:absolute;
-  right:  20px;
+  position: absolute;
+  right: 20px;
   bottom: 20px;
   z-index: 3;
   width: 35px;
@@ -127,14 +141,14 @@ export default {
   justify-content: center;
   align-items: center;
   border: 1px solid #d1d0d0;
-  -webkit-box-shadow: #d1d0d0 0px 0px 10px; 
-   -moz-box-shadow: #d1d0d0 0px 0px 10px; 
-   box-shadow: #d1d0d0 0px 0px 10px; 
-   cursor:pointer
+  -webkit-box-shadow: #d1d0d0 0px 0px 10px;
+  -moz-box-shadow: #d1d0d0 0px 0px 10px;
+  box-shadow: #d1d0d0 0px 0px 10px;
+  cursor: pointer;
 }
 
-.guideIcon{
-  width: 25px;
-  height: 25px;
+.guideIcon {
+  font-size: 30px;
+  color: $key_color_2;
 }
 </style>

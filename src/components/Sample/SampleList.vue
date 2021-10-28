@@ -4,7 +4,7 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>题库管理</el-breadcrumb-item>
-      <el-breadcrumb-item :to="{ path: '/questionBank' }"
+      <el-breadcrumb-item :to="{ path: '/problemManage/list' }"
         >题目列表</el-breadcrumb-item
       >
       <el-breadcrumb-item>{{ problemtitle }}</el-breadcrumb-item>
@@ -94,11 +94,11 @@
 </template>
 
 <script>
-import { problemPublicInfoRequest } from "../../request/problemRequest";
+import { problemPublicInfoRequest } from "@/request/problemRequest";
 import {
   sampleListRequest,
   sampleDeleteRequest,
-} from "../../request/sampleRequest";
+} from "@/request/sampleRequest";
 export default {
   data() {
     return {

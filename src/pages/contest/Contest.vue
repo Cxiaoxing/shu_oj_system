@@ -32,7 +32,7 @@
         <div id="contest-list">
           <li v-for="(contest, index) in contestlist" :key="index">
             <el-row type="flex" justify="space-between" align="middle">
-              <img class="trophy" src="../../img/trophy.svg" />
+              <img class="trophy" src="@/assets/img/trophy.svg" />
               <el-col :span="18" class="contest-main">
                 <div class="title">
                   <a
@@ -47,7 +47,7 @@
                     <img
                       v-if="contest.start_time !== null"
                       class="icon"
-                      src="../../img/cal.svg"
+                      src="@/assets/img/cal.svg"
                     />
                     <span
                       v-if="contest.start_time !== null"
@@ -59,7 +59,7 @@
                     <img
                       v-if="contest.end_time !== null"
                       class="icon"
-                      src="../../img/time.svg"
+                      src="@/assets/img/time.svg"
                     />
                     <span
                       v-if="contest.end_time !== null"
@@ -120,7 +120,7 @@
 <script>
 import time from "@/utils/time";
 import moment from "moment";
-import { contestListRequest } from "../../request/contestRequest.js";
+import { contestListRequest } from "@/request/contestRequest.js";
 
 export default {
   data() {
@@ -179,7 +179,7 @@ export default {
   },
 };
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 #contest-list {
   > li {
     padding: 20px;

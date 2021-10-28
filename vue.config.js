@@ -1,13 +1,11 @@
 const path = require("path");
-import { BASE_URL } from "./src/utils/utils";
-
 function resolve(dir) {
-  return path.join(__dirname, dir);
+    return path.join(__dirname, dir);
 }
 
 module.exports = {
-    filenameHashing: false, 
-    lintOnSave: false, 
+    filenameHashing: false,
+    lintOnSave: false,
     runtimeCompiler: true,
     assetsDir: "static",
     devServer: {
@@ -18,11 +16,11 @@ module.exports = {
         //设置请求服务的代理
         proxy: {
             '/api': {
-                target: BASE_URL, //代理地址（一般为API实际地址）
-                secure: false, 
+                target: "http://111.229.161.159:8000", //代理地址（一般为API实际地址）
+                secure: false,
                 ws: true,
                 changeOrigin: true, // 是否允许跨域
-                pathRewrite: { 
+                pathRewrite: {
                     '^/api': ''//重定向地址
                 }
             }
@@ -30,8 +28,23 @@ module.exports = {
     },
     chainWebpack: config => {
         config.resolve.alias
-          .set("@", resolve("src"))
-      },
+            .set("@", resolve("src"))
+        // 配置全局样式变量
+        const oneOfsMap = config.module.rule('scss').oneOfs.store;
+        oneOfsMap.forEach(item => {
+            item
+                .use('sass-resources-loader')
+                .loader('sass-resources-loader')
+                .options({
+                    // 全局变量资源路径
+                    resources: './src/assets/styles/global.scss'
+                    // 全局变量路径数组
+                    // resources: ['./path/to/vars.scss', './path/to/mixins.scss']
+                    // 或者将多个scss文件@import到一个main.scss用第一种方法
+                })
+                .end()
+        })
+    },
     /*
     chainWebpack: config => {
           config.set('externals', {

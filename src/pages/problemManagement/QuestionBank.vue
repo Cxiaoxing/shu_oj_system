@@ -275,7 +275,7 @@
         <!-- 标题 -->
         <el-col :span="12">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span style="font-family: PingFang SC; font-size: 16px">标题</span>
           </div>
           <el-input
@@ -289,7 +289,7 @@
         <!-- 标签 -->
         <el-col :span="12">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span style="font-family: PingFang SC; font-size: 16px">标签</span>
           </div>
           <el-select
@@ -321,7 +321,7 @@
         <!-- 难度 -->
         <el-col :span="8">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span style="font-family: PingFang SC; font-size: 16px">难度</span>
           </div>
           <el-select
@@ -346,7 +346,7 @@
         <!-- 判题方式 -->
         <el-col :span="8">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span style="font-family: PingFang SC; font-size: 16px"
               >判题方式</span
             >
@@ -373,7 +373,7 @@
         <!-- 是否展示输出 -->
         <el-col :span="8">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span style="font-family: PingFang SC; font-size: 16px"
               >输出展示</span
             >
@@ -403,7 +403,7 @@
         <!-- 高性能时间限制 -->
         <el-col :span="6">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span style="font-family: PingFang SC; font-size: 16px"
               >高性能时间限制(ms)</span
             >
@@ -419,7 +419,7 @@
         <!-- 高性能内存限制 -->
         <el-col :span="6">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span style="font-family: PingFang SC; font-size: 16px"
               >高性能内存限制(B)</span
             >
@@ -435,7 +435,7 @@
         <!-- 其他时间限制 -->
         <el-col :span="6">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span style="font-family: PingFang SC; font-size: 16px"
               >其他时间限制(ms)</span
             >
@@ -451,7 +451,7 @@
         <!-- 其他内存限制 -->
         <el-col :span="6">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span style="font-family: PingFang SC; font-size: 16px"
               >其他内存限制(B)</span
             >
@@ -469,7 +469,7 @@
       <!-- 题目描述 -->
       <div class="problemDetail">
         <div class="titleLayout">
-          <img class="mustPic" src="../../img/createproblem/must.svg" />
+          <img class="mustPic" src="@/assets/img/required_field.svg" />
           <span style="font-family: PingFang SC">描述</span>
         </div>
         <!-- 富文本编辑器 -->
@@ -481,7 +481,7 @@
       <div class="sampleDetail">
         <!-- title -->
         <div class="titleLayout">
-          <img class="mustPic" src="../../img/createproblem/must.svg" />
+          <img class="mustPic" src="@/assets/img/required_field.svg" />
           <span style="font-family: PingFang SC">样例</span>
         </div>
         <!-- 动态表单 -->
@@ -563,7 +563,7 @@ import {
   problemStatusChangeRequest,
   problemEditRequest,
   problemPublicDeleteRequest,
-} from "../../request/problemRequest";
+} from "@/request/problemRequest";
 export default {
   data() {
     return {

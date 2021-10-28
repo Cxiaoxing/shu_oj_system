@@ -106,7 +106,7 @@
       <!-- 暂未完成判题 -->
       <div class="noContextBlock" v-if="state != 'Finished'">
         <div>
-          <img class="noContextPic" src="../../img/nocontext.svg" />
+          <img class="noContextPic" src="@/assets/img/nocontext.svg" />
         </div>
         <div style="font-size: 14px">暂未完成判题，请稍后查看</div>
       </div>
@@ -131,12 +131,12 @@
               <img
                 v-if="testCase.result === 'SUCCESS'"
                 class="timeLineImage"
-                src="../../img/right.svg"
+                src="@/assets/img/right.svg"
               />
               <img
                 v-if="testCase.result !== 'SUCCESS'"
                 class="timeLineImage"
-                src="../../img/wrong.svg"
+                src="@/assets/img/wrong.svg"
               />
             </div>
             <div class="timeLineLine"></div>
@@ -177,8 +177,8 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/theme/idea.css"; // 白色
 import "codemirror/mode/python/python.js"; // python
 
-import { sampleResultRequest } from "../../request/sampleRequest";
-import { problemPublicInfoRequest } from '../../request/problemRequest';
+import { sampleResultRequest } from "@/request/sampleRequest";
+import { problemPublicInfoRequest } from '@/request/problemRequest';
 export default {
   name: "sampleResultDetail",
   data() {
@@ -289,7 +289,7 @@ export default {
   },
 };
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 /deep/ .el-alert__title {
   font-size: 20px !important;
   font-weight: 500;

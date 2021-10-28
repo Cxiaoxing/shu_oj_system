@@ -1,5 +1,6 @@
 import Vue from 'vue'
-import { Button,Alert,DatePicker,  Option,OptionGroup, Timeline,Tabs,TabPane,Tag, Pagination, Carousel,CarouselItem, Divider, Link, Select, Dialog, Switch, Dropdown,DropdownItem,DropdownMenu, MessageBox, Upload, Form, FormItem, Input, Container, Header, Main, Submenu, MenuItem, Menu, MenuItemGroup, Aside, Breadcrumb, BreadcrumbItem, Card, Row, Col, Table,TableColumn, Message, TimelineItem } from 'element-ui'
+import '../assets/styles/element-variables.scss'
+import { Button, Alert, DatePicker, Option, OptionGroup, Timeline, Tabs, TabPane, Tag, Pagination, Carousel, CarouselItem, Divider, Link, Select, Dialog, Switch, Dropdown, DropdownItem, DropdownMenu, MessageBox, Upload, Form, FormItem, Input, Container, Header, Main, Submenu, MenuItem, Menu, MenuItemGroup, Aside, Breadcrumb, BreadcrumbItem, Card, Row, Col, Table, TableColumn, Message, TimelineItem } from 'element-ui'
 
 Vue.use(Button)
 Vue.use(Tabs)

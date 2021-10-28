@@ -3,12 +3,10 @@
     <el-container class="home-container">
       <!-- 头部区域 -->
       <el-header>
-        <div style="display: flex; align-items: center">
-          <img class="logoImage" src="../img/logo.svg" />
-        </div>
+        <div class="system_name">上海大学程序设计网上训练系统</div>
         <div id="userCenter">
           <el-dropdown @command="handleCommand">
-            <img class="user" src="../img/home/user.svg" />
+            <i class="el-icon-user"></i>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="user" v-if="isLogin"
                 >个人中心</el-dropdown-item
@@ -69,13 +67,13 @@
                 >提交状态</span
               >
             </el-menu-item>
-            <!-- 观看直播（对外） -->
-            <el-menu-item index="/liveCard">
+            <!-- todo: 观看直播（对外） -->
+            <!-- <el-menu-item index="/liveCard">
               <i class="el-icon-s-platform"></i>
               <span slot="title" style="font-family: PingFang SC"
                 >观看直播</span
               >
-            </el-menu-item>
+            </el-menu-item> -->
             <!-- 用户管理 -->
             <el-submenu
               index="1"
@@ -85,8 +83,11 @@
                 <i class="el-icon-user-solid"></i>
                 <span style="font-family: PingFang SC">用户管理</span>
               </template>
-              <el-menu-item index="/userList" style="font-family: PingFang SC"
+              <el-menu-item index="/userManage/list" style="font-family: PingFang SC"
                 >用户列表</el-menu-item
+              >
+              <el-menu-item index="/userManage/create" style="font-family: PingFang SC"
+                >添加用户</el-menu-item
               >
             </el-submenu>
             <!-- 题库管理-->
@@ -99,15 +100,15 @@
                 <span style="font-family: PingFang SC">题目管理</span>
               </template>
               <el-menu-item
-                index="/questionBank"
+                index="/problemManage/list"
                 style="font-family: PingFang SC"
                 >题目列表</el-menu-item
               >
-              <el-menu-item index="/problemSet" style="font-family: PingFang SC"
+              <el-menu-item index="/problemManage/setList" style="font-family: PingFang SC"
                 >题集列表</el-menu-item
               >
               <el-menu-item
-                index="/createProblem"
+                index="/problemManage/create"
                 style="font-family: PingFang SC"
                 >创建题目</el-menu-item
               >
@@ -122,18 +123,18 @@
                 <span style="font-family: PingFang SC">竞赛管理</span>
               </template>
               <el-menu-item
-                index="/contestBank"
+                index="/contestManage/list"
                 style="font-family: PingFang SC"
                 >竞赛列表</el-menu-item
               >
               <el-menu-item
-                index="/createContest"
+                index="/contestManage/create"
                 style="font-family: PingFang SC"
                 >创建竞赛</el-menu-item
               >
             </el-submenu>
-            <!-- 直播管理 -->
-            <el-submenu
+            <!-- todo: 直播管理 -->
+            <!-- <el-submenu
               index="4"
               v-if="userRole === 'sup' || userRole === 'admin'"
             >
@@ -141,8 +142,26 @@
                 <i class="el-icon-video-camera-solid"></i>
                 <span style="font-family: PingFang SC">直播管理</span>
               </template>
-              <el-menu-item index="/live" style="font-family: PingFang SC"
+              <el-menu-item index="/liveManage/live" style="font-family: PingFang SC"
                 >创建直播</el-menu-item
+              >
+            </el-submenu> -->
+            <!-- 公告管理 -->
+            <el-submenu
+              index="5"
+              v-if="userRole === 'sup' || userRole === 'admin'"
+            >
+              <template slot="title">
+                <i class="el-icon-message-solid"></i>
+                <span style="font-family: PingFang SC">公告管理</span>
+              </template>
+              <el-menu-item index="/announceManage/list" style="font-family: PingFang SC"
+                >公告列表</el-menu-item
+              >
+              <el-menu-item
+                index="/announceManage/create"
+                style="font-family: PingFang SC"
+                >新建公告</el-menu-item
               >
             </el-submenu>
           </el-menu>
@@ -152,33 +171,6 @@
           <router-view></router-view>
         </el-main>
       </el-container>
-      <!-- 个人信息对话框 -->
-      <el-dialog title="个人信息" :visible.sync="userDialogVisible" width="20%">
-        <!-- 内容主体区域 -->
-        <el-form :model="userInfo">
-          <el-row>
-            <el-form-item>
-              <span slot="label">
-                <i class="el-icon-user"></i>
-                <span class="lableWord">账号</span>
-              </span>
-              <el-input v-model="userInfo.account"></el-input>
-            </el-form-item>
-          </el-row>
-          <el-row>
-            <el-form-item>
-              <span slot="label">
-                <i class="el-icon-phone-outline"></i>
-                <span class="lableWord">手机</span>
-              </span>
-              <el-input v-model="userInfo.mobile"></el-input>
-            </el-form-item>
-          </el-row>
-        </el-form>
-        <el-button type="primary" plain size="medium" @click="updateRequest()"
-          >更新</el-button
-        >
-      </el-dialog>
     </el-container>
   </div>
 </template>
@@ -187,53 +179,53 @@ import {
   userCheckOnlineRequest,
   userInfoRequest,
   userLogoutRequest,
-} from "../request/userRequest";
+} from "@/request/userRequest";
 export default {
   data() {
     return {
       isLogin: false,
       isCollapse: false,
-      // 控制展示个人信息对话框的显示与隐藏
-      userDialogVisible: false,
-      // 查询到的用户信息
-      userInfo: {},
-      // 查询到的用户ID
-      userId: "",
-      // 当前登陆用户的角色
       userRole: "",
     };
   },
 
   created() {
-    var that = this;
-    userCheckOnlineRequest()
-      .then(function (response) {
-        if (response) {
-          that.isLogin = true;
-          that.userId = response.id;
-          that.userRole = response.role;
-          window.localStorage.setItem("isLogin", true);
-          window.localStorage.setItem("id", response.id);
-          window.localStorage.setItem("role", response.role);
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
-        window.localStorage.clear();
-      });
+    this.checkIsLogin();
+  },
+  updated() {
+    this.checkIsLogin();
   },
   methods: {
+    // 用户是否登陆
+    checkIsLogin() {
+      var that = this;
+      userCheckOnlineRequest()
+        .then(function (response) {
+          if (response) {
+            that.isLogin = true;
+            that.userRole = response.role;
+            window.localStorage.setItem("isLogin", true);
+            window.localStorage.setItem("id", response.id);
+            window.localStorage.setItem("role", response.role);
+            that.getUserInfo(response.id);
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+          window.localStorage.clear();
+        });
+    },
+
     // 菜单栏的折叠与展开
     toggleCollapse() {
       this.isCollapse = !this.isCollapse;
     },
 
     // 获取用户信息
-    getUserInfo(region) {
-      var that = this;
-      userInfoRequest(region)
+    getUserInfo(id) {
+      userInfoRequest(id)
         .then(function (response) {
-          that.userInfo = response;
+          window.localStorage.setItem("account", response.account);
         })
         .catch(function (error) {
           console.log(error);
@@ -264,15 +256,13 @@ export default {
       } else if (command === "login") {
         this.$router.push("/login");
       } else if (command === "user") {
-        //that.userDialogVisible = true;
-        //that.getUserInfo(that.userId);
         this.$router.push("/userCenter");
       }
     },
   },
 };
 </script>
-<style lang='less' scoped>
+<style lang='scss' scoped>
 .homeWrap {
   position: absolute;
   top: 0;
@@ -282,21 +272,26 @@ export default {
 }
 .home-container {
   height: 100%;
+  .el-header {
+    background-color: $key_title_color;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    .system_name {
+      color: white;
+      font-size: 20px;
+    }
+  }
 }
-.el-header {
-  background-color: #3c4a73;
-  //background-color: #ffffff;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-}
+
 .chooseList {
   padding-bottom: 0;
 }
 
-.user {
-  width: 30px;
+.el-icon-user {
+  color: white;
+  font-size: 30px;
 }
 
 .el-aside {
@@ -309,12 +304,9 @@ export default {
 .toggle-button {
   cursor: pointer;
 }
-.lableWord {
-  font-family: PingFang SC;
-  margin-left: 3px;
-}
+
 .icon:hover {
-  color: #3370ff;
+  color: $key_color;
 }
 .icon {
   color: #86909c;

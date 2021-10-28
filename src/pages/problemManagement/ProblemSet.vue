@@ -262,13 +262,13 @@
 </template>
 
 <script>
-import { contestCreateRequest } from "../../request/contestRequest";
+import { contestCreateRequest } from "@/request/contestRequest";
 import {
   problemSetCreateRequest,
   problemSetListRequest,
   problemSetEditRequest,
   problemSetDeleteRequest,
-} from "../../request/problemSetRequest";
+} from "@/request/problemSetRequest";
 export default {
   data() {
     return {

@@ -18,7 +18,7 @@
         </div>
       </div>
       <div v-else>
-        <img class="empty-img" src="../../img/live/live-empty.png" />
+        <img class="empty-img" src="@/assets/img/live/live-empty.png" />
         <p class="empty-text">
           当前没有直播,请稍后再来~
         </p>
@@ -47,7 +47,7 @@ export default {
   },
 };
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .live-list {
   background: #f9f9f9;
   width: 100%;

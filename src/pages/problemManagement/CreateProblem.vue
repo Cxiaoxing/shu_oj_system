@@ -16,7 +16,7 @@
           color: #303133;
         "
       >
-        导入题目
+        批量创建题目
       </div>
       <el-divider></el-divider>
       <el-upload
@@ -29,13 +29,13 @@
         :on-success="handleSuccess"
         :on-error="handleError"
       >
-        <el-button type="primary" style="margin-top: 15px">上传文件</el-button>
+        <el-button type="primary">上传文件压缩包</el-button>
       </el-upload>
       <el-link
         class="linkWord"
         target="_blank"
         href="https://www.feishu.cn/docs/doccnw7qEdpKQ3N46ERmzSbaS5f#"
-        >如何批量上传文件？</el-link
+        >如何批量创建题目？</el-link
       >
     </el-card>
     <!-- 添加题目 -->
@@ -48,7 +48,7 @@
           color: #303133;
         "
       >
-        添加题目
+        创建题目
       </div>
       <el-divider></el-divider>
       <!-- 题目标题&标签 -->
@@ -56,7 +56,7 @@
         <!-- 标题 -->
         <el-col :span="12">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">标题</span>
           </div>
           <el-input
@@ -70,7 +70,7 @@
         <!-- 标签 -->
         <el-col :span="12">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">标签</span>
           </div>
           <el-select
@@ -102,7 +102,7 @@
         <!-- 难度 -->
         <el-col :span="8">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">难度</span>
           </div>
           <el-select
@@ -127,7 +127,7 @@
         <!-- 判题方式 -->
         <el-col :span="8">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">判题方式</span>
           </div>
           <el-select
@@ -152,7 +152,7 @@
         <!-- 是否展示输出 -->
         <el-col :span="8">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">输出展示</span>
           </div>
           <el-select
@@ -180,7 +180,7 @@
         <!-- 高性能时间限制 -->
         <el-col :span="6">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">高性能时间限制(ms)</span>
           </div>
           <el-input
@@ -194,7 +194,7 @@
         <!-- 高性能内存限制 -->
         <el-col :span="6">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">高性能内存限制(B)</span>
           </div>
           <el-input
@@ -208,7 +208,7 @@
         <!-- 其他时间限制 -->
         <el-col :span="6">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">其他时间限制(ms)</span>
           </div>
           <el-input
@@ -222,7 +222,7 @@
         <!-- 其他内存限制 -->
         <el-col :span="6">
           <div class="titleLayout">
-            <img class="mustPic" src="../../img/createproblem/must.svg" />
+            <img class="mustPic" src="@/assets/img/required_field.svg" />
             <span class="itemTitle">其他内存限制(B)</span>
           </div>
           <el-input
@@ -238,7 +238,7 @@
       <!-- 题目描述 -->
       <div class="problemDetail">
         <div class="titleLayout">
-          <img class="mustPic" src="../../img/createproblem/must.svg" />
+          <img class="mustPic" src="@/assets/img/required_field.svg" />
           <span class="itemTitle">描述</span>
         </div>
         <!-- 富文本编辑器 -->
@@ -250,7 +250,7 @@
       <div class="sampleDetail">
         <!-- title -->
         <div class="titleLayout">
-          <img class="mustPic" src="../../img/createproblem/must.svg" />
+          <img class="mustPic" src="@/assets/img/required_field.svg" />
           <span class="itemTitle">样例</span>
         </div>
         <!-- 动态表单 -->
@@ -323,8 +323,8 @@
   </div>
 </template>
 <script>
-import { problemCreateRequest } from '../../request/problemRequest'
-import { BASE_URL } from '../../utils/utils'
+import { problemCreateRequest } from '@/request/problemRequest'
+import { BASE_URL } from '@/assets/config'
 export default {
   data() {
     return {
@@ -481,7 +481,7 @@ export default {
   },
 };
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .secondCard {
   margin-top: 20px;
 }

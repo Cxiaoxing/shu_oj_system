@@ -100,7 +100,7 @@
 </template>
 <script>
 import moment from "moment";
-import { submissionListRequest } from "../request/submissonRequest";
+import { submissionListRequest } from "@/request/submissonRequest";
 export default {
   data() {
     return {
@@ -184,7 +184,7 @@ export default {
   },
 };
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .tableBar {
   display: flex;
   justify-content: flex-end;
