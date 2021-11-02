@@ -276,13 +276,13 @@
         <el-col :span="12">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-family: PingFang SC; font-size: 16px">标题</span>
+            <span style=" font-size: 16px">标题</span>
           </div>
           <el-input
             placeholder="请输入标题"
             v-model="input_title"
             clearable
-            style="margin-top: 10px; font-family: PingFang SC; font-size: 14px"
+            style="margin-top: 10px;  font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -290,7 +290,7 @@
         <el-col :span="12">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-family: PingFang SC; font-size: 16px">标签</span>
+            <span style=" font-size: 16px">标签</span>
           </div>
           <el-select
             v-model="input_tags"
@@ -301,7 +301,7 @@
             placeholder="请选择标签"
             style="
               margin-top: 10px;
-              font-family: PingFang SC;
+              
               font-size: 14px;
               width: 100%;
             "
@@ -322,14 +322,14 @@
         <el-col :span="8">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-family: PingFang SC; font-size: 16px">难度</span>
+            <span style=" font-size: 16px">难度</span>
           </div>
           <el-select
             v-model="difficultyValue"
             placeholder="请选择难度"
             style="
               margin-top: 10px;
-              font-family: PingFang SC;
+              
               font-size: 14px;
               width: 100%;
             "
@@ -347,7 +347,7 @@
         <el-col :span="8">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-family: PingFang SC; font-size: 16px"
+            <span style=" font-size: 16px"
               >判题方式</span
             >
           </div>
@@ -356,7 +356,7 @@
             placeholder="请选择判题方式"
             style="
               margin-top: 10px;
-              font-family: PingFang SC;
+              
               font-size: 14px;
               width: 100%;
             "
@@ -374,7 +374,7 @@
         <el-col :span="8">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-family: PingFang SC; font-size: 16px"
+            <span style=" font-size: 16px"
               >输出展示</span
             >
           </div>
@@ -383,7 +383,7 @@
             placeholder="请选择是否展示输出内容"
             style="
               margin-top: 10px;
-              font-family: PingFang SC;
+              
               font-size: 14px;
               width: 100%;
             "
@@ -404,7 +404,7 @@
         <el-col :span="6">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-family: PingFang SC; font-size: 16px"
+            <span style=" font-size: 16px"
               >高性能时间限制(ms)</span
             >
           </div>
@@ -412,7 +412,7 @@
             placeholder="请输入高性能时间限制值，单位 ms"
             v-model.number="high_performance_max_cpu_time"
             clearable
-            style="margin-top: 10px; font-family: PingFang SC; font-size: 14px"
+            style="margin-top: 10px;  font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -420,7 +420,7 @@
         <el-col :span="6">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-family: PingFang SC; font-size: 16px"
+            <span style=" font-size: 16px"
               >高性能内存限制(B)</span
             >
           </div>
@@ -428,7 +428,7 @@
             placeholder="请输入高性能内存限制值，单位 B"
             v-model.number="high_performance_max_memory"
             clearable
-            style="margin-top: 10px; font-family: PingFang SC; font-size: 14px"
+            style="margin-top: 10px;  font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -436,7 +436,7 @@
         <el-col :span="6">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-family: PingFang SC; font-size: 16px"
+            <span style=" font-size: 16px"
               >其他时间限制(ms)</span
             >
           </div>
@@ -444,7 +444,7 @@
             placeholder="请输入其他时间限制值，单位 ms"
             v-model.number="other_max_cpu_time"
             clearable
-            style="margin-top: 10px; font-family: PingFang SC; font-size: 14px"
+            style="margin-top: 10px;  font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -452,7 +452,7 @@
         <el-col :span="6">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-family: PingFang SC; font-size: 16px"
+            <span style=" font-size: 16px"
               >其他内存限制(B)</span
             >
           </div>
@@ -460,7 +460,7 @@
             placeholder="请输入其他内存限制值，单位 B"
             v-model.number="other_max_memory"
             clearable
-            style="margin-top: 10px; font-family: PingFang SC; font-size: 14px"
+            style="margin-top: 10px;  font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -470,7 +470,7 @@
       <div class="problemDetail">
         <div class="titleLayout">
           <img class="mustPic" src="@/assets/img/required_field.svg" />
-          <span style="font-family: PingFang SC">描述</span>
+          <span>描述</span>
         </div>
         <!-- 富文本编辑器 -->
         <div style="margin-top: 10px">
@@ -482,7 +482,7 @@
         <!-- title -->
         <div class="titleLayout">
           <img class="mustPic" src="@/assets/img/required_field.svg" />
-          <span style="font-family: PingFang SC">样例</span>
+          <span>样例</span>
         </div>
         <!-- 动态表单 -->
         <el-form
@@ -743,7 +743,7 @@ export default {
     handleClickProblem: function (pid) {
       let id = pid;
       let that = this;
-      that.$router.push({ name: "problem", params: { id: id } });
+      that.$router.push({ name: "problemDetail", params: { id: id } });
     },
 
     // 选项改变时处理函数
@@ -938,7 +938,7 @@ export default {
 }
 .inputWord {
   width: 400px;
-  font-family: PingFang SC;
+  
   font-size: 14px;
 }
 .marginLeft30 {

@@ -113,7 +113,6 @@ import { problemPublicInfoRequest } from "@/request/problemRequest";
 // import "codemirror/mode/clike/clike.js"; //java
 
 export default {
-  name: "problemDetail",
   data() {
     return {
       id: 0, //接受前一个页面传来的id值
@@ -226,7 +225,7 @@ export default {
 
 <style lang="scss" >
 .problemTitle {
-  font-family: PingFang SC;
+  
   font-size: 30px;
   font-weight: 400;
   color: #404040;
@@ -234,7 +233,7 @@ export default {
 
 .problemContent {
   margin-top: 20px;
-  font-family: PingFang SC;
+  
   background-color: #ffffff;
 }
 
@@ -262,7 +261,7 @@ export default {
   margin-top: 24px;
 }
 .sampleTitle {
-  font-family: PingFang SC;
+  
   font-size: 24px;
   font-weight: 600;
   line-height: 1.25;
@@ -271,7 +270,7 @@ export default {
   border-bottom: 1px solid #eaecef;
 }
 .sampleDetailWord {
-  font-family: PingFang SC;
+  
   font-size: 16px;
   margin-top: 0px;
   margin-bottom: 5px;

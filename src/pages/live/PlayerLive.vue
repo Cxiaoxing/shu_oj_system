@@ -48,7 +48,7 @@ export default {
 
 <style lang="scss" scoped>
 .titleWord {
-  font-family: PingFang SC;
+  
   font-size: 16px;
   margin-right: 10px;
   color: #505050;

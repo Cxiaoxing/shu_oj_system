@@ -166,7 +166,7 @@ export default {
       userCheckOnlineRequest()
         .then(function (response) {
           if (response) {
-            that.$router.push({ name: "problemDetail", params: { id: id } });
+            that.$router.push({ name: "practiceProblemDetail", params: { id: id } });
           }
         })
         .catch(function (error) {

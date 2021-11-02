@@ -6,12 +6,12 @@
         <div class="system_name">上海大学程序设计网上训练系统</div>
         <div id="userCenter">
           <el-dropdown @command="handleCommand">
-            <i class="el-icon-user"></i>
+            <i class="el-icon-user user_icon"></i>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="user" v-if="isLogin"
                 >个人中心</el-dropdown-item
               >
-              <el-dropdown-item command="login" v-if="isLogin === false"
+              <el-dropdown-item command="login" v-if="!isLogin"
                 >登录</el-dropdown-item
               >
               <el-dropdown-item command="logout" v-if="isLogin"
@@ -25,19 +25,9 @@
       <el-container>
         <!-- 侧边栏菜单区域 -->
         <el-aside :width="isCollapse ? '64px' : '200px'">
-          <div
-            id="collapse"
-            style="
-              cursor: pointer;
-              margin-top: 10px;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-            "
-            @click="toggleCollapse"
-          >
-            <i v-if="isCollapse === false" class="el-icon-s-fold icon"></i>
-            <i v-if="isCollapse === true" class="el-icon-s-unfold icon"></i>
+          <div id="collapse" class="collapse_icon" @click="toggleCollapse">
+            <i v-if="!isCollapse" class="el-icon-s-fold"></i>
+            <i v-if="isCollapse" class="el-icon-s-unfold"></i>
           </div>
           <el-menu
             class="el-menu-vertical-demo"
@@ -48,125 +38,92 @@
             <!-- 首页 -->
             <el-menu-item index="/welcome">
               <i class="el-icon-s-home"></i>
-              <span slot="title" style="font-family: PingFang SC">首页</span>
+              <span slot="title">首页</span>
             </el-menu-item>
             <!-- 练习题集（对外） -->
             <el-menu-item index="/practice" id="problemSet">
               <i class="el-icon-menu"></i>
-              <span slot="title" style="font-family: PingFang SC">题集</span>
+              <span slot="title">题集</span>
             </el-menu-item>
             <!-- 竞赛（对外） -->
             <el-menu-item index="/contest" id="contest">
               <i class="el-icon-s-flag"></i>
-              <span slot="title" style="font-family: PingFang SC">竞赛</span>
+              <span slot="title">竞赛</span>
             </el-menu-item>
             <!-- 提交状态（对外） -->
-            <el-menu-item index="/statusList" id="submission">
+            <el-menu-item index="/status" id="submission">
               <i class="el-icon-s-order"></i>
-              <span slot="title" style="font-family: PingFang SC"
-                >提交状态</span
-              >
+              <span slot="title">提交状态</span>
             </el-menu-item>
             <!-- todo: 观看直播（对外） -->
             <!-- <el-menu-item index="/liveCard">
               <i class="el-icon-s-platform"></i>
-              <span slot="title" style="font-family: PingFang SC"
+              <span slot="title"
                 >观看直播</span
               >
             </el-menu-item> -->
+
             <!-- 用户管理 -->
-            <el-submenu
-              index="1"
-              v-if="userRole === 'sup' || userRole === 'admin'"
-            >
+            <el-submenu index="1" v-if="isAdminRole">
               <template slot="title">
                 <i class="el-icon-user-solid"></i>
-                <span style="font-family: PingFang SC">用户管理</span>
+                <span>用户管理</span>
               </template>
-              <el-menu-item index="/userManage/list" style="font-family: PingFang SC"
-                >用户列表</el-menu-item
-              >
-              <el-menu-item index="/userManage/create" style="font-family: PingFang SC"
-                >添加用户</el-menu-item
-              >
+              <el-menu-item index="/userManage/list">用户列表</el-menu-item>
+              <el-menu-item index="/userManage/create">添加用户</el-menu-item>
             </el-submenu>
             <!-- 题库管理-->
-            <el-submenu
-              index="2"
-              v-if="userRole === 'sup' || userRole === 'admin'"
-            >
+            <el-submenu index="2" v-if="isAdminRole">
               <template slot="title">
                 <i class="el-icon-s-grid"></i>
-                <span style="font-family: PingFang SC">题目管理</span>
+                <span>题目管理</span>
               </template>
-              <el-menu-item
-                index="/problemManage/list"
-                style="font-family: PingFang SC"
-                >题目列表</el-menu-item
-              >
-              <el-menu-item index="/problemManage/setList" style="font-family: PingFang SC"
+              <el-menu-item index="/problemManage/list">题目列表</el-menu-item>
+              <el-menu-item index="/problemManage/setList"
                 >题集列表</el-menu-item
               >
-              <el-menu-item
-                index="/problemManage/create"
-                style="font-family: PingFang SC"
+              <el-menu-item index="/problemManage/create"
                 >创建题目</el-menu-item
               >
             </el-submenu>
             <!-- 竞赛管理 -->
-            <el-submenu
-              index="3"
-              v-if="userRole === 'sup' || userRole === 'admin'"
-            >
+            <el-submenu index="3" v-if="isAdminRole">
               <template slot="title">
                 <i class="el-icon-s-data"></i>
-                <span style="font-family: PingFang SC">竞赛管理</span>
+                <span>竞赛管理</span>
               </template>
-              <el-menu-item
-                index="/contestManage/list"
-                style="font-family: PingFang SC"
-                >竞赛列表</el-menu-item
-              >
-              <el-menu-item
-                index="/contestManage/create"
-                style="font-family: PingFang SC"
+              <el-menu-item index="/contestManage/list">竞赛列表</el-menu-item>
+              <el-menu-item index="/contestManage/create"
                 >创建竞赛</el-menu-item
               >
             </el-submenu>
             <!-- todo: 直播管理 -->
             <!-- <el-submenu
               index="4"
-              v-if="userRole === 'sup' || userRole === 'admin'"
+              v-if="isAdminRole"
             >
               <template slot="title">
                 <i class="el-icon-video-camera-solid"></i>
-                <span style="font-family: PingFang SC">直播管理</span>
+                <span>直播管理</span>
               </template>
-              <el-menu-item index="/liveManage/live" style="font-family: PingFang SC"
+              <el-menu-item index="/liveManage/live"
                 >创建直播</el-menu-item
               >
             </el-submenu> -->
             <!-- 公告管理 -->
-            <el-submenu
-              index="5"
-              v-if="userRole === 'sup' || userRole === 'admin'"
-            >
+            <el-submenu index="5" v-if="isAdminRole">
               <template slot="title">
                 <i class="el-icon-message-solid"></i>
-                <span style="font-family: PingFang SC">公告管理</span>
+                <span>公告管理</span>
               </template>
-              <el-menu-item index="/announceManage/list" style="font-family: PingFang SC"
-                >公告列表</el-menu-item
-              >
-              <el-menu-item
-                index="/announceManage/create"
-                style="font-family: PingFang SC"
+              <el-menu-item index="/announceManage/list">公告列表</el-menu-item>
+              <el-menu-item index="/announceManage/create"
                 >新建公告</el-menu-item
               >
             </el-submenu>
           </el-menu>
         </el-aside>
-        <el-main>
+        <el-main style="background-color: #fcfcfc">
           <!-- 路由占位符 -->
           <router-view></router-view>
         </el-main>
@@ -185,7 +142,7 @@ export default {
     return {
       isLogin: false,
       isCollapse: false,
-      userRole: "",
+      isAdminRole: false,
     };
   },
 
@@ -198,20 +155,22 @@ export default {
   methods: {
     // 用户是否登陆
     checkIsLogin() {
-      var that = this;
+      const that = this;
       userCheckOnlineRequest()
         .then(function (response) {
           if (response) {
             that.isLogin = true;
-            that.userRole = response.role;
+            that.isAdminRole =
+              response.role === "sup" || response.role === "admin";
             window.localStorage.setItem("isLogin", true);
             window.localStorage.setItem("id", response.id);
             window.localStorage.setItem("role", response.role);
             that.getUserInfo(response.id);
           }
         })
-        .catch(function (error) {
-          console.log(error);
+        .catch(function () {
+          that.isLogin = false;
+          that.isAdminRole = false;
           window.localStorage.clear();
         });
     },
@@ -234,29 +193,31 @@ export default {
 
     //退出登录
     handleCommand(command) {
-      let that = this;
-      if (command === "logout") {
-        userLogoutRequest()
-          .then(function () {
-            window.localStorage.clear();
-            that.$router.push("/home");
-            window.location.reload();
-            that.$message({
-              message: "退出登陆成功！",
-              type: "success",
+      switch (command) {
+        case "user":
+          this.$router.push("/userCenter");
+          break;
+        case "login":
+          this.$router.push("/login");
+          break;
+        case "logout":
+          const that = this;
+          userLogoutRequest()
+            .then(function () {
+              that.$router.push("/home");
+              window.location.reload();
+              that.$message({
+                message: "退出登陆成功！",
+                type: "success",
+              });
+            })
+            .catch(function (error) {
+              that.$message({
+                message: "退出登录失败！",
+                type: "warning",
+              });
             });
-            that.isLogin = false;
-          })
-          .catch(function (error) {
-            that.$message({
-              message: "退出登录失败！",
-              type: "warning",
-            });
-          });
-      } else if (command === "login") {
-        this.$router.push("/login");
-      } else if (command === "user") {
-        this.$router.push("/userCenter");
+          break;
       }
     },
   },
@@ -278,41 +239,29 @@ export default {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    .system_name {
-      color: white;
-      font-size: 20px;
-    }
   }
 }
 
-.chooseList {
-  padding-bottom: 0;
+.system_name {
+  color: white;
+  font-size: 20px;
 }
 
-.el-icon-user {
+.user_icon {
   color: white;
   font-size: 30px;
 }
 
-.el-aside {
-  background-color: #ffffff;
-}
-.el-main {
-  background-color: #f6f9fc;
-}
-
-.toggle-button {
+.collapse_icon {
   cursor: pointer;
-}
-
-.icon:hover {
-  color: $key_color;
-}
-.icon {
-  color: #86909c;
-}
-
-.logoImage {
-  width: 300px;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  i:hover {
+    color: $key_color;
+  }
+  i {
+    color: $unimportant_font_color;
+  }
 }
 </style>

@@ -125,7 +125,6 @@
 <script>
 import { userLoginRequest, userRegisterRequest } from "@/request/userRequest";
 export default {
-  name: "Login",
   data() {
     // 自定义邮箱规则
     var checkEmail = (rule, value, callback) => {
@@ -287,7 +286,7 @@ export default {
 }
 
 .login_head {
-  font-family: PingFang SC;
+  
   font-size: 30px;
   font-weight: 400;
   margin-bottom: 10px;

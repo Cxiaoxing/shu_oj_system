@@ -8,21 +8,3 @@
     <router-view v-if="!$route.meta.keepAlive"></router-view>
   </div>
 </template>
-
-<script>
-export default {
-  name: "app",
-};
-</script>
-
-<style>
-.el-breadcrumb {
-  margin-bottom: 15px;
-  font-size: 14px;
-  font-family: PingFang SC;
-}
-
-.el-dialog {
-  border-radius: 5px;
-}
-</style>

@@ -187,7 +187,10 @@
                 v-if="ACLPermissions === false"
                 class="rightCardBody flex-col"
               >
-                <img class="noContextPic" src="@/assets/img/noPermissions.svg" />
+                <img
+                  class="noContextPic"
+                  src="@/assets/img/noPermissions.svg"
+                />
                 <span class="itemContent margin-top-10"
                   >未报名，暂无查看权限</span
                 >
@@ -243,7 +246,10 @@
                 v-if="ACLPermissions === false"
                 class="rightCardBody flex-col"
               >
-                <img class="noContextPic" src="@/assets/img/noPermissions.svg" />
+                <img
+                  class="noContextPic"
+                  src="@/assets/img/noPermissions.svg"
+                />
                 <span class="itemContent margin-top-10"
                   >未报名，暂无查看权限</span
                 >
@@ -767,13 +773,11 @@ export default {
 }
 
 .contestStateWord {
-  font-family: PingFang SC;
   font-size: 18px;
   color: #505050;
 }
 
 .contestCountdown {
-  font-family: PingFang SC;
   font-size: 18px;
   font-weight: 600;
   color: #3370ff;
@@ -795,7 +799,6 @@ export default {
 }
 
 .contestTitle {
-  font-family: PingFang SC;
   font-size: 28px;
   font-style: normal;
   font-weight: 600;
@@ -818,7 +821,6 @@ export default {
 }
 
 .itemTitle {
-  font-family: PingFang SC;
   font-style: normal;
   font-weight: 450;
   font-size: 16px;
@@ -827,7 +829,6 @@ export default {
 }
 
 .itemContent {
-  font-family: PingFang SC;
   font-style: normal;
   font-weight: normal;
   font-size: 14px;
@@ -838,7 +839,6 @@ export default {
 }
 
 .itemContentTimeTitle {
-  font-family: PingFang SC;
   font-style: normal;
   font-weight: normal;
   font-size: 14px;
@@ -847,7 +847,6 @@ export default {
 }
 
 .itemContentTime {
-  font-family: PingFang SC;
   font-style: normal;
   font-weight: 500;
   font-size: 14px;
@@ -881,7 +880,6 @@ export default {
 }
 
 .rankDetail {
-  font-family: PingFang SC;
   font-size: 14px;
   font-style: normal;
   font-weight: 500;
@@ -903,7 +901,6 @@ export default {
 }
 
 .rankUser {
-  font-family: PingFang SC;
   font-size: 16px;
   font-style: normal;
   font-weight: 500;
@@ -914,7 +911,6 @@ export default {
 }
 
 .rankTime {
-  font-family: PingFang SC;
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
@@ -925,7 +921,6 @@ export default {
 }
 
 .rankOrder {
-  font-family: PingFang SC;
   font-size: 16px;
   font-style: normal;
   font-weight: 400;

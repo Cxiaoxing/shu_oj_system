@@ -3,31 +3,13 @@
     <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item :to="{ path: '/contest' }">竞赛</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ path: '/practice' }">题集</el-breadcrumb-item>
       <el-breadcrumb-item>{{ problem_info.title }}</el-breadcrumb-item>
     </el-breadcrumb>
-    <!-- 题目切换按钮 -->
-    <div class="problem_turning">
-      <el-button
-        class="previous_problem"
-        type="primary"
-        icon="el-icon-arrow-left"
-        @click="previous_problem()"
-        v-if="inner_id != 1"
-        >上一题</el-button
-      >
-      <el-button
-        class="after_problem"
-        type="primary"
-        @click="after_problem()"
-        v-if="inner_id != total"
-        >下一题<i class="el-icon-arrow-right el-icon--right"></i
-      ></el-button>
-    </div>
-    <!-- 卡片 -->
     <el-row :gutter="20">
       <el-col :span="12">
-        <el-card style="height: 100%">
+        <!-- 题目展示区域 -->
+        <el-card>
           <!-- 题目区域 -->
           <div>
             <div style="display: flex; justify-content: space-between">
@@ -45,7 +27,7 @@
               />
             </div>
             <!--样例 -->
-            <div v-if="problem_contents.example_count != 0" class="sample">
+            <div v-if="problem_contents.example_count !== 0" class="sample">
               <div
                 v-for="(example, index) in problem_contents.examples"
                 v-bind:key="index"
@@ -63,7 +45,7 @@
       </el-col>
       <el-col :span="12">
         <!-- 编程区域 -->
-        <el-card>
+        <el-card class="rightCard">
           <div>
             <!-- 编程语言选择区 -->
             <div>
@@ -106,6 +88,16 @@
         </el-card>
       </el-col>
     </el-row>
+    <!-- 提交结束后引导查看提交详情弹窗 -->
+    <el-dialog title="" :visible.sync="dialogVisible" width="30%">
+      <span>提交成功！</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="goProblemResult()"
+          >查看详情</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -114,27 +106,24 @@ import { codemirror } from "vue-codemirror";
 // 核心样式
 import "codemirror/lib/codemirror.css";
 // 引入主题后还需要在 options 中指定主题才会生效
-import "codemirror/theme/rubyblue.css"; // 蓝绿色
-import "codemirror/theme/darcula.css"; // 黑色
-import "codemirror/theme/elegant.css"; // 白色
 import "codemirror/theme/idea.css"; // 白色
 // 代码高亮
 import "codemirror/mode/python/python.js"; // python
 // import "codemirror/mode/clike/clike.js"; //java
-import { problemPrivateInfoRequest } from "@/request/problemRequest";
+
+import { problemPublicInfoRequest } from "@/request/problemRequest";
 import { submissionRequest } from "@/request/submissonRequest";
+
 export default {
-  name: "problemDetail",
   data() {
     return {
       id: 0, //接受前一个页面传来的id值
-      total: 0, //题目总数
-      region: "",
-      inner_id: "",
+      uuid: "",
       problem_info: {}, //题目基础信息
       problem_contents: {}, //题目描述
-      code: "", // 代码编辑器绑定的值
-      // 代码编辑器默认配置
+      dialogVisible: false, //控制查看题目详情弹窗
+      code: "\n\n\n\n\n\n", // 代码编辑器绑定的值
+      // 代码编辑器配置
       options: {
         tabSize: 2, // 缩进格式
         theme: "idea", // 主题，对应主题库 JS 需要提前引入
@@ -142,6 +131,8 @@ export default {
         line: true,
         lineWrapping: true, //代码折叠
         styleActiveLine: true, // 高亮选中行
+        showCursorWhenSelecting: true,
+        autofocus: true,
         hintOptions: {
           completeSingle: true, // 当匹配只有一项的时候是否自动补全
         },
@@ -176,18 +167,16 @@ export default {
     };
   },
   created() {
-    this.region = this.$route.params.region;
     this.id = this.$route.params.id;
-    this.inner_id = this.$route.params.inner_id;
-    this.total = this.$route.params.total;
-    this.getProblem();
+    this.getProblem(this.id);
   },
   methods: {
     // 获取题目详情
-    getProblem: function () {
+    getProblem: function (region) {
       var that = this;
-      problemPrivateInfoRequest(this.region, this.inner_id)
+      problemPublicInfoRequest(region)
         .then(function (response) {
+          console.log(response);
           that.problem_info = response.info;
           that.problem_contents = response.contents;
         })
@@ -200,26 +189,16 @@ export default {
       this.language = language;
     },
     // 提交代码
-    submitCode: function () {
+    submitCode: function (region) {
       var that = this;
       const data = {
         src: this.code,
         language: this.language,
       };
-      submissionRequest(this.region, this.inner_id, data)
+      submissionRequest("set_main", region, data)
         .then(function (response) {
-          that
-            .$confirm("提交成功", {
-              confirmButtonText: "查看结果",
-              cancelButtonText: "知道了",
-              type: "success",
-            })
-            .then(() => {
-              that.$router.push({
-                name: "submissionDetail",
-                params: { uuid: response },
-              });
-            });
+          that.dialogVisible = true;
+          that.uuid = response;
         })
         .catch(function (error) {
           console.log(error);
@@ -230,33 +209,13 @@ export default {
         });
     },
 
-    // 上一题
-    previous_problem() {
-      var that = this;
-      var previous = new Promise(function (resolve, reject) {
-        var inner_id =
-          parseInt(that.inner_id) > 1 ? parseInt(that.inner_id) - 1 : 1;
-        that.inner_id = inner_id;
-        resolve(inner_id);
-      });
-      previous.then(function (inner_id) {
-        that.getProblem(that.region, inner_id);
-      });
-    },
-
-    // 下一题
-    after_problem() {
-      var that = this;
-      var after = new Promise(function (resolve, reject) {
-        let inner_id =
-          parseInt(that.inner_id) < parseInt(that.total)
-            ? parseInt(that.inner_id) + 1
-            : parseInt(that.total);
-        that.inner_id = inner_id;
-        resolve(inner_id);
-      });
-      after.then(function (inner_id) {
-        that.getProblem(that.region, inner_id);
+    // 跳转至题目结果详情
+    goProblemResult() {
+      let that = this;
+      let uuid = that.uuid;
+      that.$router.push({
+        name: "submissionDetail",
+        params: { uuid: uuid },
       });
     },
   },
@@ -267,23 +226,19 @@ export default {
 </script>
 
 <style lang="scss" >
-.problem_turning {
-  margin-bottom: 10px;
-  background-color: rgb(255, 255, 255);
-  width: 100%;
-  height: 35px;
+.cardLayout {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
-
-.previous_problem {
-  float: left;
+.rightcard {
+  width: 50%;
 }
-
-.after_problem {
-  float: right;
+.leftcard {
+  width: 48%;
 }
-
 .problemTitle {
-  font-family: PingFang SC;
+  
   font-size: 30px;
   font-weight: 400;
   color: #404040;
@@ -291,7 +246,7 @@ export default {
 
 .problemContent {
   margin-top: 20px;
-  font-family: PingFang SC;
+  
   background-color: #ffffff;
 }
 
@@ -319,7 +274,7 @@ export default {
   margin-top: 24px;
 }
 .sampleTitle {
-  font-family: PingFang SC;
+  
   font-size: 24px;
   font-weight: 600;
   line-height: 1.25;
@@ -328,7 +283,7 @@ export default {
   border-bottom: 1px solid #eaecef;
 }
 .sampleDetailWord {
-  font-family: PingFang SC;
+  
   font-size: 16px;
   margin-top: 0px;
   margin-bottom: 5px;

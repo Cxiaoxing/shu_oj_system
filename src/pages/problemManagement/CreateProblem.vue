@@ -10,7 +10,7 @@
     <el-card class="firstCard">
       <div
         style="
-          font-family: PingFang SC;
+          
           font-size: 20px;
           font-weight: 400;
           color: #303133;
@@ -42,7 +42,7 @@
     <el-card class="secondCard">
       <div
         style="
-          font-family: PingFang SC;
+          
           font-size: 20px;
           font-weight: 400;
           color: #303133;
@@ -63,7 +63,7 @@
             placeholder="请输入标题"
             v-model="input_title"
             clearable
-            style="margin-top: 10px; font-family: PingFang SC; font-size: 14px"
+            style="margin-top: 10px;  font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -82,7 +82,7 @@
             placeholder="请选择标签"
             style="
               margin-top: 10px;
-              font-family: PingFang SC;
+              
               font-size: 14px;
               width: 100%;
             "
@@ -110,7 +110,7 @@
             placeholder="请选择难度"
             style="
               margin-top: 10px;
-              font-family: PingFang SC;
+              
               font-size: 14px;
               width: 100%;
             "
@@ -135,7 +135,7 @@
             placeholder="请选择判题方式"
             style="
               margin-top: 10px;
-              font-family: PingFang SC;
+              
               font-size: 14px;
               width: 100%;
             "
@@ -160,7 +160,7 @@
             placeholder="请选择是否展示输出内容"
             style="
               margin-top: 10px;
-              font-family: PingFang SC;
+              
               font-size: 14px;
               width: 100%;
             "
@@ -187,7 +187,7 @@
             placeholder="请输入高性能时间限制值，单位 ms"
             v-model.number="high_performance_max_cpu_time"
             clearable
-            style="margin-top: 10px; font-family: PingFang SC; font-size: 14px"
+            style="margin-top: 10px;  font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -201,7 +201,7 @@
             placeholder="请输入高性能内存限制值，单位 B"
             v-model.number="high_performance_max_memory"
             clearable
-            style="margin-top: 10px; font-family: PingFang SC; font-size: 14px"
+            style="margin-top: 10px;  font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -215,7 +215,7 @@
             placeholder="请输入其他时间限制值，单位 ms"
             v-model.number="other_max_cpu_time"
             clearable
-            style="margin-top: 10px; font-family: PingFang SC; font-size: 14px"
+            style="margin-top: 10px;  font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -229,7 +229,7 @@
             placeholder="请输入其他内存限制值，单位 B"
             v-model.number="other_max_memory"
             clearable
-            style="margin-top: 10px; font-family: PingFang SC; font-size: 14px"
+            style="margin-top: 10px;  font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -505,7 +505,7 @@ export default {
 }
 
 .itemTitle {
-  font-family: PingFang SC;
+  
   font-size: 15px;
   color: #494747;
 }
@@ -516,7 +516,7 @@ export default {
 }
 
 .linkWord {
-  font-family: PingFang SC;
+  
   font-size: 12px;
   color: #494747;
   font-weight: 400;
@@ -524,7 +524,7 @@ export default {
 
 .inputWord {
   width: 400px; 
-  font-family: PingFang SC; 
+   
   font-size: 14px;
 }
 </style>

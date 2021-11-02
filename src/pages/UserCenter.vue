@@ -596,7 +596,7 @@ export default {
 }
 
 .editInfoButtonWord {
-  font-family: PingFang SC;
+  
   font-size: 14px;
   font-style: normal;
   font-weight: 400;
@@ -618,14 +618,14 @@ export default {
 }
 .infoWordRight {
   margin-left: 5px;
-  font-family: PingFang SC;
+  
   font-size: 14px;
   color: $ordinary_font_color;
 }
 
 .infoWord {
   margin-left: 15px;
-  font-family: PingFang SC;
+  
   font-size: 14px;
   color: $important_font_color;
   font-weight: 450;
@@ -646,19 +646,19 @@ export default {
 
 .submissionWordLight {
   color: #606a78;
-  font-family: PingFang SC;
+  
   font-size: 14px;
 }
 
 .submissionWordHeavy {
   color: #505050;
-  font-family: PingFang SC;
+  
   font-weight: 500;
   font-size: 14px;
 }
 
 .TopRightSmallWord {
-  font-family: PingFang SC;
+  
   font-size: 12px;
   font-style: normal;
   font-weight: 400;
@@ -675,7 +675,7 @@ export default {
   font-weight: 600;
   line-height: 34px;
   letter-spacing: 0px;
-  font-family: PingFang SC;
+  
   font-size: 16px;
   font-style: normal;
   font-weight: 400;

@@ -103,7 +103,7 @@
             placeholder="请输入竞赛的名称"
             v-model="modify_title"
             clearable
-            style="margin-top: 10px; font-family: PingFang SC; font-size: 14px"
+            style="margin-top: 10px;  font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -470,7 +470,7 @@ export default {
 }
 
 .itemTitle {
-  font-family: PingFang SC;
+  
   font-size: 15px;
   color: #494747;
 }

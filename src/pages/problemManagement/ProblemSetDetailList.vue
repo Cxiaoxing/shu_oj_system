@@ -252,7 +252,6 @@ import {
   ProblemAddRegionRequest
 } from "@/request/problemRequest";
 export default {
-  name: "problemSetDetailList",
   data() {
     return {
       // 接受前一个页面传来的 region
@@ -329,7 +328,7 @@ export default {
       let region = re;
       let that = this;
       that.$router.push({
-        name: "problem",
+        name: "problemDetail",
         params: { id: id, region: region },
       });
     },

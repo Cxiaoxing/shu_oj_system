@@ -1,5 +1,5 @@
 <template>
-  <div style="font-family: PingFang SC">
+  <div>
     <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
@@ -47,7 +47,7 @@
       >
         <div
           style="
-            font-family: PingFang SC;
+            
             font-size: 20px;
             font-weight: 500;
             color: #303133;
@@ -60,7 +60,7 @@
           <div>
             <span
               style="
-                font-family: PingFang SC;
+                
                 font-size: 16px;
                 font-weight: 500;
                 color: #303133;
@@ -88,7 +88,7 @@
           <div>
             <span
               style="
-                font-family: PingFang SC;
+                
                 font-size: 16px;
                 font-weight: 500;
                 color: #303133;
@@ -96,7 +96,7 @@
               >When
             </span>
             <span
-              style="font-family: PingFang SC; font-size: 14px; color: #606a78"
+              style=" font-size: 14px; color: #606a78"
               >{{ formatTime(subTime) }}</span
             >
           </div>
@@ -180,7 +180,6 @@ import "codemirror/mode/python/python.js"; // python
 import { sampleResultRequest } from "@/request/sampleRequest";
 import { problemPublicInfoRequest } from '@/request/problemRequest';
 export default {
-  name: "sampleResultDetail",
   data() {
     return {
       // 代码编辑器默认配置
@@ -367,7 +366,7 @@ export default {
   width: 25px;
 }
 .timeLineTitle {
-  font-family: PingFang SC;
+  
   font-size: 16px;
   font-style: normal;
   font-weight: 600;
@@ -386,7 +385,7 @@ export default {
 }
 
 .timeLineContextTitle {
-  font-family: PingFang SC;
+  
   font-size: 14px;
   font-style: normal;
   font-weight: 600;
@@ -397,7 +396,7 @@ export default {
 }
 
 .timeLineContextWord {
-  font-family: PingFang SC;
+  
   font-size: 12px;
   font-style: normal;
   font-weight: 400;

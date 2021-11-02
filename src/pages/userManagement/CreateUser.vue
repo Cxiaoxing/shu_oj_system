@@ -10,7 +10,7 @@
     <el-card class="firstCard" v-if="false">
       <div
         style="
-          font-family: PingFang SC;
+          
           font-size: 20px;
           font-weight: 400;
           color: #303133;
@@ -44,7 +44,7 @@
     <el-card class="secondCard">
       <div
         style="
-          font-family: PingFang SC;
+          
           font-size: 20px;
           font-weight: 400;
           color: #303133;

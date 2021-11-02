@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-carousel :interval="4000" type="card" height="200px">
-      <el-carousel-item v-for="item in imgList" :key="item">
+      <el-carousel-item v-for="(item, index) in imgList" :key="index">
         <img :src="item.src" style="width: 100%" />
         <!-- todo: 上传图片公告，点击跳转 @click="jumpToAnnounceDetail(item)" -->
       </el-carousel-item>

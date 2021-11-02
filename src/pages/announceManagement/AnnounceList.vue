@@ -88,7 +88,7 @@
             placeholder="请输入公告的名称"
             v-model="new_announceInfo.title"
             clearable
-            style="margin-top: 10px; font-family: PingFang SC; font-size: 14px"
+            style="margin-top: 10px;  font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -147,7 +147,6 @@ import {
 import moment from "moment";
 
 export default {
-  name: "AnnounceList",
   data() {
     return {
       searchInput: "",

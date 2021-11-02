@@ -6,57 +6,57 @@ const Home = () => import(/* webpackChunkName: "HomeScreen" */ '../components/Ho
 const Login = () => import(/* webpackChunkName: "HomeScreen" */ '../pages/Login.vue')
 const Welcome = () => import(/* webpackChunkName: "HomeScreen" */ '../pages/Welcome.vue')
 
+// 【公告详情】
+const AnnounceDetail = () => import(/* webpackChunkName: "Announce" */ '../pages/announce/AnnounceDetail.vue')
 
-// 内部【标程管理】
-const ProblemDetail = () => import(/* webpackChunkName: "Sample" */ '../components/sample/ProblemDetail.vue')
-const SampleResultDetail = () => import(/* webpackChunkName: "Sample" */ '../components/sample/SampleResultDetail.vue')
-const SampleList = () => import(/* webpackChunkName: "Sample" */ '../components/sample/SampleList.vue')
+// 【题集】
+const Practice = () => import(/* webpackChunkName: "Problem" */ '../pages/practice/Practice.vue')
+const PracticeProblemDetail = () => import(/* webpackChunkName: "Problem" */ '../pages/practice/ProblemDetail.vue')
 
-// 内部【题库管理】
-const QuestionBank = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/QuestionBank.vue')
-const ProblemSet = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/ProblemSet.vue')
-const ProblemSetDetailList = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/ProblemSetDetailList.vue')
-const CreateProblem = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/CreateProblem.vue')
-
-// 内部【用户管理】
-const UserList = () => import(/* webpackChunkName: "UserManagement" */ '../pages/userManagement/UserList.vue')
-const CreateUser = () => import(/* webpackChunkName: "UserManagement" */ '../pages/userManagement/CreateUser.vue')
-
-// 内部【竞赛管理】
-const ContestBank = () => import(/* webpackChunkName: "ContestManagement" */ '../pages/contestManagement/ContestBank.vue')
-const ContestDetailList = () => import(/* webpackChunkName: "ContestManagement" */ '../pages/contestManagement/ContestDetailList.vue')
-const CreateContest = () => import(/* webpackChunkName: "ContestManagement" */ '../pages/contestManagement/CreateContest.vue')
-
-// 内部【直播管理】
-const Live = () => import(/* webpackChunkName: "LiveManagement" */ '../pages/liveManagement/Live.vue')
-
-// 内部【公告管理】
-const Announce = () => import(/* webpackChunkName: "AnnounceManagement" */ '../pages/announceManagement/AnnounceList.vue')
-const CreateAnnounce = () => import(/* webpackChunkName: "AnnounceManagement" */ '../pages/announceManagement/CreateAnnounce.vue')
-
-// 外部【题集】
-const Practice = () => import(/* webpackChunkName: "Problem" */ '../pages/problem/Practice.vue')
-const ProblemSetDetail = () => import(/* webpackChunkName: "Problem" */ '../pages/problem/ProblemDetail.vue')
-
-// 外部【竞赛】
+// 【竞赛】
 const Contest = () => import(/* webpackChunkName: "Contest" */ '../pages/contest/Contest.vue')
 const ContestDetail = () => import(/* webpackChunkName: "Contest" */ '../pages/contest/ContestDetail.vue')
-const ContestProblemDetail = () => import(/* webpackChunkName: "Contest" */ '../pages/contest/ContestProblemDetail.vue')
+const ContestProblemDetail = () => import(/* webpackChunkName: "Contest" */ '../pages/contest/ProblemDetail.vue')
 
-// 外部【提交状态】
-const StatusList = () => import(/* webpackChunkName: "Submission" */ '../pages/StatusList.vue')
+// 【提交状态】
+const Status = () => import(/* webpackChunkName: "Submission" */ '../pages/StatusList.vue')
 const SubmissionDetail = () => import(/* webpackChunkName: "Submission" */ '../components/SubmissionDetail.vue')
 
-// 外部【观看直播】
+// 【观看直播】
 const LiveCard = () => import(/* webpackChunkName: "Live" */ '../pages/live/LiveCard.vue')
 const PlayerLive = () => import(/* webpackChunkName: "Live" */ '../pages/live/PlayerLive.vue')
 
-// 外部【个人中心】
+// 【个人中心】
 const UserCenter = () => import(/* webpackChunkName: "UserCenter" */ '../pages/UserCenter.vue')
 
-// 外部【公告详情】
-const AnnounceDetail = () => import(/* webpackChunkName: "Announce" */ '../pages/announce/AnnounceDetail.vue')
+/****************************    内部管理    ****************************/ 
 
+// 【用户管理】
+const UserList = () => import(/* webpackChunkName: "UserManagement" */ '../pages/userManagement/UserList.vue')
+const CreateUser = () => import(/* webpackChunkName: "UserManagement" */ '../pages/userManagement/CreateUser.vue')
+
+// 【标程管理】
+const ProblemDetail = () => import(/* webpackChunkName: "Sample" */ '../components/sample/ProblemDetail.vue')
+const SampleList = () => import(/* webpackChunkName: "Sample" */ '../components/sample/SampleList.vue')
+const SampleResultDetail = () => import(/* webpackChunkName: "Sample" */ '../components/sample/SampleResultDetail.vue')
+
+// 【题库管理】
+const ProblemList = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/ProblemList.vue')
+const ProblemSetList = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/ProblemSetList.vue')
+const ProblemSetDetailList = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/ProblemSetDetailList.vue')
+const CreateProblem = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/CreateProblem.vue')
+
+// 【竞赛管理】
+const ContestList = () => import(/* webpackChunkName: "ContestManagement" */ '../pages/contestManagement/ContestList.vue')
+const ContestDetailList = () => import(/* webpackChunkName: "ContestManagement" */ '../pages/contestManagement/ContestDetailList.vue')
+const CreateContest = () => import(/* webpackChunkName: "ContestManagement" */ '../pages/contestManagement/CreateContest.vue')
+
+// 【直播管理】
+const Live = () => import(/* webpackChunkName: "LiveManagement" */ '../pages/liveManagement/Live.vue')
+
+// 【公告管理】
+const AnnounceList = () => import(/* webpackChunkName: "AnnounceManagement" */ '../pages/announceManagement/AnnounceList.vue')
+const CreateAnnounce = () => import(/* webpackChunkName: "AnnounceManagement" */ '../pages/announceManagement/CreateAnnounce.vue')
 
 
 Vue.use(VueRouter)
@@ -84,13 +84,13 @@ const router = new VueRouter({
         { path: '/userCenter', component: UserCenter },
         // 主题集
         { path: '/practice', component: Practice },
-        { path: '/problemDetail/:id', component: ProblemSetDetail, name: 'problemDetail' },
+        { path: '/practice/problemDetail/:id', component: PracticeProblemDetail, name: 'practiceProblemDetail' },
         // 竞赛
         { path: '/contest', component: Contest },
-        { path: '/contestDetail/:region/:title', component: ContestDetail, name: 'contestDetail' },
-        { path: '/contestProblemDetail/:region/:id/:inner_id/:total', component: ContestProblemDetail, name: 'contestProblemDetail' },
+        { path: '/contestDetail/:region/:title/list', component: ContestDetail, name: 'contestDetail' },
+        { path: '/contest/:region/problemDetail/:id/:inner_id/:total', component: ContestProblemDetail, name: 'contestProblemDetail' },
         // 提交记录
-        { path: '/statusList', component: StatusList },
+        { path: '/status', component: Status },
         // 提交详情
         { path: '/submissionDetail/:uuid', component: SubmissionDetail, name: 'submissionDetail' },
         // 直播
@@ -99,17 +99,17 @@ const router = new VueRouter({
 
         // 题目管理
         { path: '/problemManage', redirect: '/problemManage/list' },
-        { path: '/problemManage/problemDetail/:id', component: ProblemDetail, name: 'problem' },
-        { path: '/problemManage/list', component: QuestionBank },
-        { path: '/problemManage/setList', component: ProblemSet },
+        { path: '/problemManage/list', component: ProblemList },
+        { path: '/problemManage/setList', component: ProblemSetList },
         { path: '/problemManage/setDetail/:region/list', component: ProblemSetDetailList, name: 'problemSetDetailList' },
         { path: '/problemManage/create', component: CreateProblem },
-        // 标程
+        // 标程管理
+        { path: '/problemManage/problemDetail/:id', component: ProblemDetail, name: 'problemDetail' },
         { path: '/problemManage/sampleList/:id', component: SampleList, name: 'sampleList' },
         { path: '/problemManage/sampleResultDetail/:uuid', component: SampleResultDetail, name: 'sampleResultDetail' },
         // 竞赛管理
         { path: '/contestManage', redirect: '/contestManage/list' },
-        { path: '/contestManage/list', component: ContestBank },
+        { path: '/contestManage/list', component: ContestList },
         { path: '/contestManage/create', component: CreateContest },
         { path: '/contestManage/contestDetail/:region/list', component: ContestDetailList, name: 'contestDetailList' },
         // 用户管理
@@ -120,7 +120,7 @@ const router = new VueRouter({
         { path: '/liveManage/live', component: Live },
         // 公告管理
         { path: '/announceManage', redirect: '/announceManage/list' },
-        { path: '/announceManage/list', component: Announce },
+        { path: '/announceManage/list', component: AnnounceList },
         { path: '/announceManage/create', component: CreateAnnounce },
       ]
     }

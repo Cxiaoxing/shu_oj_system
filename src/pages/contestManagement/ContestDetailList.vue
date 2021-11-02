@@ -262,7 +262,6 @@ import {
 } from "@/request/problemRequest";
 
 export default {
-  name: "contestDetailList",
   data() {
     return {
       // 接受前一个页面传来的 region
@@ -334,7 +333,7 @@ export default {
     goProblemDetail(pid) {
       let id = pid;
       let that = this;
-      that.$router.push({ name: "problem", params: { id: id } });
+      that.$router.push({ name: "problemDetail", params: { id: id } });
     },
 
     // 删除竞赛中的题目

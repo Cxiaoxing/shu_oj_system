@@ -48,7 +48,7 @@
             placeholder="请输入公告的名称"
             v-model="new_announceInfo.title"
             clearable
-            style="margin-top: 10px; font-family: PingFang SC; font-size: 14px"
+            style="margin-top: 10px;  font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -105,7 +105,6 @@ import {
 } from "@/request/announceRequest";
 
 export default {
-  name: "problemDetail",
   data() {
     return {
       userRole: "",
@@ -172,7 +171,7 @@ export default {
 
 <style lang="scss" >
 .title {
-  font-family: PingFang SC;
+  
   font-size: 30px;
   font-weight: 400;
   color: #404040;
@@ -184,7 +183,7 @@ export default {
 
 .contents {
   margin-top: 20px;
-  font-family: PingFang SC;
+  
   background-color: #ffffff;
 }
 
@@ -224,7 +223,7 @@ export default {
 }
 
 .itemTitle {
-  font-family: PingFang SC;
+  
   font-size: 15px;
   color: #494747;
 }
