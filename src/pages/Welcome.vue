@@ -125,6 +125,6 @@ export default {
 
 .guideIcon {
   font-size: 30px;
-  color: $key_color_2;
+  color: $key_color_light;
 }
 </style>

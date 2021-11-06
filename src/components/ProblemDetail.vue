@@ -1,11 +1,5 @@
 <template>
   <div>
-    <!-- 面包屑导航区域 -->
-    <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item :to="{ path: '/practice' }">题集</el-breadcrumb-item>
-      <el-breadcrumb-item>{{ problem_info.title }}</el-breadcrumb-item>
-    </el-breadcrumb>
     <el-row :gutter="20">
       <el-col :span="12">
         <!-- 题目展示区域 -->
@@ -55,10 +49,7 @@
           <!-- 编程语言选择区 -->
           <div>
             <span>语言: </span>
-            <el-select
-              v-model="language"
-              placeholder="请选择编程语言"
-            >
+            <el-select v-model="language" placeholder="请选择编程语言">
               <el-option
                 v-for="item in languages"
                 :key="item.value"
@@ -89,19 +80,9 @@
             >
           </div>
         </el-card>
-        </el-col>
+      </el-col>
     </el-row>
-    <!-- 提交结束后引导查看提交详情弹窗 -->
-    <el-dialog title="" :visible.sync="dialogVisible" width="30%">
-      <span>提交成功！</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">知道了</el-button>
-        <el-button type="primary" @click="goProblemResult()"
-          >查看详情</el-button
-        >
-      </span>
-    </el-dialog>  
-  </div>  
+  </div>
 </template>
 
 <script>
@@ -113,18 +94,28 @@ import "codemirror/mode/python/python.js"; // python
 // import "codemirror/mode/clike/clike.js"; //java
 
 import { problemPublicInfoRequest } from "@/request/problemRequest";
+import { sampleRequest } from "@/request/sampleRequest";
 import { submissionRequest } from "@/request/submissonRequest";
-
 export default {
+  props: {
+    id: {
+      type: Number,
+      default: 0,
+    },
+    isSample: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  components: {
+    codemirror,
+  },
   data() {
     return {
-      id: 0, //接受前一个页面传来的id值
-      uuid: "",
       problem_info: {}, //题目基础信息
       problem_contents: {}, //题目描述
-      dialogVisible: false, //控制查看题目详情弹窗
+      uuid: "",
       code: "", // 代码编辑器绑定的值
-      // 代码编辑器配置
       options: {
         tabSize: 2, // 缩进格式
         theme: "idea", // 主题，对应主题库 JS 需要提前引入
@@ -163,12 +154,9 @@ export default {
       ],
       // 默认语言
       language: "cpp",
-      // 查看结果定时器
-      timer: null,
     };
   },
   created() {
-    this.id = this.$route.params.id;
     this.getProblem(this.id);
   },
   methods: {
@@ -185,108 +173,73 @@ export default {
           console.log(error);
         });
     },
+
     // 选择编程语言
     changeLanguage: function (language) {
       this.language = language;
     },
-    // 提交代码
-    submitCode: function (region) {
-      var that = this;
-      const data = {
-        src: this.code,
-        language: this.language,
-      };
-      submissionRequest("set_main", region, data)
-        .then(function (response) {
-          that.dialogVisible = true;
-          that.uuid = response;
-        })
-        .catch(function (error) {
-          console.log(error);
-          that.$message({
-            message: "提交失败！",
-            type: "warning",
-          });
-        });
-    },
 
-    // 跳转至题目结果详情
-    goProblemResult() {
-      let that = this;
-      let uuid = that.uuid;
-      that.$router.push({
-        name: "submissionDetail",
-        params: { uuid: uuid },
-      });
+    // 提交代码
+    submitCode: function (pid) {
+        const that = this;
+        if (this.isSample) {
+          const data = {
+            problem_id: pid,
+            src: this.code,
+            language: this.language,
+          };
+          sampleRequest(data)
+            .then(function (response) {
+              that
+                .$confirm("提交成功", {
+                  confirmButtonText: "查看详情",
+                  cancelButtonText: "知道了",
+                  type: "success",
+                })
+                .then(() => {
+                  that.$router.push({
+                    name: "sampleResultDetail",
+                    params: { uuid: response },
+                  });
+                });
+            })
+            .catch(function (error) {
+              console.log(error);
+              that.$message({
+                message: "提交失败！",
+                type: "warning",
+              });
+            });
+        } else {
+          const data = {
+            src: this.code,
+            language: this.language,
+          };
+          const region = "set_main"; //todo
+          submissionRequest(region, pid, data)
+            .then(function (response) {
+              that
+                .$confirm("提交成功", {
+                  confirmButtonText: "查看详情",
+                  cancelButtonText: "知道了",
+                  type: "success",
+                })
+                .then(() => {
+                  that.$router.push({
+                    name: "submissionDetail",
+                    params: { uuid: response },
+                  });
+                });
+            })
+            .catch(function (error) {
+              console.log(error);
+              that.$message({
+                message: "提交失败！",
+                type: "warning",
+              });
+            });
+        }
     },
-  },
-  components: {
-    codemirror,
   },
 };
 </script>
-
-<style lang="scss" >
-.cardLayout {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-.rightcard {
-  width: 50%;
-}
-.leftcard {
-  width: 48%;
-}
-.problemTitle {
-  font-size: 30px;
-  font-weight: 400;
-  color: #404040;
-}
-
-.sample {
-  margin-top: 20px;
-  padding: 8px 25px 15px 25px;
-  background-color: $background_color;
-  border-radius: 4px;
-}
-.sampleDisplay {
-  margin-top: 16px;
-  margin-bottom: 24px;
-  margin-left: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.sampleDetail {
-  display: flex;
-  flex-direction: column;
-  margin-top: 24px;
-}
-
-.sampleTitle {
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 1.25;
-  padding-bottom: 0.3em;
-  font-size: 1.5em;
-  border-bottom: 1px solid #eaecef;
-}
-
-.sampleDetailWord {
-  font-size: 16px;
-  margin-top: 0px;
-  margin-bottom: 5px;
-  line-height: 1.5;
-}
-
-.CodeMirror {
-  height: 380px;
-}
-
-.CodeMirror-scroll {
-  height: 100%;
-  overflow-y: hidden;
-  overflow-x: auto;
-}
-</style>

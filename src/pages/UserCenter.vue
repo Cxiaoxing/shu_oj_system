@@ -85,17 +85,7 @@
           </div>
           <!-- 热力图展示区域 -->
           <div class="heetmap">
-            <calendar-heatmap
-              :end-date="myDate"
-              :values="submissionsTime"
-              :range-color="[
-                '#f7f2f6',
-                '#e7d5e4',
-                '#dabad2',
-                '#bd9bb7',
-                '#a581a0',
-              ]"
-            />
+            <calendar-heatmap :end-date="myDate" :values="submissionsTime" />
           </div>
         </el-card>
       </div>
@@ -244,7 +234,7 @@
 
 <script>
 import moment from "moment";
-import {CalendarHeatmap} from "vue-calendar-heatmap"; //热力图
+import { CalendarHeatmap } from "vue-calendar-heatmap"; //热力图
 import echarts from "../utils/initEcharts";
 import {
   userCheckOnlineRequest,
@@ -560,7 +550,7 @@ export default {
   width: 130px;
   height: 130px;
   background: #ffffff;
-  border: 1px solid $key_color_4;
+  border: 1px solid $key_color;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -596,7 +586,6 @@ export default {
 }
 
 .editInfoButtonWord {
-  
   font-size: 14px;
   font-style: normal;
   font-weight: 400;
@@ -618,14 +607,12 @@ export default {
 }
 .infoWordRight {
   margin-left: 5px;
-  
   font-size: 14px;
   color: $ordinary_font_color;
 }
 
 .infoWord {
   margin-left: 15px;
-  
   font-size: 14px;
   color: $important_font_color;
   font-weight: 450;
@@ -646,19 +633,18 @@ export default {
 
 .submissionWordLight {
   color: #606a78;
-  
+
   font-size: 14px;
 }
 
 .submissionWordHeavy {
   color: #505050;
-  
+
   font-weight: 500;
   font-size: 14px;
 }
 
 .TopRightSmallWord {
-  
   font-size: 12px;
   font-style: normal;
   font-weight: 400;
@@ -675,7 +661,7 @@ export default {
   font-weight: 600;
   line-height: 34px;
   letter-spacing: 0px;
-  
+
   font-size: 16px;
   font-style: normal;
   font-weight: 400;

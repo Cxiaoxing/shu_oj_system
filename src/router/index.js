@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
+const Test = () => import(/* webpackChunkName: "HomeScreen" */ '../pages/Test.vue')
+
 // 路由懒加载，当路由被访问时才加载对应组件，同一个webpackChunkName生成一个js文件
 const Home = () => import(/* webpackChunkName: "HomeScreen" */ '../components/Home.vue')
 const Login = () => import(/* webpackChunkName: "HomeScreen" */ '../pages/Login.vue')
@@ -29,7 +31,7 @@ const PlayerLive = () => import(/* webpackChunkName: "Live" */ '../pages/live/Pl
 // 【个人中心】
 const UserCenter = () => import(/* webpackChunkName: "UserCenter" */ '../pages/UserCenter.vue')
 
-/****************************    内部管理    ****************************/ 
+/****************************    内部管理    ****************************/
 
 // 【用户管理】
 const UserList = () => import(/* webpackChunkName: "UserManagement" */ '../pages/userManagement/UserList.vue')
@@ -74,6 +76,8 @@ const router = new VueRouter({
       component: Home,
       redirect: '/welcome',
       children: [
+        // 测试
+        { path: '/test/:id', component: Test },
         // 首页
         { path: '/welcome', component: Welcome },
         // 公告

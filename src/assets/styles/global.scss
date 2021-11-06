@@ -1,14 +1,9 @@
 /* 全局样式表 */
 // 主题色
-$key_title_color: #81677e;
-$key_color: #a581a0;
-$key_color_2: #bd9bb7;
-$key_color_3: #dabad2;
-$key_color_4: #e7d5e4;
-$key_color_5: #f7f2f6;
-
-// 字体
-$title_font_family: PingFang SC;
+$key_title_color: #2e343b;
+$key_color: rgb(32,80,179);
+$key_color_light: rgb(96, 161, 240);
+$background_color: #fbfbfb;
 
 // 字体色
 $important_font_color: #5a5a5a;
@@ -18,9 +13,17 @@ $unimportant_font_color: #adadad;
 .el-breadcrumb {
     margin-bottom: 15px;
     font-size: 14px;
-    
 }
 
 .el-dialog {
     border-radius: 5px;
+}
+
+.scrollbar {
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.margin_top_20{
+    margin-top: 20px;
 }
