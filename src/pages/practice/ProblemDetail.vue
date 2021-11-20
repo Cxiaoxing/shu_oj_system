@@ -3,7 +3,7 @@
     <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item :to="{ path: '/practice' }">题集</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ path: '/practice' }">题库</el-breadcrumb-item>
       <el-breadcrumb-item>{{ problem_info.title }}</el-breadcrumb-item>
     </el-breadcrumb>
     <el-row :gutter="20">
@@ -55,10 +55,7 @@
           <!-- 编程语言选择区 -->
           <div>
             <span>语言: </span>
-            <el-select
-              v-model="language"
-              placeholder="请选择编程语言"
-            >
+            <el-select v-model="language" placeholder="请选择编程语言">
               <el-option
                 v-for="item in languages"
                 :key="item.value"
@@ -84,12 +81,12 @@
             <el-button
               class="margin_top_20"
               type="primary"
-              @click="submitCode(id)"
+              @click="submitCode()"
               >提交</el-button
             >
           </div>
         </el-card>
-        </el-col>
+      </el-col>
     </el-row>
     <!-- 提交结束后引导查看提交详情弹窗 -->
     <el-dialog title="" :visible.sync="dialogVisible" width="30%">
@@ -100,8 +97,8 @@
           >查看详情</el-button
         >
       </span>
-    </el-dialog>  
-  </div>  
+    </el-dialog>
+  </div>
 </template>
 
 <script>
@@ -112,7 +109,7 @@ import "codemirror/theme/idea.css";
 import "codemirror/mode/python/python.js"; // python
 // import "codemirror/mode/clike/clike.js"; //java
 
-import { problemPublicInfoRequest } from "@/request/problemRequest";
+import { problemInfoFromRegionRequest } from "@/request/problemRequest";
 import { submissionRequest } from "@/request/submissonRequest";
 
 export default {
@@ -173,9 +170,9 @@ export default {
   },
   methods: {
     // 获取题目详情
-    getProblem: function (region) {
-      var that = this;
-      problemPublicInfoRequest(region)
+    getProblem: function (id) {
+      const that = this;
+      problemInfoFromRegionRequest("set_main", id)
         .then(function (response) {
           console.log(response);
           that.problem_info = response.info;
@@ -190,13 +187,13 @@ export default {
       this.language = language;
     },
     // 提交代码
-    submitCode: function (region) {
-      var that = this;
+    submitCode: function () {
+      const that = this;
       const data = {
         src: this.code,
         language: this.language,
       };
-      submissionRequest("set_main", region, data)
+      submissionRequest("set_main", this.id, data)
         .then(function (response) {
           that.dialogVisible = true;
           that.uuid = response;
@@ -204,7 +201,7 @@ export default {
         .catch(function (error) {
           console.log(error);
           that.$message({
-            message: "提交失败！",
+            message: "提交失败",
             type: "warning",
           });
         });
@@ -212,7 +209,7 @@ export default {
 
     // 跳转至题目结果详情
     goProblemResult() {
-      let that = this;
+      const that = this;
       let uuid = that.uuid;
       that.$router.push({
         name: "submissionDetail",

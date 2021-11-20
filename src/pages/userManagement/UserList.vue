@@ -27,11 +27,6 @@
                 ></el-button>
               </el-input>
             </el-col>
-            <el-col :span="1" :offset="1">
-              <el-button type="primary" @click="addDialogVisible = true"
-                >添加用户</el-button
-              >
-            </el-col>
             <el-col :span="1" :offset="11">
               <el-button
                 v-if="multipleSelection.length != 0"
@@ -51,17 +46,18 @@
           >
             <el-table-column type="selection" width="55"> </el-table-column>
             <el-table-column prop="id" label="ID" width="80"> </el-table-column>
-            <el-table-column prop="account" label="账号"> </el-table-column>
-            <el-table-column
-              prop="mobile"
-              label="手机号"
-              :formatter="mobileFormtype"
-            ></el-table-column>
+            <el-table-column prop="username" label="用户名"> </el-table-column>
+            <el-table-column prop="email" label="邮箱"></el-table-column>
             <el-table-column
               prop="role"
               label="角色"
               :formatter="roleFormtype"
             ></el-table-column>
+            <el-table-column prop="school" label="学校"> </el-table-column>
+            <el-table-column prop="student_number" label="学号">
+            </el-table-column>
+            <el-table-column prop="real_name" label="真实姓名">
+            </el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
                 <!-- 修改按钮 -->
@@ -75,7 +71,7 @@
                 <el-button
                   type="danger"
                   size="small"
-                  @click="deleteUser(scope.row.id, scope.row.account)"
+                  @click="deleteUser(scope.row.id, scope.row.username)"
                   >删除</el-button
                 >
               </template>
@@ -97,52 +93,6 @@
       </div>
     </el-card>
 
-    <!-- 添加用户弹窗 -->
-    <el-dialog
-      title="添加用户"
-      :visible.sync="addDialogVisible"
-      width="30%"
-      @close="addDialogClosed"
-    >
-      <!-- 内容主体区域 -->
-      <el-form
-        :model="addUserForm"
-        :rules="addUserFormRules"
-        ref="addUserFormRef"
-        label-position="left"
-        size="medium"
-      >
-        <el-form-item label="账号" prop="account">
-          <el-input v-model="addUserForm.account"></el-input>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="addUserForm.password"></el-input>
-        </el-form-item>
-        <el-form-item label="手机号" prop="mobile">
-          <el-input v-model="addUserForm.mobile"></el-input>
-        </el-form-item>
-        <el-form-item label="角色" prop="role">
-          <el-select
-            v-model="addUserForm.role"
-            placeholder="请选择用户角色"
-            size="medium"
-          >
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-              :disabled="item.disabled"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <el-button type="primary" plain size="medium" @click="addUser()"
-        >添加用户</el-button
-      >
-    </el-dialog>
-
     <!-- 修改用户信息弹窗 -->
     <el-dialog
       title="修改用户信息"
@@ -154,14 +104,27 @@
         :model="userInfo"
         :rules="userInfoRules"
         ref="userInfoRef"
-        label-position="left"
-        size="medium"
+        label-width="auto"
       >
-        <el-form-item label="账号" prop="account">
-          <el-input v-model="userInfo.account"></el-input>
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="userInfo.username"></el-input>
         </el-form-item>
-        <el-form-item label="手机号" prop="mobile">
-          <el-input v-model="userInfo.mobile"></el-input>
+        <el-form-item label="密码" prop="password">
+          <el-input
+            v-model="userInfo.password"
+            type="password"
+            show-password
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="password_confirm">
+          <el-input
+            v-model="userInfo.password_confirm"
+            type="password"
+            show-password
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="userInfo.email"></el-input>
         </el-form-item>
         <el-form-item label="角色" prop="role">
           <el-select v-model="userInfo.role" placeholder="请选择用户角色">
@@ -175,10 +138,17 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="学校" prop="school">
+          <el-input v-model="userInfo.school"></el-input>
+        </el-form-item>
+        <el-form-item label="学号" prop="student_number">
+          <el-input v-model="userInfo.student_number"></el-input>
+        </el-form-item>
+        <el-form-item label="真实姓名" prop="real_name">
+          <el-input v-model="userInfo.real_name"></el-input>
+        </el-form-item>
       </el-form>
-      <el-button type="primary" plain size="medium" @click="editUser()"
-        >更新</el-button
-      >
+      <el-button type="primary" @click="editUser()">更新</el-button>
     </el-dialog>
   </div>
 </template>
@@ -187,33 +157,41 @@
 import {
   userInfoRequest,
   userListRequest,
-  userRegisterRequest,
   userEditRequest,
   userDeleteRequest,
 } from "@/request/userRequest";
+import { checkEmail } from "@/assets/config";
+
 export default {
   data() {
-    // 自定义邮箱规则
-    var checkEmail = (rule, value, callback) => {
-      const regEmail = /^\w+@\w+(\.\w+)+$/;
-      if (regEmail.test(value)) {
-        // 合法邮箱
+    const confirmPassword = (rule, value, callback) => {
+      if (value === this.userInfo.password) {
         return callback();
       }
-      callback(new Error("请输入合法邮箱"));
+      callback(new Error("请确保两次输入密码一致"));
     };
-    // 自定义手机号规则
-    var checkMobile = (rule, value, callback) => {
-      const regMobile =
-        /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
-      if (!value || regMobile.test(value)) {
-        return callback();
-      }
-      // 返回一个错误提示
-      callback(new Error("请输入合法的手机号码"));
-    };
-
     return {
+      searchInput: "",
+      currentPage: 1,
+      pageSize: 7,
+      total: null,
+      userlist: [],
+
+      editDialogVisible: false,
+      deleteDialogVisible: false,
+      multipleSelection: [],
+      userId: "",
+      userInfo: {},
+      userInfoRules: {
+        username: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+        ],
+        password_confirm: [{ validator: confirmPassword, trigger: "blur" }],
+        email: [
+          { required: true, message: "请输入邮箱", trigger: "blur" },
+          { validator: checkEmail, trigger: "blur" },
+        ],
+      },
       // 角色选择
       options: [
         {
@@ -229,51 +207,6 @@ export default {
           label: "普通用户",
         },
       ],
-      // 控制修改用户信息弹窗
-      editDialogVisible: false,
-      // 控制添加用户弹窗
-      addDialogVisible: false,
-      // 控制删除用户弹窗
-      deleteDialogVisible: false,
-      // 多选用户
-      multipleSelection: [],
-
-      // 添加用户的表单数据
-      addUserForm: {
-        account: "",
-        password: "",
-        mobile: "",
-        role: "",
-      },
-      // 添加用户的表单验证规则对象
-      addUserFormRules: {
-        account: [{ required: true, message: "请输入账号", trigger: "blur" }],
-        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
-        mobile: [{ validator: checkMobile, trigger: "blur" }],
-      },
-      // 搜索输入内容
-      searchInput: "",
-      // 当前页
-      currentPage: 1,
-      // 每页记录数
-      pageSize: 20,
-      // 总记录数
-      total: null,
-      // 查询到的用户列表
-      userlist: [],
-      // 查询到的用户信息
-      userInfo: {},
-      // 查询到的用户ID
-      userId: "",
-      // 修改表单的验证规则对象
-      userInfoRules: {
-        account: [{ required: true, message: "请输入账号", trigger: "blur" }],
-        mobile: [
-          { required: false, message: "请输入手机号", trigger: "blur" },
-          { validator: checkMobile, trigger: "blur" },
-        ],
-        role: [{ required: false, message: "请输入用户角色", trigger: "blur" }],
-      },
     };
   },
   created() {
@@ -289,8 +222,8 @@ export default {
       if (this.multipleSelection.length) {
         this.downloadLoading = true;
         import("@/vendor/Export2Excel").then((excel) => {
-          const tHeader = ["用户ID", "用户名", "手机号", "用户角色"];
-          const filterVal = ["id", "account", "mobile", "role"];
+          const tHeader = ["用户ID", "用户名", "邮箱", "用户角色"];
+          const filterVal = ["id", "username", "email", "role"];
           const list = this.multipleSelection;
           const data = this.formatJson(filterVal, list);
           excel.export_json_to_excel({
@@ -319,17 +252,12 @@ export default {
       );
     },
 
-    // 监听 添加用户对话框的关闭事件
-    addDialogClosed() {
-      this.$refs.addUserFormRef.resetFields();
-    },
-
     // 获取用户列表
     getUserList: function (currentPage = 1) {
-      let that = this;
+      const that = this;
       const params = {
         id_order: true,
-        account_filter: this.searchInput,
+        username_filter: this.searchInput,
         limit: this.pageSize,
         offset: this.pageSize * (currentPage - 1),
       };
@@ -352,54 +280,15 @@ export default {
 
     //获取某个用户的具体信息
     getUserInfo(region) {
-      var that = this;
+      const that = this;
       userInfoRequest(region)
         .then(function (response) {
-          that.userInfo = response;
+          const update_password = { 
+            "password": "",
+            "password_confirm": "" }
+          that.userInfo = {...response, ...update_password}
         })
         .catch(function (error) {
-          console.log(error);
-        });
-    },
-
-    // 预验证添加用户表单
-    addUser() {
-      this.$refs.addUserFormRef.validate((valid) => {
-        if (valid) {
-          this.addUserRequest(this.addUserForm);
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
-    },
-
-    // 发起添加用户请求
-    addUserRequest: function (addUserForm) {
-      const data = {
-        account: this.addUserForm.account,
-        password: this.addUserForm.password,
-        mobile: this.addUserForm.mobile,
-        role: this.addUserForm.role,
-      };
-      let that = this;
-      userRegisterRequest(data)
-        .then(function (response) {
-          //关闭对话框
-          that.addDialogVisible = false;
-          //重新获取用户列表
-          that.getUserList(that.currentPage);
-          // 提示用户修改成功
-          that.$message({
-            message: "添加用户成功！",
-            type: "success",
-          });
-        })
-        .catch(function (error) {
-          that.$message({
-            message: "添加用户失败！",
-            type: "warning",
-          });
           console.log(error);
         });
     },
@@ -409,9 +298,6 @@ export default {
       this.$refs.userInfoRef.validate((valid) => {
         if (valid) {
           this.editUserRequest(this.userInfo);
-        } else {
-          console.log("error submit!!");
-          return false;
         }
       });
     },
@@ -419,12 +305,16 @@ export default {
     // 发起修改用户请求
     editUserRequest: function (userInfo) {
       const data = {
-        new_account: this.userInfo.account,
-        new_mobile: this.userInfo.mobile,
-        new_role: this.userInfo.role,
+        new_username: userInfo.username,
+        new_password: userInfo.password,
+        new_email: userInfo.email,
+        new_role: userInfo.role,
+        new_school: userInfo.school,
+        new_student_number: userInfo.student_number,
+        new_real_name: userInfo.real_name,
       };
-      let that = this;
-      userEditRequest(this.userInfo.id, data)
+      const that = this;
+      userEditRequest(userInfo.id, data)
         .then(function (response) {
           //关闭对话框
           that.editDialogVisible = false;
@@ -432,13 +322,13 @@ export default {
           that.getUserList(that.currentPage);
           // 提示用户修改成功
           that.$message({
-            message: "修改用户信息成功！",
+            message: "修改用户信息成功",
             type: "success",
           });
         })
         .catch(function (error) {
           that.$message({
-            message: "修改用户信息失败！",
+            message: "修改用户信息失败",
             type: "warning",
           });
           console.log(error);
@@ -446,9 +336,9 @@ export default {
     },
 
     // 逐个删除用户
-    deleteUser(id, account) {
+    deleteUser(id, username) {
       this.$confirm(
-        "此操作将永久删除用户 【" + account + "】 , 是否继续?",
+        "此操作将永久删除用户 【" + username + "】 , 是否继续?",
         "提示",
         {
           confirmButtonText: "删除",
@@ -457,20 +347,20 @@ export default {
         }
       )
         .then(() => {
-          let that = this;
+          const that = this;
           userDeleteRequest(id)
             .then(function (response) {
               //重新获取用户列表
               that.getUserList(that.currentPage);
               // 提示用户删除成功
               that.$message({
-                message: "用户删除成功！",
+                message: "用户删除成功",
                 type: "success",
               });
             })
             .catch(function (error) {
               that.$message({
-                message: "用户删除失败！",
+                message: "用户删除失败",
                 type: "warning",
               });
               console.log(error);
@@ -483,16 +373,17 @@ export default {
           });
         });
     },
+
     // 批量删除用户
     mulDeleteUser() {
       // todo: 批量删除用户功能
+      const that = this;
       this.$confirm("此操作将永久删除所选中的用户, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       })
         .then(() => {
-          let that = this;
           this.$axios({
             method: "delete",
             url: "/proble/",
@@ -502,48 +393,41 @@ export default {
               that.getUserList(that.currentPage);
               // 提示用户删除成功
               that.$message({
-                message: "删除成功！",
+                message: "删除成功",
                 type: "success",
               });
             })
             .catch(function (error) {
               that.$message({
-                message: "删除失败！",
+                message: "删除失败",
                 type: "warning",
               });
               console.log(error);
             });
         })
-        .catch(() => {
-          this.$message({
+        .catch(function () {
+          that.$message({
             type: "info",
             message: "已取消删除",
           });
         });
     },
+
     // 判断角色类型，返回对应文字
     roleFormtype(row, column, cellValue) {
       if (cellValue == "sup") {
         return "超级管理员";
       } else if (cellValue == "admin") {
         return "管理员";
-      } else if (cellValue == "") {
-        return "普通用户";
-      }
-    },
-    //
-    mobileFormtype(row, column, cellValue) {
-      if (cellValue == null) {
-        return "暂未绑定手机号";
       } else {
-        return cellValue;
+        return "普通用户";
       }
     },
   },
 };
 </script>
 
-<style lang='less' scoped>
+<style lang='scss' scoped>
 .editpic {
   width: 25px;
 }

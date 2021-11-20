@@ -1,9 +1,9 @@
 /* 全局样式表 */
 // 主题色
-$key_title_color: #2e343b;
-$key_color: rgb(32,80,179);
+$key_title_color: #3b4a5c;
+$key_color: rgb(39, 90, 192);
 $key_color_light: rgb(96, 161, 240);
-$background_color: #fbfbfb;
+$background_color: #f8f8f8;
 
 // 字体色
 $important_font_color: #5a5a5a;
@@ -19,11 +19,27 @@ $unimportant_font_color: #adadad;
     border-radius: 5px;
 }
 
+// 滑动条
 .scrollbar {
     overflow-y: scroll;
     overflow-x: hidden;
 }
 
-.margin_top_20{
+.margin_top_10 {
+    margin-top: 10px;
+}
+
+.margin_top_20 {
     margin-top: 20px;
+}
+
+.margin_bottom_10{
+    margin-bottom: 10px;
+}
+
+//靠右按钮包裹
+.buttonWrap {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
 }

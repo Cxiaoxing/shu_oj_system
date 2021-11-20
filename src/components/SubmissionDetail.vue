@@ -45,28 +45,13 @@
           justify-content: space-between;
         "
       >
-        <div
-          style="
-            
-            font-size: 20px;
-            font-weight: 500;
-            color: #303133;
-          "
-        >
-          {{ problemtitle }}
+        <div style="font-size: 28px; font-weight: 500">
+          {{ problemTitle }}
         </div>
         <div>
           <!-- 状态显示 -->
           <div>
-            <span
-              style="
-                
-                font-size: 16px;
-                font-weight: 500;
-                color: #303133;
-              "
-              >State
-            </span>
+            <span style="font-size: 16px; font-weight: 500">State </span>
             <!-- 根据不同状态显示不同颜色的标签: Finished:绿色，Pending：蓝色，Waiting：灰色 -->
             <el-tag
               effect="dark"
@@ -86,88 +71,109 @@
           </div>
           <!-- 提交时间 -->
           <div>
-            <span
-              style="
-                
-                font-size: 16px;
-                font-weight: 500;
-                color: #303133;
-              "
-              >When
-            </span>
-            <span
-              style=" font-size: 14px; color: #606a78"
-              >{{ formatTime(subTime) }}</span
-            >
+            <span style="font-size: 16px; font-weight: 500">When </span>
+            <span style="font-size: 14px; color: #606a78">{{
+              formatTime(subTime)
+            }}</span>
           </div>
         </div>
       </div>
       <el-divider></el-divider>
       <!-- 暂未完成判题 -->
-      <div class="noContextBlock" v-if="state != 'Finished'">
+      <div class="noContextBlock" v-if="state !== 'Finished'">
         <div>
           <img class="noContextPic" src="@/assets/img/nocontext.svg" />
         </div>
         <div style="font-size: 14px">暂未完成判题，请稍后查看</div>
       </div>
       <!-- 已完成判题，但比赛期间不能查看提交详情 -->
-      <div
-        class="noContextBlock"
-        v-if="state == 'Finished' && contestRunning === true"
-      >
+      <div class="noContextBlock" v-else-if="contestRunning === true">
         <div>
           <img class="noContextPic" src="@/assets/img/nocontext.svg" />
         </div>
         <div style="font-size: 14px">比赛期间不能查看提交详情</div>
       </div>
       <!-- 已完成判题，编译错误，展示编译错误信息 -->
-      <div
-        v-if="state == 'Finished' && err !== null && contestRunning === false"
-      >
-        <div style="color: #f54a45">错误原因：</div>
+      <div v-else-if="err !== null">
+        <div style="color: #f54a45">编译错误原因：</div>
         <div style="font-size: 14px; margin-top: 5px">{{ error_reason }}</div>
       </div>
       <!-- 已完成判题&编译正确，展示测试点信息 -->
-      <div
-        v-if="state == 'Finished' && err === null && contestRunning === false"
-      >
-        <div style="font-size: 16px; font-weight: 500">测试点详情</div>
+      <div v-else>
+        <div style="font-size: 20px; font-weight: 450">测试点详情</div>
         <div
-          v-for="(testCase, index) in testCase"
-          :index="index + ''"
-          :key="index"
-          class="timeLine"
-        >
-          <div class="timeLineLeft">
-            <div class="timeLineCircle">
-              <img
-                v-if="testCase.result === 'SUCCESS'"
-                class="timeLineImage"
-                src="@/assets/img/right.svg"
-              />
-              <img
-                v-if="testCase.result !== 'SUCCESS'"
-                class="timeLineImage"
-                src="@/assets/img/wrong.svg"
-              />
-            </div>
-            <div class="timeLineLine"></div>
-          </div>
-          <div class="timeLineRight">
-            <div class="timeLineTitle">Case {{ index + 1 }}</div>
-            <div class="timeLineContext">
-              <span class="timeLineContextTitle">{{ testCase.result }}</span>
-              <el-row style="margin-top: 8px">
-                <el-col class="timeLineContextWord" :span="8"
-                  >CPU Time: {{ testCase.cpu_time }} ms</el-col
+          class="testCaseTip"
+          v-html="'绿色: SUCCESS&emsp;&ensp;红色: WRONG_ANSWER'"
+        />
+        <div class="testCaseWrap scrollbar">
+          <div
+            v-for="(item, index) in testCase"
+            :index="index + ''"
+            :key="index"
+          >
+            <div
+              class="testCase"
+              :style="
+                item.result === 'SUCCESS'
+                  ? { 'background-color': '#5fc931' }
+                  : { 'background-color': '#f05459' }
+              "
+            >
+              <div class="testCaseTitle"># Case {{ index + 1 }}</div>
+              <div class="testCaseContent">
+                <span class="testCaseContentTitle"> CPU Time:</span>
+                <span class="testCaseContentDetail">
+                  {{ item.cpu_time }} ms</span
                 >
-                <el-col class="timeLineContextWord" :span="8"
-                  >Memory: {{ submissionMemoryFormat(testCase.memory) }}</el-col
+              </div>
+              <div class="testCaseContent">
+                <span class="testCaseContentTitle">Memory:</span>
+                <span class="testCaseContentDetail">
+                  {{ submissionMemoryFormat(item.memory) }}</span
                 >
-                <el-col class="timeLineContextWord" :span="8"
-                  >Output: {{ testCase.output }}</el-col
+              </div>
+              <div class="testCaseDownload" v-if="item.result !== 'SUCCESS'">
+                <!-- todo: 测试点数据下载 -->
+                <el-popover title="标准输入数据" trigger="click">
+                  <div style="max-width: 500px">{{ standardTestCaseData }}</div>
+                  <el-link
+                    icon="el-icon-download"
+                    type="primary"
+                    :underline="false"
+                    target="_black"
+                    style="margin-top: 8px"
+                    :href="`${BASE_URL}/problems/${problem_id}/test_case/${item.test_case}?input=true`"
+                    >下载到本地</el-link
+                  >
+                  <el-link
+                    slot="reference"
+                    @click="downloadTestCase(item.test_case, 'true')"
+                    >标准输入</el-link
+                  ></el-popover
                 >
-              </el-row>
+                <el-popover
+                  placement="bottom"
+                  title="标准输出数据"
+                  trigger="click"
+                >
+                  <div style="max-width: 500px">{{ standardTestCaseData }}</div>
+                  <el-link
+                    icon="el-icon-download"
+                    type="primary"
+                    :underline="false"
+                    target="_black"
+                    style="margin-top: 8px"
+                    :href="`${BASE_URL}/problems/${problem_id}/test_case/${item.test_case}?input=false`"
+                    >下载到本地</el-link
+                  >
+                  <el-link
+                    slot="reference"
+                    style="margin-left: 10px"
+                    @click="downloadTestCase(item.test_case, 'false')"
+                    >标准输出</el-link
+                  ></el-popover
+                >
+              </div>
             </div>
           </div>
         </div>
@@ -175,7 +181,10 @@
     </el-card>
     <!-- 代码展示区域 -->
     <el-card style="margin-top: 20px; padding: 20px">
-      <div style="font-size: 16px; font-weight: 500">语言: {{ language }}</div>
+      <div style="display: flex; justify-content: space-between">
+        <span style="font-size: 20px; font-weight: 500">源代码</span>
+        <span>语言: {{ language }}</span>
+      </div>
       <el-divider></el-divider>
       <codemirror v-model="code" :options="options"></codemirror>
     </el-card>
@@ -188,15 +197,20 @@ import moment from "moment";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/idea.css"; // 白色
 import "codemirror/mode/python/python.js"; // python
-import { problemPublicInfoRequest } from "@/request/problemRequest";
+import {
+  problemInfoFromRegionRequest,
+  problemTestCaseRequest,
+} from "@/request/problemRequest";
 import {
   submissionLimitedResultRequest,
   submissionResultRequest,
 } from "@/request/submissonRequest";
+import { BASE_URL } from "@/assets/config";
 
 export default {
   data() {
     return {
+      BASE_URL,
       // 代码编辑器默认配置
       options: {
         tabSize: 2, // 缩进格式
@@ -212,7 +226,8 @@ export default {
       },
       code: "", // 所提交的代码值
       uuid: "",
-      problemtitle: "",
+      problem_id: "",
+      problemTitle: "",
       subResult: "3", //提交结果：0-成功；1-失败；2-编译错误
       err: null,
       error_reason: "",
@@ -221,13 +236,8 @@ export default {
       state: "",
       language: "",
       testCase: [],
-      timelinecolor: "",
-      timelinecolor: {
-        success: "#00b42a",
-        unsuccess: "#f54a45",
-      },
-      // 题目提交结果
-      submission: [],
+      standardTestCaseData: "",
+      submission: [], // 题目提交结果
       contestRunning: false, // 比赛进行中
     };
   },
@@ -239,11 +249,11 @@ export default {
   },
   methods: {
     // 获取题目信息
-    getProblem: function (region) {
-      var that = this;
-      problemPublicInfoRequest(region)
+    getProblem: function (region, problem_id) {
+      const that = this;
+      problemInfoFromRegionRequest(region, problem_id)
         .then(function (response) {
-          that.problemtitle = response.info.title;
+          that.problemTitle = response.info.title;
         })
         .catch(function (error) {
           console.log(error);
@@ -268,15 +278,15 @@ export default {
 
     // 获取结果
     getResult: function (uuid) {
-      var that = this;
+      const that = this;
       const requestFunction = this.contestRunning
         ? submissionLimitedResultRequest
         : submissionResultRequest;
       // 比赛已结束
       requestFunction(uuid)
         .then(function (response) {
-          console.log(response);
-          that.getProblem(response.problem_id);
+          that.getProblem(response.region, response.problem_id);
+          that.problem_id = response.problem_id;
           that.subTime = response.submit_time;
           that.code = response.settings.src;
           that.state = response.state;
@@ -312,6 +322,14 @@ export default {
         return "#f54a45";
       }
     },
+
+    downloadTestCase(test_case_id, isInput) {
+      problemTestCaseRequest(this.problem_id, test_case_id, isInput).then(
+        (response) => {
+          this.standardTestCaseData = response;
+        }
+      );
+    },
   },
   components: {
     codemirror,
@@ -341,98 +359,45 @@ export default {
 .noContextPic {
   width: 150px;
 }
-.testCase {
+
+.testCaseTip {
+  color: $unimportant_font_color;
+  font-size: 8px;
+  margin-bottom: 10px;
+}
+.testCaseWrap {
+  max-height: 300px;
   display: flex;
-  flex-direction: row;
   flex-wrap: wrap;
 }
-
-.testCaseItem {
-  margin: 10px;
-  padding-top: 5px;
-  height: 180px;
-  width: 180px;
-  color: #ffffff;
-}
-.testCaseIndex {
-  font-size: 18px;
-  font-weight: 400;
-}
-.success {
-  background-color: #00b42a;
-}
-.warning {
-  background-color: #f54a45;
-  border-radius: 10px;
-}
-.content {
-  margin-top: 20px;
-}
-.timeLine {
+.testCase {
+  margin: 8px;
+  width: 120px;
+  height: 130px;
   display: flex;
-  flex-direction: row;
-  margin-top: 30px;
+  flex-wrap: wrap;
+  align-content: center;
+  padding-left: 23px;
+  color: white;
 }
-.timeLineLeft {
-  display: flex;
-  flex-direction: column;
-}
-.timeLineRight {
-  display: flex;
-  flex-direction: column;
-  margin-left: 30px;
-}
-.timeLineCircle {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background-color: #f0f1f2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.timeLineImage {
-  width: 25px;
-}
-.timeLineTitle {
-  
-  font-size: 16px;
-  font-style: normal;
+.testCaseTitle {
+  font-size: 15px;
   font-weight: 600;
-  line-height: 24px;
-  letter-spacing: 0px;
-  text-align: left;
-  color: #081023;
+  margin-bottom: 8px;
 }
-
-.timeLineContext {
-  background-color: #f5f6f7;
-  margin-top: 12px;
-  padding: 16px 24px 16px 24px;
-  width: 954px;
-  border-radius: 4px;
-}
-
-.timeLineContextTitle {
-  
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: 22px;
-  letter-spacing: 0px;
-  text-align: left;
-  color: #081023;
-}
-
-.timeLineContextWord {
-  
+.testCaseContent {
   font-size: 12px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 14px;
   letter-spacing: 0px;
-  text-align: left;
-  color: #606a78;
+}
+.testCaseContentTitle {
+  font-weight: 450;
+  margin-right: 6px;
+}
+.testCaseDownload .el-link.el-link--default {
+  font-size: 5px;
+  color: #00fdfd;
+}
+.testCaseDownload .el-link.el-link--default:hover {
+  color: #275ac0;
 }
 </style>

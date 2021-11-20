@@ -151,7 +151,7 @@ export default {
     return {
       searchInput: "",
       currentPage: 1,
-      pageSize: 20,
+      pageSize: 10,
       total: null,
       announceList: [], //公告列表
       new_announceId: "", //需要更新的id
@@ -170,10 +170,10 @@ export default {
     getAnnounceList(currentPage = 1) {  
       const that = this;
       const params = {
-        id_order: true,
         title_filter: this.searchInput,
         limit: this.pageSize,
         offset: this.pageSize * (currentPage - 1),
+        is_released: false,
       };
       announceListRequest(params)
         .then(function (response) {
@@ -216,14 +216,14 @@ export default {
       announceEditRequest(this.new_announceId, data)
         .then(function (response) {
           that.$message({
-            message: "更新公告成功！",
+            message: "更新公告成功",
             type: "success",
           });
           that.getAnnounceList();
         })
         .catch(() => {
           that.$message({
-            message: "更新公告失败！",
+            message: "更新公告失败",
             type: "warning",
           });
         });
@@ -234,14 +234,14 @@ export default {
       announceDeleteRequest(id)
         .then(function (response) {
           that.$message({
-            message: "删除公告成功！",
+            message: "删除公告成功",
             type: "success",
           });
           that.getAnnounceList();
         })
         .catch(() => {
           that.$message({
-            message: "删除公告失败！",
+            message: "删除公告失败",
             type: "warning",
           });
         });

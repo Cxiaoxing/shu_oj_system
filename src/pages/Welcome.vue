@@ -82,9 +82,9 @@ export default {
     getAnnounceList(currentPage = 1) {
       const that = this;
       const params = {
-        id_order: true,
         limit: this.pageSize,
         offset: this.pageSize * (currentPage - 1),
+        is_released: true,
       };
       announceListRequest(params)
         .then(function (response) {

@@ -94,7 +94,7 @@
 </template>
 
 <script>
-import { problemPublicInfoRequest } from "@/request/problemRequest";
+import { problemInfoPrivateRequest } from "@/request/problemRequest";
 import {
   sampleListRequest,
   sampleDeleteRequest,
@@ -116,8 +116,8 @@ export default {
   methods: {
     // 获取题目信息
     getProblem: function (region) {
-      var that = this;
-      problemPublicInfoRequest(region)
+      const that = this;
+      problemInfoPrivateRequest(region)
         .then(function (response) {
           that.problemtitle = response.info.title;
         })
@@ -128,7 +128,7 @@ export default {
 
     // 获取标程列表
     getSampleList: function (id) {
-      let that = this;
+      const that = this;
       const params = { problem_id_filter: id, limit: 100, offset: 0 };
       sampleListRequest(params)
         .then(function (response) {
@@ -160,20 +160,20 @@ export default {
         type: "warning",
       })
         .then(() => {
-          let that = this;
+          const that = this;
           sampleDeleteRequest(uuid)
             .then(function (response) {
               //重新获取标程列表
               that.getSampleList(that.id);
               // 提示用户删除成功
               that.$message({
-                message: "标程删除成功！",
+                message: "标程删除成功",
                 type: "success",
               });
             })
             .catch(function (error) {
               that.$message({
-                message: "标程删除失败！",
+                message: "标程删除失败",
                 type: "warning",
               });
               console.log(error);
@@ -189,14 +189,14 @@ export default {
     // 点击题目跳转至提交结果详情
     handleClickProblem: function (id) {
       let uuid = id;
-      let that = this;
+      const that = this;
       that.$router.push({ name: "sampleResultDetail", params: { uuid: uuid } });
     },
   },
 };
 </script>
 
-<style lang='less' scoped>
+<style lang='scss' scoped>
 .editpic {
   width: 25px;
 }

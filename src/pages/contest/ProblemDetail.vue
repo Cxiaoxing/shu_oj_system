@@ -98,7 +98,7 @@
               <el-button
                 class="submitButton"
                 type="primary"
-                @click="submitCode(id)"
+                @click="submitCode()"
                 >提交</el-button
               >
             </div>
@@ -121,7 +121,7 @@ import "codemirror/theme/idea.css"; // 白色
 // 代码高亮
 import "codemirror/mode/python/python.js"; // python
 // import "codemirror/mode/clike/clike.js"; //java
-import { problemPrivateInfoRequest } from "@/request/problemRequest";
+import { problemInfoFromRegionRequest } from "@/request/problemRequest";
 import { submissionRequest } from "@/request/submissonRequest";
 export default {
   data() {
@@ -184,8 +184,8 @@ export default {
   methods: {
     // 获取题目详情
     getProblem: function () {
-      var that = this;
-      problemPrivateInfoRequest(this.region, this.inner_id)
+      const that = this;
+      problemInfoFromRegionRequest(this.region, this.id)
         .then(function (response) {
           that.problem_info = response.info;
           that.problem_contents = response.contents;
@@ -200,12 +200,12 @@ export default {
     },
     // 提交代码
     submitCode: function () {
-      var that = this;
+      const that = this;
       const data = {
         src: this.code,
         language: this.language,
       };
-      submissionRequest(this.region, this.inner_id, data)
+      submissionRequest(this.region, this.id, data)
         .then(function (response) {
           that
             .$confirm("提交成功", {
@@ -223,7 +223,7 @@ export default {
         .catch(function (error) {
           console.log(error);
           that.$message({
-            message: "提交失败！",
+            message: "提交失败",
             type: "warning",
           });
         });
@@ -231,7 +231,7 @@ export default {
 
     // 上一题
     previous_problem() {
-      var that = this;
+      const that = this;
       var previous = new Promise(function (resolve, reject) {
         var inner_id =
           parseInt(that.inner_id) > 1 ? parseInt(that.inner_id) - 1 : 1;
@@ -245,7 +245,7 @@ export default {
 
     // 下一题
     after_problem() {
-      var that = this;
+      const that = this;
       var after = new Promise(function (resolve, reject) {
         let inner_id =
           parseInt(that.inner_id) < parseInt(that.total)

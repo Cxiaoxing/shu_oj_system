@@ -145,7 +145,7 @@ export default {
     },
     // 获取竞赛列表
     getContestList(currentPage = 1) {
-      var that = this;
+      const that = this;
       const params = {
         title_filter: this.searchInput,
         limit: this.pageSize,
@@ -169,7 +169,7 @@ export default {
     goContest(contestTitle, re) {
       let title = contestTitle;
       let region = re;
-      let that = this;
+      const that = this;
       that.$router.push({
         name: "contestDetail",
         params: { title: title, region: region },

@@ -121,7 +121,7 @@ export default {
   methods: {
     // 获取提交状态列表
     getStateList(currentPage = 1) {
-      var that = this;
+      const that = this;
       const params = {
         region_filter: "set_main",
         user_id_filter: this.switchValue,
@@ -178,7 +178,7 @@ export default {
     // 跳转至提交结果详情
     handleClickSubmission(row, column, event, cell) {
       let uuid = row.id;
-      let that = this;
+      const that = this;
       that.$router.push({ name: "submissionDetail", params: { uuid: uuid } });
     },
   },

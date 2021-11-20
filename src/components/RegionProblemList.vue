@@ -1,27 +1,29 @@
 <template>
   <div>
-    <!-- 面包屑导航区域 -->
-    <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>题库</el-breadcrumb-item>
-    </el-breadcrumb>
-
-    <!-- 卡片视图区域，展示题目列表 -->
-    <el-card>
-      <!-- 搜索区域 -->
-      <ProblemSearchBar :searchProblemList="searchProblemList" />
+    <el-card style="margin-top: 20px">
+      <!-- 搜索与添加区域 -->
+      <el-row :gutter="40">
+        <el-col :span="20">
+          <ProblemSearchBar :searchProblemList="searchProblemList" />
+        </el-col>
+        <el-col :span="1" :offset="1">
+          <el-button type="primary" @click="addProblemDialogVisible = true"
+            >添加题目</el-button
+          >
+        </el-col>
+      </el-row>
       <!-- 列表区域 -->
-      <el-table :data="problemlist" @row-click="handleClickProblem">
-        <el-table-column prop="inner_id" label="ID" width="80">
+      <el-table :data="problemList" style="margin-top: 20px">
+        <el-table-column prop="inner_id" width="80" label="ID">
         </el-table-column>
-        <el-table-column prop="out_problem.info.title" label="题目">
+        <el-table-column prop="out_problem.info.title" label="名称">
         </el-table-column>
         <el-table-column prop="out_problem.info.tags" label="标签">
           <template slot-scope="scope">
             <el-tag
+              style="margin-right: 5px"
               v-for="(item, index) in scope.row.out_problem.info.tags"
               :key="index"
-              style="margin-right: 5px"
               >{{ item }}</el-tag
             >
           </template>
@@ -56,7 +58,30 @@
           :formatter="passingRateFormtype"
         >
         </el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <!-- 修改按钮 -->
+            <el-button
+              size="small"
+              @click="goProblemDetail(scope.row.out_problem.id)"
+              >查看</el-button
+            >
+            <!-- 删除按钮 -->
+            <el-button
+              type="danger"
+              size="small"
+              @click="
+                goDeleteProblem(
+                  scope.row.out_problem.id,
+                  scope.row.out_problem.info.title
+                )
+              "
+              >删除</el-button
+            >
+          </template>
+        </el-table-column>
       </el-table>
+      <!-- 分页 -->
       <el-pagination
         background
         hide-on-single-page
@@ -69,48 +94,64 @@
       >
       </el-pagination>
     </el-card>
+    <!-- 添加题目弹窗 -->
+    <addProblemDialog
+      :region="region"
+      :addProblemDialogVisible="addProblemDialogVisible"
+      :closeDialog="closeAddProblemDialog"
+    />
   </div>
 </template>
 
 <script>
-import { problemListFromRegionRequest } from "@/request/problemRequest";
-import { userCheckOnlineRequest } from "@/request/userRequest";
-import ProblemSearchBar from "@/components/ProblemSearchBar.vue";
+import {
+  problemDeleteFromRegionRequest,
+  problemListFromRegionRequest,
+} from "@/request/problemRequest";
+import ProblemSearchBar from "./ProblemSearchBar.vue";
+import AddProblemDialog from "./AddProblemDialog.vue";
 export default {
   components: {
     ProblemSearchBar,
+    AddProblemDialog,
+  },
+  props: {
+    region: {
+      type: String,
+      default: "",
+    },
   },
   data() {
     return {
+      problemList: [],
       title_filter: "",
       tag_filter: [],
       difficulty_filter: "",
       currentPage: 1,
       pageSize: 10,
       total: null,
-      problemlist: [],
+      addProblemDialogVisible: false,
     };
   },
   created() {
     this.getProblemList();
   },
   methods: {
-    // 搜索题目列表
-    getProblemList: function (currentPage = 1) {
+    // 获取该region的题目列表
+    getProblemList(currentPage = 1) {
       const that = this;
       const params = {
-        id_order: true,
+        inner_id_order: true,
         title_filter: this.title_filter,
         tag_filter: this.tag_filter,
         difficulty_filter: this.difficulty_filter,
-        release_filter: true,
         limit: this.pageSize,
         offset: this.pageSize * (currentPage - 1),
       };
-      problemListFromRegionRequest("set_main", params)
+      problemListFromRegionRequest(this.region, params)
         .then(function (response) {
           that.currentPage = currentPage;
-          that.problemlist = response.list;
+          that.problemList = response.list;
           that.total = response.total;
         })
         .catch(function (error) {
@@ -127,27 +168,48 @@ export default {
     },
 
     // 点击题目跳转至题目详情
-    handleClickProblem(row, column, event, cell) {
-      const that = this;
-      // 调用 me 接口获取用户状态
-      userCheckOnlineRequest()
-        .then(function (response) {
-          if (response) {
-            that.$router.push({
-              name: "practiceProblemDetail",
-              params: { id: row.out_problem.id },
+    goProblemDetail(id) {
+      this.$router.push({
+        name: "problemDetail",
+        params: { id: id },
+      });
+    },
+
+    // 删除region中的题目
+    goDeleteProblem(id, title) {
+      this.$confirm(
+        "此操作将从region中删除题目 【" + title + "】 , 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          problemDeleteFromRegionRequest(this.region, id)
+            .then(() => {
+              this.getProblemList(this.currentPage);
+              this.$message({
+                message: "删除题目成功",
+                type: "success",
+              });
+            })
+            .catch(() => {
+              this.$message({
+                message: "删除题目失败",
+                type: "warning",
+              });
             });
-          }
         })
-        .catch(function (error) {
-          console.log(error);
-          // 提示用户登录
-          that.$message({
-            message: "请先登录",
+        .catch(() => {
+          this.$message({
             type: "info",
+            message: "已取消删除",
           });
         });
     },
+
     // 计算通过率，返回对应文字
     passingRateFormtype(row, column, cellValue) {
       if (row.submit_times == 0) {
@@ -156,10 +218,12 @@ export default {
         return ((row.accept_times / row.submit_times) * 100).toFixed(2) + "%";
       }
     },
+
+    // 关闭添加题目弹窗
+    closeAddProblemDialog() {
+      this.addProblemDialogVisible = false;
+      this.getProblemList(this.currentPage);
+    },
   },
 };
 </script>
-
-<style lang='scss' scoped>
-</style>
-

@@ -134,7 +134,7 @@ export default {
         .catch(function (error) {
           console.log(error);
           that.$message({
-            message: "查看公告详情失败！",
+            message: "查看公告详情失败",
             type: "error",
           });
         });
@@ -153,14 +153,14 @@ export default {
       announceEditRequest(this.id, data)
         .then(function (response) {
           that.$message({
-            message: "更新公告成功！",
+            message: "更新公告成功",
             type: "success",
           });
           that.getAnnounceInfo(that.id);
         })
         .catch(() => {
           that.$message({
-            message: "更新公告失败！",
+            message: "更新公告失败",
             type: "warning",
           });
         });

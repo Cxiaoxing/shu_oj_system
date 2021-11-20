@@ -279,7 +279,7 @@ export default {
       // 当前页
       currentPage: 1,
       // 每页记录数
-      pageSize: 20,
+      pageSize: 10,
       // 总记录数
       total: null,
       // 多选
@@ -335,7 +335,7 @@ export default {
   methods: {
     // 获取题集列表
     getProblemSetList: function (currentPage = 1) {
-      var that = this;
+      const that = this;
       const params = {
         title_filter: this.searchInput,
 
@@ -358,7 +358,7 @@ export default {
         if (valid) {
           this.addProblemSetRequest(this.addProblemSetForm);
         } else {
-          console.log("error submit!!");
+          console.log("error submit!");
           return false;
         }
       });
@@ -371,7 +371,7 @@ export default {
         title: this.addProblemSetForm.title,
         introduction: this.addProblemSetForm.introduction,
       };
-      let that = this;
+      const that = this;
       problemSetCreateRequest(data)
         .then(function (response) {
           //关闭对话框
@@ -380,13 +380,13 @@ export default {
           that.getProblemSetList(that.currentPage);
           // 提示用户新建题集成功
           that.$message({
-            message: "新建题集成功！",
+            message: "新建题集成功",
             type: "success",
           });
         })
         .catch(function (error) {
           that.$message({
-            message: "新建题集失败！",
+            message: "新建题集失败",
             type: "warning",
           });
           console.log(error);
@@ -399,7 +399,7 @@ export default {
         new_title: this.addProblemSetForm.title,
         new_introduction: this.addProblemSetForm.introduction,
       };
-      let that = this;
+      const that = this;
       problemSetEditRequest(this.addProblemSetForm.region, data)
         .then(function (response) {
           //关闭对话框
@@ -408,13 +408,13 @@ export default {
           that.getProblemSetList(that.currentPage);
           // 提示用户新建题集成功
           that.$message({
-            message: "修改题集成功！",
+            message: "修改题集成功",
             type: "success",
           });
         })
         .catch(function (error) {
           that.$message({
-            message: "修改题集失败！",
+            message: "修改题集失败",
             type: "warning",
           });
           console.log(error);
@@ -435,20 +435,20 @@ export default {
         title: this.addContestForm.title,
         introduction: this.addContestForm.introduction,
       };
-      let that = this;
+      const that = this;
       contestCreateRequest(data)
         .then(function (response) {
           //关闭对话框
           that.addContestDialogVisible = false;
           // 提示用户新建题集成功
           that.$message({
-            message: "新建竞赛成功！",
+            message: "新建竞赛成功",
             type: "success",
           });
         })
         .catch(function (error) {
           that.$message({
-            message: "新建竞赛失败！",
+            message: "新建竞赛失败",
             type: "warning",
           });
           console.log(error);
@@ -477,20 +477,20 @@ export default {
         }
       )
         .then(() => {
-          let that = this;
+          const that = this;
           problemSetDeleteRequest(problemSetId)
             .then(function (response) {
               //重新获取题集列表
               that.getProblemSetList();
               // 提示用户删除成功
               that.$message({
-                message: "删除成功！",
+                message: "删除成功",
                 type: "success",
               });
             })
             .catch(function (error) {
               that.$message({
-                message: "删除失败！",
+                message: "删除失败",
                 type: "warning",
               });
               console.log(error);
@@ -534,7 +534,7 @@ export default {
     // 查看题集详情
     handleClickProblem: function (re) {
       let region = re;
-      let that = this;
+      const that = this;
       that.$router.push({
         name: "problemSetDetailList",
         params: { region: region },
@@ -544,7 +544,7 @@ export default {
 };
 </script>
 
-<style lang='less' scoped>
+<style lang='scss' scoped>
 .editpic {
   width: 25px;
 }

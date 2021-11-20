@@ -20,6 +20,10 @@ export function userRegisterRequest(data) {
     return _post('/users', data)
 }
 
+export function userBatchRegisterRequest(data) {
+    return _post('/users/batch_create', data)
+}
+
 export function userCheckOnlineRequest() {
     return _get('/users/me')
 }

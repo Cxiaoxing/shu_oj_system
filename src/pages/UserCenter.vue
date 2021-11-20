@@ -3,30 +3,44 @@
     <div class="userCenter">
       <div class="userCenterTop">
         <!-- 个人信息展示卡片 -->
-        <el-card class="userInfoCard userCenterTopLeft">
+        <el-card class="userCenterTopLeft">
           <!-- 头像区域 -->
-          <div class="userImageBackground">
-            <i class="el-icon-user-solid userImage system_key_color" />
-          </div>
+          <el-upload
+            class="userImageBackground"
+            :action="BASE_URL + '/users/' + userId + '/profile_picture'"
+            :show-file-list="false"
+            :before-upload="beforeUserImageUpload"
+            :on-success="uploadUserImageSuccess"
+            :on-error="uploadUserImageError"
+          >
+            <img
+              v-if="
+                userInfo.profile_picture_url &&
+                userInfo.profile_picture_url !== ''
+              "
+              :src="userInfo.profile_picture_url"
+              class="userImage"
+            />
+            <span v-else class="userImageEmpty">{{
+              `点击此处${"\n"}上传头像`
+            }}</span>
+          </el-upload>
           <!-- 编辑个人信息 -->
-          <div class="editInfoButton" @click="userDialogVisible = true">
+          <div class="editInfoButton" @click="openEditUserDialog()">
             <span class="editInfoButtonWord">编辑个人信息</span>
           </div>
           <!-- 个人信息展示区域 -->
           <div class="userInfoBlock">
             <div class="infoDetail">
-              <i class="el-icon-user-solid system_key_color" />
-              <span class="infoWordRight">账号</span>
-              <span class="infoWord"> {{ userInfo.account }}</span>
+              <span class="infoWordRight">用户名</span>
+              <span class="infoWord"> {{ userInfo.username }}</span>
             </div>
             <div class="infoDetail">
-              <i class="el-icon-phone system_key_color" />
-              <span class="infoWordRight">手机</span>
-              <span class="infoWord"> {{ userInfo.mobile }}</span>
+              <span class="infoWordRight" v-html="'邮&emsp;箱'" />
+              <span class="infoWord"> {{ userInfo.email }}</span>
             </div>
             <div class="infoDetail">
-              <i class="el-icon-s-help system_key_color" />
-              <span class="infoWordRight">角色</span>
+              <span class="infoWordRight" v-html="'角&emsp;色'" />
               <span v-if="userInfo.role === 'sup'" class="infoWord"
                 >超级管理员</span
               >
@@ -90,144 +104,146 @@
         </el-card>
       </div>
       <div class="userCenterButtom">
-        <el-tabs>
-          <el-tab-pane>
-            <span slot="label" class="tabWord">提交记录</span>
-            <div
-              class="submissionItem"
-              v-for="(submissions, index) in submissionslist"
-              :key="index"
-            >
+        <el-card>
+          <el-tabs>
+            <el-tab-pane class="scrollbar" style="max-height: 500px">
+              <span slot="label" class="tabWord">提交记录</span>
               <div
-                class="submission"
-                @click="goSubmissionDetail(submissions.id)"
+                class="submissionItem"
+                v-for="(submissions, index) in submissionslist"
+                :key="index"
               >
-                <div>
-                  <span class="submissionWordLight">我在题目</span>
-                  <span class="submissionWordHeavy">
-                    {{ submissions.problem_id }}
-                  </span>
-                  <span class="submissionWordLight">中使用</span>
-                  <span class="submissionWordHeavy">
-                    {{ submissions.language }}
-                  </span>
-                  <span class="submissionWordLight">进行了提交</span>
-                </div>
-                <div>
-                  <el-tag
-                    effect="dark"
-                    size="medium"
-                    style="margin-right: 20px"
-                    type="warning"
-                    v-if="submissions.err !== null"
-                    >Compile Error</el-tag
-                  >
-                  <el-tag
-                    effect="dark"
-                    size="medium"
-                    style="margin-right: 20px"
-                    type="success"
-                    v-if="
-                      submissions.err === null &&
-                      submissions.is_accepted === true
-                    "
-                    >Accepted</el-tag
-                  >
-                  <el-tag
-                    effect="dark"
-                    size="medium"
-                    style="margin-right: 20px"
-                    type="danger"
-                    v-if="
-                      submissions.err === null &&
-                      submissions.is_accepted === false
-                    "
-                    >Unaccepted</el-tag
-                  >
-                  <span class="submissionWordLight">{{
-                    formatTime(submissions.submit_time)
-                  }}</span>
+                <div
+                  class="submission"
+                  @click="goSubmissionDetail(submissions.id)"
+                >
+                  <div>
+                    <span class="submissionWordLight">我在题目</span>
+                    <span class="submissionWordHeavy">
+                      {{ submissions.problem_id }}
+                    </span>
+                    <span class="submissionWordLight">中使用</span>
+                    <span class="submissionWordHeavy">
+                      {{ submissions.language }}
+                    </span>
+                    <span class="submissionWordLight">进行了提交</span>
+                  </div>
+                  <div>
+                    <el-tag
+                      effect="dark"
+                      size="medium"
+                      style="margin-right: 20px"
+                      type="warning"
+                      v-if="submissions.err !== null"
+                      >Compile Error</el-tag
+                    >
+                    <el-tag
+                      effect="dark"
+                      size="medium"
+                      style="margin-right: 20px"
+                      type="success"
+                      v-if="
+                        submissions.err === null &&
+                        submissions.is_accepted === true
+                      "
+                      >Accepted</el-tag
+                    >
+                    <el-tag
+                      effect="dark"
+                      size="medium"
+                      style="margin-right: 20px"
+                      type="danger"
+                      v-if="
+                        submissions.err === null &&
+                        submissions.is_accepted === false
+                      "
+                      >Unaccepted</el-tag
+                    >
+                    <span class="submissionWordLight">{{
+                      formatTime(submissions.submit_time)
+                    }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <el-pagination
-              small
-              hide-on-single-page
-              @current-change="getSubmissionsList"
-              :page-size="pageSize"
-              :current-page="currentPage"
-              layout="prev, pager, next"
-              :total="total"
-              style="margin-top: 30px; text-align: end"
-            >
-            </el-pagination>
-          </el-tab-pane>
-          <el-tab-pane>
-            <span slot="label" class="tabWord">数据统计</span>
-            <el-row :gutter="30" style="margin-top: 40px">
-              <!-- 题目提交难度分布饼图 -->
-              <el-col :span="12">
-                <div
-                  id="difficulty_pie_chart"
-                  style="width: 450px; height: 400px"
-                ></div>
-              </el-col>
-              <el-col :span="12">
-                <!-- 题目提交难度通过、未通过分布柱状图 -->
-                <div
-                  id="difficulty_column_chart"
-                  style="width: 500px; height: 400px"
-                ></div>
-              </el-col>
-            </el-row>
-          </el-tab-pane>
-        </el-tabs>
+              <el-pagination
+                small
+                hide-on-single-page
+                @current-change="getSubmissionsList"
+                :page-size="pageSize"
+                :current-page="currentPage"
+                layout="prev, pager, next"
+                :total="total"
+                style="margin-top: 30px; text-align: end"
+              >
+              </el-pagination>
+            </el-tab-pane>
+            <el-tab-pane>
+              <span slot="label" class="tabWord">数据统计</span>
+              <el-row :gutter="30" style="margin-top: 40px">
+                <!-- 题目提交难度分布饼图 -->
+                <el-col :span="12">
+                  <div
+                    id="difficulty_pie_chart"
+                    style="width: 450px; height: 400px"
+                  ></div>
+                </el-col>
+                <el-col :span="12">
+                  <!-- 题目提交难度通过、未通过分布柱状图 -->
+                  <div
+                    id="difficulty_column_chart"
+                    style="width: 500px; height: 400px"
+                  ></div>
+                </el-col>
+              </el-row>
+            </el-tab-pane>
+          </el-tabs>
+        </el-card>
       </div>
     </div>
-    <!-- 个人信息对话框 -->
-    <el-dialog title="个人信息" :visible.sync="userDialogVisible" width="40%">
-      <!-- 内容主体区域 -->
-      <el-form :model="userInfo">
-        <el-row>
-          <el-form-item>
-            <span slot="label">
-              <span class="lableWord">账号</span>
-            </span>
-            <el-input v-model="userInfo.account"></el-input>
-          </el-form-item>
-        </el-row>
-        <el-row>
-          <el-form-item>
-            <span slot="label">
-              <span class="lableWord">手机</span>
-            </span>
-            <el-input v-model="userInfo.mobile"></el-input>
-          </el-form-item>
-        </el-row>
-        <el-row>
-          <el-form-item>
-            <span slot="label">
-              <span class="lableWord">新密码</span>
-            </span>
-            <el-input v-model="userInfo.password"></el-input>
-          </el-form-item>
-        </el-row>
-        <el-row>
-          <el-form-item>
-            <span slot="label">
-              <span class="lableWord">确认密码</span>
-            </span>
-            <el-input v-model="userInfo.passwordConfirm"></el-input>
-          </el-form-item>
-        </el-row>
-      </el-form>
-      <el-button
-        type="primary"
-        plain
-        size="medium"
-        @click="updateRequest(userId)"
-        >更新</el-button
+    <!-- 编辑个人信息对话框 -->
+    <el-dialog title="个人信息" :visible.sync="userDialogVisible" width="32%">
+      <el-form
+        :model="updateUserForm"
+        :rules="updateUserFormRules"
+        ref="updateUserFormRef"
+        label-width="auto"
       >
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="updateUserForm.username"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input
+            placeholder="不填写则默认原密码"
+            v-model="updateUserForm.password"
+            type="password"
+            show-password
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="password_confirm">
+          <el-input
+            v-model="updateUserForm.password_confirm"
+            type="password"
+            show-password
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="updateUserForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="学校">
+          <el-input v-model="updateUserForm.school"></el-input>
+        </el-form-item>
+        <el-form-item label="学号">
+          <el-input v-model="updateUserForm.student_number"></el-input>
+        </el-form-item>
+        <el-form-item label="真实姓名">
+          <el-input v-model="updateUserForm.real_name"></el-input>
+        </el-form-item>
+      </el-form>
+      <div class="buttonWrap">
+        <el-button type="primary" size="medium" @click="updateRequest(userId)"
+          >更新个人信息</el-button
+        >
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -245,13 +261,43 @@ import {
   userSubmitListRequest,
 } from "../request/userRequest";
 require("echarts/theme/macarons"); //引入饼图主题
+import { checkEmail } from "@/assets/config";
+import { BASE_URL } from "@/assets/config";
 
 export default {
   components: { CalendarHeatmap },
   data() {
+    const confirmPassword = (rule, value, callback) => {
+      if (value === this.registerForm.password) {
+        return callback();
+      }
+      callback(new Error("请确保两次输入密码一致"));
+    };
     return {
       userDialogVisible: false,
+      BASE_URL,
       userInfo: {},
+      updateUserForm: {
+        id: null,
+        username: "",
+        password: "",
+        password_confirm: "",
+        email: "",
+        role: "",
+        school: "",
+        student_number: "",
+        real_name: "",
+      },
+      updateUserFormRules: {
+        username: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+        ],
+        password_confirm: [{ validator: confirmPassword, trigger: "blur" }],
+        email: [
+          { required: true, message: "请输入邮箱", trigger: "blur" },
+          { validator: checkEmail, trigger: "blur" },
+        ],
+      },
       userId: "",
       submissionslist: [],
       submitCounts: {},
@@ -265,7 +311,7 @@ export default {
   mounted() {},
   created() {
     this.myDate = new Date();
-    var that = this;
+    const that = this;
     userCheckOnlineRequest()
       .then(function (response) {
         if (response) {
@@ -284,7 +330,7 @@ export default {
   methods: {
     // 获取用户信息
     getUserInfo() {
-      var that = this;
+      const that = this;
       userInfoRequest(this.userId)
         .then(function (response) {
           that.userInfo = response;
@@ -296,7 +342,7 @@ export default {
 
     // 获取题目难度信息
     getDifficultyInfo() {
-      var that = this;
+      const that = this;
       userSubmitDiffcultyInfoRequest(that.userId)
         .then(function (response) {
           that.submitCounts = response;
@@ -312,7 +358,7 @@ export default {
 
     // 获取题目提交次数统计
     getSubmissionsTime() {
-      var that = this;
+      const that = this;
       userSubmitNumberInfoRequest(this.userId)
         .then(function (response) {
           that.submissionsTime = response;
@@ -322,36 +368,68 @@ export default {
         });
     },
 
+    // 上传头像
+    beforeUserImageUpload(file) {
+      const isJPG = file.type === "image/jpeg" || file.type === "image/png";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isJPG) {
+        this.$message.error("上传头像图片只能是 JPG/PNG 格式");
+      }
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 2MB");
+      }
+      return isJPG && isLt2M;
+    },
+    uploadUserImageSuccess() {
+      this.getUserInfo();
+      this.$message.success("用户头像上传成功");
+    },
+    uploadUserImageError() {
+      this.$message.warning("用户头像上传失败");
+    },
+
+    // 打开修改用户弹窗
+    openEditUserDialog() {
+      this.updateUserForm = this.userInfo;
+      this.userDialogVisible = true;
+    },
     // 发起修改用户请求
-    updateRequest: function (userInfo) {
+    updateRequest: function () {
+      this.$refs.updateUserFormRef.validate((valid) => {
+        if (!valid) {
+          return;
+        }
+      });
+      const that = this;
       const data = {
-        new_account: this.userInfo.account,
-        new_mobile: this.userInfo.mobile,
-        new_password: this.userInfo.password,
+        new_username: this.updateUserForm.username,
+        new_email: this.updateUserForm.email,
+        new_password: this.updateUserForm.password,
+        new_real_name: this.updateUserForm.real_name,
+        new_school: this.updateUserForm.school,
+        new_student_number: this.updateUserForm.student_number,
       };
-      let that = this;
-      userEditRequest(this.userInfo.id, data)
+      userEditRequest(this.userId, data)
         .then(function (response) {
-          //关闭对话框
           that.userDialogVisible = false;
-          // 重新获取用户信息
-          // 提示用户修改成功
+          that.getUserInfo();
           that.$message({
-            message: "更新用户信息成功！",
+            message: "更新用户信息成功",
             type: "success",
           });
         })
         .catch(function (error) {
           that.$message({
-            message: "更新用户信息失败!",
+            message: "更新用户信息失败",
             type: "warning",
           });
           console.log(error);
         });
     },
+
     // 个人提交记录
     getSubmissionsList(currentPage = 1) {
-      var that = this;
+      const that = this;
       const params = {
         user_id_filter: this.userId,
         limit: this.pageSize,
@@ -375,7 +453,7 @@ export default {
     // 查看提交详情（外部）
     goSubmissionDetail(uid) {
       let uuid = uid;
-      let that = this;
+      const that = this;
       that.$router.push({ name: "submissionDetail", params: { uuid: uuid } });
     },
 
@@ -532,6 +610,9 @@ export default {
 }
 .userCenterTopLeft {
   width: 30%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .userCenterTopRight {
   width: 68%;
@@ -539,29 +620,30 @@ export default {
   flex-direction: column;
   align-content: space-between;
 }
-.userInfoCard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 
+// 用户头像
 .userImageBackground {
-  margin: auto;
   width: 130px;
   height: 130px;
-  background: #ffffff;
-  border: 1px solid $key_color;
-  border-radius: 50%;
+  margin: auto;
+  border: 1px dashed $unimportant_font_color;
   display: flex;
   justify-content: center;
   align-items: center;
-  .userImage {
-    // width: 125px;
-    // height: 125px;
-    font-size: 125px; //todo: 上传头像，删除假数据
-    border-radius: 50%;
-    overflow: hidden;
-  }
+  cursor: pointer;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+}
+.userImageBackground:hover {
+  border-color: $key_color;
+}
+.userImageEmpty {
+  color: $unimportant_font_color;
+  font-size: 25px;
+}
+.userImage {
+  width: 125px;
+  height: 125px;
 }
 
 .system_key_color {
@@ -587,7 +669,6 @@ export default {
 
 .editInfoButtonWord {
   font-size: 14px;
-  font-style: normal;
   font-weight: 400;
   line-height: 20px;
   letter-spacing: 0em;
@@ -598,28 +679,23 @@ export default {
 .infoDetail {
   display: flex;
   flex-direction: row;
-  align-items: center;
   margin-top: 5px;
-}
-
-.infoIcon {
-  width: 25px;
-}
-.infoWordRight {
-  margin-left: 5px;
   font-size: 14px;
-  color: $ordinary_font_color;
-}
 
-.infoWord {
-  margin-left: 15px;
-  font-size: 14px;
-  color: $important_font_color;
-  font-weight: 450;
+  .infoWordRight {
+    margin-top: 1px;
+    color: $ordinary_font_color;
+  }
+
+  .infoWord {
+    margin-left: 15px;
+    color: $important_font_color;
+    font-weight: 450;
+  }
 }
 
 .tabWord {
-  color: #606060;
+  color: $ordinary_font_color;
 }
 
 .submission {

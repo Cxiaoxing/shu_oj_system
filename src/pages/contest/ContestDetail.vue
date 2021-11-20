@@ -158,7 +158,7 @@
               <div v-for="(rank, index) in ranklist" :key="index">
                 <div class="rankItem" v-if="rank.is_unrated == false">
                   <div class="rankOrder">第 {{ rank.rank }} 名</div>
-                  <div class="rankUser">{{ rank.account }}</div>
+                  <div class="rankUser">{{ rank.username }}</div>
                   <div class="rankTime">{{ secondFormat(rank.time_cost) }}</div>
                 </div>
               </div>
@@ -261,7 +261,7 @@
               width="100"
               fixed
             ></el-table-column>
-            <el-table-column prop="account" label="用户" fixed>
+            <el-table-column prop="username" label="用户" fixed>
             </el-table-column>
             <el-table-column label="通过(题)">
               <template slot-scope="scope">
@@ -454,7 +454,7 @@ export default {
   methods: {
     // 获取竞赛信息
     getContest() {
-      var that = this;
+      const that = this;
       const params = {
         title_filter: this.ctitle,
         limit: 1,
@@ -478,7 +478,7 @@ export default {
     },
     // 获取排名
     getRankList() {
-      var that = this;
+      const that = this;
       contestRankRequest(this.region)
         .then(function (response) {
           that.ranklist = response.columns;
@@ -527,7 +527,7 @@ export default {
       if (this.contest.need_pass === true) {
         this.showPasswordDialog = true;
       } else {
-        var that = this;
+        const that = this;
         contestRegisterRequest(this.contest.region)
           .then(function (response) {
             that.contest.is_registered = true;
@@ -551,7 +551,7 @@ export default {
     },
 
     registerRequest() {
-      var that = this;
+      const that = this;
       const data = {
         password: that.password,
       };
@@ -572,7 +572,7 @@ export default {
         .catch(function (error) {
           console.log(error);
           that.$message({
-            message: "密码错误！",
+            message: "密码错误",
             type: "warning",
           });
         });
@@ -593,7 +593,7 @@ export default {
     // 开始比赛，跳转至比赛提交页
     startTheContest() {
       let region = this.region;
-      let that = this;
+      const that = this;
       that.$router.push({
         name: "contestProblemList",
         params: { region: region },
@@ -605,7 +605,7 @@ export default {
     },
     // 获取提交状态列表
     getStateList(currentPage = 1) {
-      var that = this;
+      const that = this;
       const params = {
         limit: this.pageSize,
         offset: this.pageSize * (currentPage - 1),
@@ -647,7 +647,7 @@ export default {
 
     // 获取该竞赛的题目列表
     getContestProblemList(re, currentPage = 1) {
-      var that = this;
+      const that = this;
       const params = {
         inner_id_order: true,
         limit: this.pageSize,
@@ -668,7 +668,7 @@ export default {
     goProblemDetail(re, pid, inner_id) {
       let region = re;
       let id = pid;
-      let that = this;
+      const that = this;
       let routeUrl = this.$router.resolve({
         name: "contestProblemDetail",
         params: {
@@ -691,7 +691,7 @@ export default {
       ) {
         // 比赛中且非本用户请求时不能跳转
         this.$message({
-          message: "比赛过程中不能查看其他用户的提交详情！",
+          message: "比赛过程中不能查看其他用户的提交详情",
           type: "waring",
         });
       } else {

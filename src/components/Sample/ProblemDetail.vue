@@ -109,14 +109,13 @@ import "codemirror/theme/idea.css"; // 白色
 // 代码高亮
 import "codemirror/mode/python/python.js"; // python
 import { sampleRequest } from "@/request/sampleRequest";
-import { problemPublicInfoRequest } from "@/request/problemRequest";
+import { problemInfoPrivateRequest } from "@/request/problemRequest";
 // import "codemirror/mode/clike/clike.js"; //java
 
 export default {
   data() {
     return {
       id: 0, //接受前一个页面传来的id值
-      region: "",
       problem_info: {}, //题目基础信息
       problem_contents: {}, //题目描述
       code: "\n\n\n\n\n\n", // 代码编辑器绑定的值
@@ -163,14 +162,13 @@ export default {
   },
   created() {
     this.id = this.$route.params.id;
-    this.region = this.$route.params.region;
-    this.getProblem(this.id, this.region);
+    this.getProblem(this.id);
   },
   methods: {
     // 获取题目详情
     getProblem: function (id) {
-      var that = this;
-      problemPublicInfoRequest(id)
+      const that = this;
+      problemInfoPrivateRequest(id)
         .then(function (response) {
           that.problem_info = response.info;
           that.problem_contents = response.contents;
@@ -185,7 +183,7 @@ export default {
     },
     // 提交代码
     submitCode: function (pid) {
-      var that = this;
+      const that = this;
       const data = {
         problem_id: pid,
         src: this.code,
@@ -205,14 +203,14 @@ export default {
         .catch(function (error) {
           console.log(error);
           that.$message({
-            message: "提交失败！",
+            message: "提交失败",
             type: "warning",
           });
         });
     },
     // 管理标程
     goSampleList() {
-      let that = this;
+      const that = this;
       let id = this.id;
       that.$router.push({ name: "sampleList", params: { id: id } });
     },

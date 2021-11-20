@@ -11,7 +11,7 @@ const Welcome = () => import(/* webpackChunkName: "HomeScreen" */ '../pages/Welc
 // 【公告详情】
 const AnnounceDetail = () => import(/* webpackChunkName: "Announce" */ '../pages/announce/AnnounceDetail.vue')
 
-// 【题集】
+// 【题库】
 const Practice = () => import(/* webpackChunkName: "Problem" */ '../pages/practice/Practice.vue')
 const PracticeProblemDetail = () => import(/* webpackChunkName: "Problem" */ '../pages/practice/ProblemDetail.vue')
 
@@ -86,7 +86,7 @@ const router = new VueRouter({
         { path: '/login', component: Login },
         // 用户中心
         { path: '/userCenter', component: UserCenter },
-        // 主题集
+        // 题库
         { path: '/practice', component: Practice },
         { path: '/practice/problemDetail/:id', component: PracticeProblemDetail, name: 'practiceProblemDetail' },
         // 竞赛

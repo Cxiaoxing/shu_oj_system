@@ -1,7 +1,7 @@
 import { _get, _post, _put, _delete } from './http.js'
 
 export function announceCreateRequest(data) {
-    return _post('/announcements/create', data)
+    return _post('/announcements', data)
 }
 
 export function announceDeleteRequest(id) {

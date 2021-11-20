@@ -4,38 +4,42 @@ export function problemCreateRequest(data) {
     return _post('/problems/create', data)
 }
 
-export function problemPublicDeleteRequest(region) {
-    return _delete(`/problems/${region}`)
+export function problemDeleteRequest(problem_id) {
+    return _delete(`/problems/${problem_id}`)
 }
 
-export function problemPublicInfoRequest(region) {
-    return _get(`/problems/${region}`)
+export function problemInfoPrivateRequest(problem_id) {
+    return _get(`/problems/${problem_id}`)
 }
 
-export function problemPublicListRequest(params) {
+export function problemListPrivateRequest(params) {
     return _get('/problems', params)
 }
 
-export function problemPrivateDeleteRequest(region, inner_id) {
-    return _delete(`/regions/${region}/${inner_id}`)
+export function problemDeleteFromRegionRequest(region, problem_id) {
+    return _delete(`/regions/${region}/${problem_id}`)
 }
 
-export function problemPrivateInfoRequest(region, inner_id) {
-    return _get(`/regions/${region}/${inner_id}`)
+export function problemInfoFromRegionRequest(region, problem_id) {
+    return _get(`/regions/${region}/${problem_id}`)
 }
 
-export function problemPrivateListRequest(region, params) {
+export function problemListFromRegionRequest(region, params) {
     return _get(`/regions/${region}`, params)
 }
 
-export function problemStatusChangeRequest(region, data) {
-    return _post(`/problems/${region}/change_release_state`, data)
+export function problemStatusChangeRequest(problem_id, data) {
+    return _post(`/problems/${problem_id}/change_release_state`, data)
 }
 
-export function problemEditRequest(region, data) {
-    return _put(`/problems/${region}`, data)
+export function problemEditRequest(problem_id, data) {
+    return _put(`/problems/${problem_id}`, data)
 }
 
 export function ProblemAddRegionRequest(region, data) {
     return _post(`/regions/${region}`, data)
+}
+
+export function problemTestCaseRequest(problem_id, test_case_id, isInput) {
+    return _get(`/problems/${problem_id}/test_case/${test_case_id}?input=${isInput}`)
 }

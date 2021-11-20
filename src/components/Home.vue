@@ -40,10 +40,10 @@
               <i class="el-icon-s-home"></i>
               <span slot="title">首页</span>
             </el-menu-item>
-            <!-- 练习题集（对外） -->
+            <!-- 题库（对外） -->
             <el-menu-item index="/practice" id="problemSet">
               <i class="el-icon-menu"></i>
-              <span slot="title">题集</span>
+              <span slot="title">题库</span>
             </el-menu-item>
             <!-- 竞赛（对外） -->
             <el-menu-item index="/contest" id="contest">
@@ -184,7 +184,7 @@ export default {
     getUserInfo(id) {
       userInfoRequest(id)
         .then(function (response) {
-          window.localStorage.setItem("account", response.account);
+          window.localStorage.setItem("username", response.username);
         })
         .catch(function (error) {
           console.log(error);
@@ -207,13 +207,13 @@ export default {
               that.$router.push("/home");
               window.location.reload();
               that.$message({
-                message: "退出登陆成功！",
+                message: "退出登陆成功",
                 type: "success",
               });
             })
             .catch(function (error) {
               that.$message({
-                message: "退出登录失败！",
+                message: "退出登录失败",
                 type: "warning",
               });
             });

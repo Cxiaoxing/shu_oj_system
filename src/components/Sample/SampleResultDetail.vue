@@ -178,7 +178,7 @@ import "codemirror/theme/idea.css"; // 白色
 import "codemirror/mode/python/python.js"; // python
 
 import { sampleResultRequest } from "@/request/sampleRequest";
-import { problemPublicInfoRequest } from '@/request/problemRequest';
+import { problemInfoPrivateRequest } from '@/request/problemRequest';
 export default {
   data() {
     return {
@@ -225,8 +225,8 @@ export default {
   methods: {
     // 获取题目信息
     getProblem: function (region) {
-      var that = this;
-      problemPublicInfoRequest(region)
+      const that = this;
+      problemInfoPrivateRequest(region)
         .then(function (response) {
           that.problemtitle = response.info.title;
         })
@@ -242,7 +242,7 @@ export default {
 
     // 获取结果
     getResult: function (uuid) {
-      var that = this;
+      const that = this;
       sampleResultRequest(uuid)
         .then(function (response) {
           console.log(response);

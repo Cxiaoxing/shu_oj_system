@@ -271,7 +271,7 @@ export default {
       // 当前页
       currentPage: 1,
       // 每页记录数
-      pageSize: 10,
+      pageSize: 7,
       // 总记录数
       total: null,
       // 控制修改竞赛弹窗展示
@@ -300,7 +300,7 @@ export default {
   methods: {
     // 获取竞赛列表
     getContestList(currentPage = 1) {
-      var that = this;
+      const that = this;
       const params = {
         title_filter: this.searchInput,
         limit: this.pageSize,
@@ -320,7 +320,7 @@ export default {
     // 查看竞赛题目详情
     handleClickProblem(re) {
       let region = re;
-      let that = this;
+      const that = this;
       that.$router.push({
         name: "contestDetailList",
         params: { region: region },
@@ -385,12 +385,12 @@ export default {
           },
         };
       }
-      let that = this;
+      const that = this;
       contestEditRequest(this.modify_region, data)
         .then(function (response) {
           // 提示用户创建成功
           that.$message({
-            message: "修改竞赛成功！",
+            message: "修改竞赛成功",
             type: "success",
           });
           that.modifyContestDialogVisible = false;
@@ -398,7 +398,7 @@ export default {
         })
         .catch(function (error) {
           that.$message({
-            message: "修改竞赛失败！",
+            message: "修改竞赛失败",
             type: "warning",
           });
           console.log(error);
@@ -416,20 +416,20 @@ export default {
         }
       )
         .then(() => {
-          let that = this;
+          const that = this;
           contestDeleteRequest(contestid)
             .then(function (response) {
               //重新获取竞赛列表
               that.getContestList();
               // 提示用户删除成功
               that.$message({
-                message: "删除成功！",
+                message: "删除成功",
                 type: "success",
               });
             })
             .catch(function (error) {
               that.$message({
-                message: "删除失败！",
+                message: "删除失败",
                 type: "warning",
               });
               console.log(error);
@@ -450,7 +450,7 @@ export default {
 };
 </script>
 
-<style lang='less' scoped>
+<style lang='scss' scoped>
 .editpic {
   width: 25px;
 }

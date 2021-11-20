@@ -93,14 +93,14 @@ export default {
       const that = this;
       const data = {
         title: this.input_title,
-        author: window.localStorage.getItem("account"),
+        author: window.localStorage.getItem("username"),
         contents: this.input_contents,
         release_time: this.input_release_time,
       };
       announceCreateRequest(data)
         .then(function (response) {
           that
-            .$confirm("新建公告成功！", {
+            .$confirm("新建公告成功", {
               confirmButtonText: "查看公告",
               cancelButtonText: "知道了",
               type: "success",
@@ -114,7 +114,7 @@ export default {
         })
         .catch(() => {
           that.$message({
-            message: "创建公告失败！",
+            message: "创建公告失败",
             type: "warning",
           });
         });

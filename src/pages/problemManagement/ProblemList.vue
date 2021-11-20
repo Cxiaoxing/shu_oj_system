@@ -9,41 +9,8 @@
 
     <!-- 卡片视图区域，展示题目列表 -->
     <el-card>
-      <!-- 搜索与添加区域 -->
-      <el-row :gutter="40">
-        <el-col :span="8">
-          <el-input
-            placeholder="请输入想要搜索的题目名称"
-            v-model="searchInput"
-            @keyup.enter.native="getProblemList()"
-          >
-            <el-button
-              slot="append"
-              icon="el-icon-search"
-              @click="getProblemList()"
-            ></el-button>
-          </el-input>
-        </el-col>
-        <el-col :span="2" :offset="10">
-          <el-button
-            v-if="multipleSelection.length != 0"
-            type="primary"
-            plain
-            @click="addProblemSetDialogVisible = true"
-            >创建题集</el-button
-          >
-        </el-col>
-        <el-col :span="2">
-          <el-button
-            v-if="multipleSelection.length != 0"
-            type="primary"
-            plain
-            @click="addContestDialogVisible = true"
-            >创建竞赛</el-button
-          >
-        </el-col>
-      </el-row>
-
+      <!-- 搜索区域 -->
+      <ProblemSearchBar :searchProblemList="searchProblemList" />
       <!-- 列表区域 -->
       <el-table :data="problemlist" style="margin-top: 20px">
         <el-table-column prop="id" width="80" label="ID"> </el-table-column>
@@ -58,56 +25,27 @@
             >
           </template>
         </el-table-column>
-        <el-table-column
-          prop="info.difficulty"
-          width="150"
-          label="难度"
-          :filters="[
-            { text: '入门', value: 0.0 },
-            { text: '简单', value: 2.5 },
-            { text: '中等', value: 5.0 },
-            { text: '困难', value: 7.5 },
-          ]"
-          :filter-method="filterDifficulty"
-          filter-placement="bottom-end"
-        >
+        <el-table-column prop="info.difficulty" label="难度">
           <template slot-scope="scope">
             <el-tag
               effect="dark"
               type="info"
-              v-if="
-                scope.row.info.difficulty >= 0 &&
-                scope.row.info.difficulty < 2.5
-              "
-              >入门
+              v-if="scope.row.info.difficulty < 2.5"
+              >Navie
             </el-tag>
             <el-tag
               effect="dark"
               type="success"
-              v-if="
-                scope.row.info.difficulty >= 2.5 &&
-                scope.row.info.difficulty < 5.0
-              "
-              >简单
+              v-else-if="scope.row.info.difficulty < 5.0"
+              >Easy
             </el-tag>
             <el-tag
               effect="dark"
               type="warning"
-              v-if="
-                scope.row.info.difficulty >= 5.0 &&
-                scope.row.info.difficulty < 7.5
-              "
-              >中等
+              v-else-if="scope.row.info.difficulty < 7.5"
+              >Middle
             </el-tag>
-            <el-tag
-              effect="dark"
-              type="danger"
-              v-if="
-                scope.row.info.difficulty >= 7.5 &&
-                scope.row.info.difficulty < 10.0
-              "
-              >困难
-            </el-tag>
+            <el-tag effect="dark" type="danger" v-else>Hard </el-tag>
           </template>
         </el-table-column>
         <el-table-column
@@ -165,104 +103,6 @@
       >
       </el-pagination>
     </el-card>
-    <!-- 创建题集弹窗 -->
-    <el-dialog
-      title="创建题集"
-      :visible.sync="addProblemSetDialogVisible"
-      width="50%"
-      @close="addProblemSetDialogClosed"
-    >
-      <!-- 内容主体区域 -->
-      <el-form
-        :model="addProblemSetForm"
-        :rules="addProblemSetFormRules"
-        ref="addProblemSetFormRef"
-        label-width="auto"
-        label-position="top"
-        size="medium"
-      >
-        <el-form-item label="题集名称" prop="name">
-          <el-input v-model="addProblemSetForm.name"></el-input>
-        </el-form-item>
-        <el-form-item label="相关介绍" prop="introduction">
-          <el-input
-            type="textarea"
-            v-model="addProblemSetForm.introduction"
-          ></el-input>
-        </el-form-item>
-      </el-form>
-      <div style="width: 100%; display: flex; justify-content: flex-end">
-        <el-button type="primary" @click="createProblemSet()">创建</el-button>
-      </div>
-    </el-dialog>
-
-    <!-- 创建竞赛弹窗 -->
-    <el-dialog
-      title="创建竞赛"
-      :visible.sync="addContestDialogVisible"
-      width="50%"
-      @close="addContestDialogClosed"
-    >
-      <!-- 内容主体区域 -->
-      <el-form
-        :model="addContestForm"
-        :rules="addContestFormRules"
-        ref="addContestFormRef"
-        label-width="auto"
-        label-position="top"
-        size="medium"
-      >
-        <el-form-item label="竞赛名称" prop="name">
-          <el-input v-model="addContestForm.name"></el-input>
-        </el-form-item>
-        <el-form-item label="相关介绍" prop="introduction">
-          <el-input
-            type="textarea"
-            v-model="addContestForm.introduction"
-          ></el-input>
-        </el-form-item>
-        <el-row type="flex" justify="space-between">
-          <el-col :span="6">
-            <el-form-item label="开始时间" prop="startTime">
-              <div class="block">
-                <el-date-picker
-                  v-model="addContestForm.startTime"
-                  type="datetime"
-                  placeholder="选择开始时间"
-                >
-                </el-date-picker>
-              </div>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="结束时间" prop="endTime">
-              <div class="block">
-                <el-date-picker
-                  v-model="addContestForm.endTime"
-                  type="datetime"
-                  placeholder="选择开始时间"
-                >
-                </el-date-picker>
-              </div>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="密码" prop="password">
-              <div class="block">
-                <el-input
-                  v-model="addContestForm.password"
-                  placeholder="请输入竞赛密码"
-                >
-                </el-input>
-              </div>
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <div style="width: 100%; display: flex; justify-content: flex-end">
-        <el-button type="primary" @click="createContest()">创建</el-button>
-      </div>
-    </el-dialog>
 
     <!-- 修改题目弹窗 -->
     <el-dialog
@@ -276,13 +116,13 @@
         <el-col :span="12">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style=" font-size: 16px">标题</span>
+            <span style="font-size: 16px">标题</span>
           </div>
           <el-input
             placeholder="请输入标题"
             v-model="input_title"
             clearable
-            style="margin-top: 10px;  font-size: 14px"
+            style="margin-top: 10px; font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -290,7 +130,7 @@
         <el-col :span="12">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style=" font-size: 16px">标签</span>
+            <span style="font-size: 16px">标签</span>
           </div>
           <el-select
             v-model="input_tags"
@@ -301,7 +141,7 @@
             placeholder="请选择标签"
             style="
               margin-top: 10px;
-              
+
               font-size: 14px;
               width: 100%;
             "
@@ -322,17 +162,12 @@
         <el-col :span="8">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style=" font-size: 16px">难度</span>
+            <span style="font-size: 16px">难度</span>
           </div>
           <el-select
             v-model="difficultyValue"
             placeholder="请选择难度"
-            style="
-              margin-top: 10px;
-              
-              font-size: 14px;
-              width: 100%;
-            "
+            style="margin-top: 10px; font-size: 14px; width: 100%"
           >
             <el-option
               v-for="item in difficultyOptions"
@@ -347,16 +182,14 @@
         <el-col :span="8">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style=" font-size: 16px"
-              >判题方式</span
-            >
+            <span style="font-size: 16px">判题方式</span>
           </div>
           <el-select
             v-model="judgeValue"
             placeholder="请选择判题方式"
             style="
               margin-top: 10px;
-              
+
               font-size: 14px;
               width: 100%;
             "
@@ -374,19 +207,12 @@
         <el-col :span="8">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style=" font-size: 16px"
-              >输出展示</span
-            >
+            <span style="font-size: 16px">输出展示</span>
           </div>
           <el-select
             v-model="opaque_output"
             placeholder="请选择是否展示输出内容"
-            style="
-              margin-top: 10px;
-              
-              font-size: 14px;
-              width: 100%;
-            "
+            style="margin-top: 10px; font-size: 14px; width: 100%"
           >
             <el-option
               v-for="item in outputOptions"
@@ -404,15 +230,13 @@
         <el-col :span="6">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style=" font-size: 16px"
-              >高性能时间限制(ms)</span
-            >
+            <span style="font-size: 16px">高性能时间限制(ms)</span>
           </div>
           <el-input
             placeholder="请输入高性能时间限制值，单位 ms"
             v-model.number="high_performance_max_cpu_time"
             clearable
-            style="margin-top: 10px;  font-size: 14px"
+            style="margin-top: 10px; font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -420,15 +244,13 @@
         <el-col :span="6">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style=" font-size: 16px"
-              >高性能内存限制(B)</span
-            >
+            <span style="font-size: 16px">高性能内存限制(B)</span>
           </div>
           <el-input
             placeholder="请输入高性能内存限制值，单位 B"
             v-model.number="high_performance_max_memory"
             clearable
-            style="margin-top: 10px;  font-size: 14px"
+            style="margin-top: 10px; font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -436,15 +258,13 @@
         <el-col :span="6">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style=" font-size: 16px"
-              >其他时间限制(ms)</span
-            >
+            <span style="font-size: 16px">其他时间限制(ms)</span>
           </div>
           <el-input
             placeholder="请输入其他时间限制值，单位 ms"
             v-model.number="other_max_cpu_time"
             clearable
-            style="margin-top: 10px;  font-size: 14px"
+            style="margin-top: 10px; font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -452,15 +272,13 @@
         <el-col :span="6">
           <div class="titleLayout">
             <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style=" font-size: 16px"
-              >其他内存限制(B)</span
-            >
+            <span style="font-size: 16px">其他内存限制(B)</span>
           </div>
           <el-input
             placeholder="请输入其他内存限制值，单位 B"
             v-model.number="other_max_memory"
             clearable
-            style="margin-top: 10px;  font-size: 14px"
+            style="margin-top: 10px; font-size: 14px"
           >
           </el-input>
         </el-col>
@@ -558,68 +376,37 @@
 
 <script>
 import {
-  problemPublicInfoRequest,
-  problemPublicListRequest,
+  problemInfoPrivateRequest,
+  problemListPrivateRequest,
   problemStatusChangeRequest,
   problemEditRequest,
-  problemPublicDeleteRequest,
+  problemDeleteRequest,
 } from "@/request/problemRequest";
+import ProblemSearchBar from "@/components/ProblemSearchBar.vue";
+
 export default {
+  components: {
+    ProblemSearchBar,
+  },
   data() {
     return {
-      searchInput: "",
+      title_filter: "",
+      tag_filter: [],
+      difficulty_filter: "",
       currentPage: 1,
-      pageSize: 10,
+      pageSize: 7,
       total: null,
       problemlist: [],
-      // 多选
-      multipleSelection: [],
-      // 控制创建题集天窗
-      addProblemSetDialogVisible: false,
-      // 控制创建竞赛弹窗
-      addContestDialogVisible: false,
+
       // 控制修改题目弹窗
       modifyProblemDialogVisible: false,
-      // 创建题集表单
-      addProblemSetForm: {
-        name: "",
-        introduction: "",
-      },
-      // 创建竞赛表单
-      addContestForm: {
-        name: "",
-        introduction: "",
-        startTime: "",
-        endTime: "",
-        password: "",
-      },
-      // 创建题集时的表单验证规则对象
-      addProblemSetFormRules: {
-        name: [{ required: true, message: "请输入题集名称", trigger: "blur" }],
-        introduction: [
-          { required: false, message: "请输入题集相关介绍", trigger: "blur" },
-        ],
-      },
-      // 创建竞赛时的表单验证规则对象
-      addContestFormRules: {
-        name: [{ required: true, message: "请输入竞赛名称", trigger: "blur" }],
-        introduction: [
-          { required: false, message: "请输入竞赛相关介绍", trigger: "blur" },
-        ],
-        startTime: [
-          { required: true, message: "请选择竞赛开始时间", trigger: "blur" },
-        ],
-        endTime: [
-          { required: true, message: "请选择竞赛开始时间", trigger: "blur" },
-        ],
-      },
       // 修改题目时的内容
       modify_id: "",
       input_title: "",
-      // 新建题目时的标签
+      // 修改题目时的标签
       input_tags: [],
       input_description: "",
-      // 新建题目时的难度
+      // 修改题目时的难度
       difficultyValue: "",
       judgeValue: "",
       high_performance_max_cpu_time: "",
@@ -627,7 +414,7 @@ export default {
       other_max_cpu_time: "",
       other_max_memory: "",
       opaque_output: "",
-      // 新建题目时的样例表单
+      // 修改题目时的样例表单
       createSampleForm: {
         dynamicItem: [
           {
@@ -636,22 +423,9 @@ export default {
           },
         ],
       },
-      // 新建题目时的标签选择器
-      tagOptions: [
-        {
-          value: "栈",
-          label: "栈",
-        },
-        {
-          value: "堆",
-          label: "堆",
-        },
-        {
-          value: "贪心算法",
-          label: "贪心算法",
-        },
-      ],
-      // 新建题目时的困难度选择
+      // 修改题目时的标签选择器
+      tagOptions: [],
+      // 修改题目时的困难度选择
       difficultyOptions: [
         {
           value: 0,
@@ -670,7 +444,7 @@ export default {
           label: "困难",
         },
       ],
-      // 新建题目时的判题方式选择
+      // 修改题目时的判题方式选择
       judgeOptions: [
         {
           value: false,
@@ -681,7 +455,7 @@ export default {
           label: "特殊",
         },
       ],
-      // 新建题目时的是否展示输出内容选择
+      // 修改题目时的是否展示输出内容选择
       outputOptions: [
         {
           value: false,
@@ -700,16 +474,17 @@ export default {
   methods: {
     // 获取题目列表
     getProblemList: function (currentPage = 1) {
-      var that = this;
+      const that = this;
       const params = {
         id_order: true,
-        title_filter: this.searchInput,
+        title_filter: this.title_filter,
+        tag_filter: this.tag_filter,
+        difficulty_filter: this.difficulty_filter,
         limit: this.pageSize,
         offset: this.pageSize * (currentPage - 1),
       };
-      problemPublicListRequest(params)
+      problemListPrivateRequest(params)
         .then(function (response) {
-          console.log(response);
           that.currentPage = currentPage;
           that.problemlist = response.list;
           that.total = response.total;
@@ -719,21 +494,29 @@ export default {
         });
     },
 
+    // 搜索题目列表
+    searchProblemList(title_filter, tag_filter, difficulty_filter) {
+      this.title_filter = title_filter;
+      this.tag_filter = tag_filter;
+      this.difficulty_filter = difficulty_filter;
+      this.getProblemList();
+    },
+
     // 改变题目发布状态
     problrmStatusChange(probleminfo) {
       console.log(probleminfo);
       const data = { target_state: probleminfo.is_released };
-      var that = this;
+      const that = this;
       problemStatusChangeRequest(probleminfo.id, data)
         .then(function (response) {
           that.$message({
-            message: "修改成功！",
+            message: "修改成功",
             type: "success",
           });
         })
         .catch(function (error) {
           that.$message({
-            message: "修改失败！",
+            message: "修改失败",
             type: "warning",
           });
         });
@@ -742,27 +525,14 @@ export default {
     // 点击题目跳转至题目详情
     handleClickProblem: function (pid) {
       let id = pid;
-      let that = this;
+      const that = this;
       that.$router.push({ name: "problemDetail", params: { id: id } });
-    },
-
-    // 选项改变时处理函数
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-      console.log(val);
-    },
-    // 创建题集
-    createProblemSet() {},
-
-    // 创建竞赛函数
-    createContest() {
-      console.log(this.addContestForm.startTime);
     },
 
     // 展示修改题目弹窗
     showEditDialog(problemid) {
-      var that = this;
-      problemPublicInfoRequest(problemid)
+      const that = this;
+      problemInfoPrivateRequest(problemid)
         .then(function (response) {
           console.log(response);
           var setProblemInfo = new Promise(function (resolve, reject) {
@@ -826,20 +596,20 @@ export default {
           test_case_count: 0,
         },
       };
-      let that = this;
+      const that = this;
       problemEditRequest(that.modify_id, data)
         .then(function (response) {
           that.modifyProblemDialogVisible = false;
           that.getProblemList();
           // 提示用户创建成功
           that.$message({
-            message: "修改题目成功！",
+            message: "修改题目成功",
             type: "success",
           });
         })
         .catch(function (error) {
           that.$message({
-            message: "修改题目失败！",
+            message: "修改题目失败",
             type: "warning",
           });
           console.log(error);
@@ -858,20 +628,20 @@ export default {
         }
       )
         .then(() => {
-          let that = this;
-          problemPublicDeleteRequest(problemid)
+          const that = this;
+          problemDeleteRequest(problemid)
             .then(function (response) {
               //重新获取题目列表
               that.getProblemList();
               // 提示用户删除成功
               that.$message({
-                message: "删除成功！",
+                message: "删除成功",
                 type: "success",
               });
             })
             .catch(function (error) {
               that.$message({
-                message: "删除失败！",
+                message: "删除失败",
                 type: "warning",
               });
               console.log(error);
@@ -885,21 +655,6 @@ export default {
         });
     },
 
-    // 监听创建竞赛对话框的关闭事件
-    addContestDialogClosed() {
-      this.$refs.addContestFormRef.resetFields();
-    },
-
-    // 监听创建题集对话框的关闭事件
-    addProblemSetDialogClosed() {
-      this.$refs.addProblemSetFormRef.resetFields();
-    },
-
-    //  根据困难度筛选
-    filterDifficulty(value, row) {
-      // return row.info.difficulty === value;
-      return row.info.difficulty >= value && row.info.difficulty < value + 2.5;
-    },
     // 根绝发布状态筛选
     filterReleaseStatus(value, row) {
       return row.is_released === value;
@@ -908,7 +663,7 @@ export default {
 };
 </script>
 
-<style lang='less' scoped>
+<style lang='scss' scoped>
 .editpic {
   width: 25px;
 }
@@ -938,7 +693,7 @@ export default {
 }
 .inputWord {
   width: 400px;
-  
+
   font-size: 14px;
 }
 .marginLeft30 {

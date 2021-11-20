@@ -256,12 +256,12 @@ export default {
           },
         };
       }
-      var that = this;
+      const that = this;
       contestCreateRequest(data)
         .then(function (response) {
           // 提示用户创建成功
           that.$message({
-            message: "创建竞赛成功！",
+            message: "创建竞赛成功",
             type: "success",
           });
           var region = "contest_"+that.input_region;
@@ -272,7 +272,7 @@ export default {
         })
         .catch(function (error) {
           that.$message({
-            message: "创建竞赛失败！",
+            message: "创建竞赛失败",
             type: "warning",
           });
           console.log(error);

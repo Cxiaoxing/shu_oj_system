@@ -16,7 +16,7 @@ module.exports = {
         //设置请求服务的代理
         proxy: {
             '/api': {
-                target: "http://111.229.161.159:8000", //代理地址（一般为API实际地址）
+                target: "http://111.229.161.159:8080", //代理地址（一般为API实际地址）
                 secure: false,
                 ws: true,
                 changeOrigin: true, // 是否允许跨域

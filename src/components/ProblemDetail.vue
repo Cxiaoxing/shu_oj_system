@@ -93,7 +93,7 @@ import "codemirror/theme/idea.css";
 import "codemirror/mode/python/python.js"; // python
 // import "codemirror/mode/clike/clike.js"; //java
 
-import { problemPublicInfoRequest } from "@/request/problemRequest";
+import { problemInfoPrivateRequest } from "@/request/problemRequest";
 import { sampleRequest } from "@/request/sampleRequest";
 import { submissionRequest } from "@/request/submissonRequest";
 export default {
@@ -162,8 +162,8 @@ export default {
   methods: {
     // 获取题目详情
     getProblem: function (region) {
-      var that = this;
-      problemPublicInfoRequest(region)
+      const that = this;
+      problemInfoPrivateRequest(region)
         .then(function (response) {
           console.log(response);
           that.problem_info = response.info;
@@ -206,7 +206,7 @@ export default {
             .catch(function (error) {
               console.log(error);
               that.$message({
-                message: "提交失败！",
+                message: "提交失败",
                 type: "warning",
               });
             });
@@ -234,7 +234,7 @@ export default {
             .catch(function (error) {
               console.log(error);
               that.$message({
-                message: "提交失败！",
+                message: "提交失败",
                 type: "warning",
               });
             });

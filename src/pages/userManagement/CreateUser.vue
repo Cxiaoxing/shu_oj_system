@@ -7,124 +7,121 @@
       <el-breadcrumb-item>添加用户</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡片视图区域，展示批量导入入口 -->
-    <el-card class="firstCard" v-if="false">
-      <div
-        style="
-          
-          font-size: 20px;
-          font-weight: 400;
-          color: #303133;
-        "
-      >
-        批量添加用户
-      </div>
-      <el-divider></el-divider>
-      <!-- todo: 改接口，展现 -->
-      <el-upload
-        ref="upload"
-        action="http://111.229.161.159:8000/users"
-        accept=".zip"
-        :show-file-list="true"
-        :file-list="fileList"
-        :auto-upload="true"
-        :on-success="handleSuccess"
-        :on-error="handleError"
-      >
-        <el-button type="primary">上传EXCEL文件</el-button>
-      </el-upload>
-      <!-- todo: 上传文件指引 -->
-      <el-link
-        class="linkWord"
-        target="_blank"
-        href="https://www.feishu.cn/docs/doccnw7qEdpKQ3N46ERmzSbaS5f#"
-        >如何批量添加用户？</el-link
-      >
-    </el-card>
-    <!-- 添加用户 -->
-    <el-card class="secondCard">
-      <div
-        style="
-          
-          font-size: 20px;
-          font-weight: 400;
-          color: #303133;
-        "
-      >
-        添加用户
-      </div>
-      <el-divider></el-divider>
-      <el-form
-        :model="addUserForm"
-        :rules="addUserFormRules"
-        ref="addUserFormRef"
-        label-position="left"
-        size="medium"
-        style="width: 300px"
-      >
-        <el-form-item label="账号" prop="account">
-          <el-input v-model="addUserForm.account"></el-input>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="addUserForm.password"></el-input>
-        </el-form-item>
-        <el-form-item label="手机号" prop="mobile">
-          <el-input v-model="addUserForm.mobile"></el-input>
-        </el-form-item>
-        <el-form-item label="角色" prop="role">
-          <el-select
-            v-model="addUserForm.role"
-            placeholder="请选择用户角色"
-            size="medium"
+    <el-row :gutter="20">
+      <el-col :span="12">
+        <!-- 添加用户 -->
+        <el-card>
+          <div style="font-size: 20px; font-weight: 400; color: #303133">
+            添加用户
+          </div>
+          <el-divider></el-divider>
+          <el-form
+            :model="addUserForm"
+            :rules="addUserFormRules"
+            ref="addUserFormRef"
+            label-width="auto"
           >
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-              :disabled="item.disabled"
+            <el-form-item label="用户名" prop="username">
+              <el-input v-model="addUserForm.username"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" prop="password">
+              <el-input
+                v-model="addUserForm.password"
+                type="password"
+                show-password
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="确认密码" prop="password_confirm">
+              <el-input
+                v-model="addUserForm.password_confirm"
+                type="password"
+                show-password
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="邮箱" prop="email">
+              <el-input v-model="addUserForm.email"></el-input>
+            </el-form-item>
+            <el-form-item label="学校" prop="school">
+              <el-input v-model="addUserForm.school"></el-input>
+            </el-form-item>
+            <el-form-item label="学号" prop="student_number">
+              <el-input v-model="addUserForm.student_number"></el-input>
+            </el-form-item>
+            <el-form-item label="真实姓名" prop="real_name">
+              <el-input v-model="addUserForm.real_name"></el-input>
+            </el-form-item>
+            <el-form-item label="角色" prop="role">
+              <el-select
+                v-model="addUserForm.role"
+                placeholder="请选择用户角色"
+                size="medium"
+              >
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                  :disabled="item.disabled"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
+          <div class="buttonWrap">
+            <el-button type="primary" @click="addUser()">添加用户</el-button>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="12">
+        <el-card>
+          <div style="font-size: 20px; font-weight: 400; color: #303133">
+            批量添加用户
+          </div>
+          <el-divider></el-divider>
+          <el-input
+            type="textarea"
+            :rows="22"
+            :placeholder="batchAddPlaceholder"
+            v-model="batchAddUserText"
+          >
+          </el-input>
+          <div class="buttonWrap">
+            <el-button type="primary" @click="batchAddUser()"
+              >批量添加用户</el-button
             >
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <el-button type="primary" @click="addUser()">添加用户</el-button>
-    </el-card>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 <script>
-import { userRegisterRequest } from "@/request/userRequest";
-import { BASE_URL } from "@/assets/config";
+import {
+  userRegisterRequest,
+  userBatchRegisterRequest,
+} from "@/request/userRequest";
+import { checkEmail } from "@/assets/config";
 export default {
   data() {
-    // 自定义邮箱规则
-    var checkEmail = (rule, value, callback) => {
-      const regEmail = /^\w+@\w+(\.\w+)+$/;
-      if (regEmail.test(value)) {
-        // 合法邮箱
+    const confirmPassword = (rule, value, callback) => {
+      if (value === this.addUserForm.password) {
         return callback();
       }
-      callback(new Error("请输入合法邮箱"));
-    };
-    // 自定义手机号规则
-    var checkMobile = (rule, value, callback) => {
-      const regMobile =
-        /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
-      if (!value || regMobile.test(value)) {
-        return callback();
-      }
-      // 返回一个错误提示
-      callback(new Error("请输入合法的手机号码"));
+      callback(new Error("请确保两次输入密码一致"));
     };
     return {
-      BASE_URL: BASE_URL,
       // 上传的文件列表
       fileList: [],
       // 添加用户的表单数据
       addUserForm: {
-        account: "",
+        username: "",
         password: "",
-        mobile: "",
+        password_confirm: "",
+        email: "",
         role: "",
+        school: "",
+        student_number: "",
+        real_name: "",
       },
       // 角色选择
       options: [
@@ -143,10 +140,22 @@ export default {
       ],
       // 添加用户的表单验证规则对象
       addUserFormRules: {
-        account: [{ required: true, message: "请输入账号", trigger: "blur" }],
+        username: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+        ],
         password: [{ required: true, message: "请输入密码", trigger: "blur" }],
-        mobile: [{ validator: checkMobile, trigger: "blur" }],
+        password_confirm: [
+          { required: true, message: "请再次输入密码", trigger: "blur" },
+          { validator: confirmPassword, trigger: "blur" },
+        ],
+        email: [
+          { required: true, message: "请输入邮箱", trigger: "blur" },
+          { validator: checkEmail, trigger: "blur" },
+        ],
       },
+      // 批量导入
+      batchAddPlaceholder: `请通过excel表复制粘贴批量添加用户的 学号、姓名。${"\n"}例如：${"\t"}11111111 张三${"\n\t"}22222222 李四`,
+      batchAddUserText: "",
     };
   },
 
@@ -166,37 +175,58 @@ export default {
       this.$refs.addUserFormRef.validate((valid) => {
         if (valid) {
           const data = {
-            account: this.addUserForm.account,
+            username: this.addUserForm.username,
             password: this.addUserForm.password,
-            mobile: this.addUserForm.mobile,
+            email: this.addUserForm.email,
             role: this.addUserForm.role,
+            school: this.addUserForm.school,
+            student_number: this.addUserForm.student_number,
+            real_name: this.addUserForm.real_name,
           };
-          let that = this;
+          const that = this;
           userRegisterRequest(data)
             .then(function (response) {
               that.$message({
-                message: "添加用户成功！",
+                message: "添加用户成功",
                 type: "success",
               });
             })
             .catch(function (error) {
               that.$message({
-                message: "添加用户失败！",
+                message: "添加用户失败",
                 type: "warning",
               });
               console.log(error);
             });
-        } else {
-          console.log("error submit!!");
-          return false;
         }
       });
+    },
+    // 批量添加用户
+    batchAddUser() {
+      const data = {
+        list: this.batchAddUserText.split("\n").map((item, index) => {
+          const [student_number, real_name] = item.split("\t");
+          return { student_number, real_name };
+        }),
+      };
+      const that = this;
+      userBatchRegisterRequest(data)
+        .then(function (response) {
+          that.$message({
+            message: "批量添加用户成功",
+            type: "success",
+          });
+        })
+        .catch(function (error) {
+          that.$message({
+            message: "批量添加用户失败",
+            type: "warning",
+          });
+          console.log(error);
+        });
     },
   },
 };
 </script>
 <style lang="scss" scoped>
-.secondCard {
-  margin-top: 20px;
-}
 </style>
