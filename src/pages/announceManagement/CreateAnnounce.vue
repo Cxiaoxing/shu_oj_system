@@ -6,38 +6,29 @@
       <el-breadcrumb-item>公告管理</el-breadcrumb-item>
       <el-breadcrumb-item>新建公告</el-breadcrumb-item>
     </el-breadcrumb>
-    <!-- 创建公告 -->
-    <el-card class="secondCard">
-      <div
-        style="
-          
-          font-size: 20px;
-          font-weight: 400;
-          color: #303133;
-        "
-      >
-        创建公告
-      </div>
+
+    <el-card>
+      <div class="create-form-title">新建公告</div>
       <el-divider></el-divider>
       <!-- 标题 & 发布时间 -->
-      <el-row :gutter="30">
+      <el-row :gutter="30" class="create-form-row-wrap">
         <el-col :span="12">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">公告名称</span>
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">公告名称</span>
           </div>
           <el-input
             placeholder="请输入公告的名称"
             v-model="input_title"
             clearable
-            style="margin-top: 10px;  font-size: 14px"
+            class="create-form-value-wrap"
           >
           </el-input>
         </el-col>
         <el-col :span="12">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">发布时间</span>
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">发布时间</span>
           </div>
           <el-date-picker
             v-model="input_release_time"
@@ -46,30 +37,24 @@
             type="datetime"
             placeholder="选择发布时间"
             style="width: 100%"
-            class="margin"
+            class="create-form-value-wrap"
           >
           </el-date-picker>
         </el-col>
       </el-row>
-      <!-- 公告描述 -->
-      <div class="announceDetail">
-        <div class="titleLayout">
-          <img class="mustPic" src="@/assets/img/required_field.svg" />
-          <span class="itemTitle">公告详情</span>
+
+      <div class="create-form-row-wrap">
+        <div class="create-form-label-wrap">
+          <img class="required_img" src="@/assets/img/required_field.svg" />
+          <span class="text">公告详情</span>
         </div>
-        <!-- 富文本编辑器 -->
-        <div style="margin-top: 10px">
-          <mavon-editor v-model="input_contents" class="margin"></mavon-editor>
-        </div>
+        <mavon-editor
+          v-model="input_contents"
+          class="create-form-value-wrap"
+        ></mavon-editor>
       </div>
-      <div
-        style="
-          margin-top: 30px;
-          width: 100%;
-          display: flex;
-          justify-content: flex-end;
-        "
-      >
+
+      <div class="create-form-button-wrap">
         <el-button type="primary" @click="submitForm()">新建公告</el-button>
       </div>
     </el-card>
@@ -86,11 +71,8 @@ export default {
     };
   },
 
-  created() {},
-
   methods: {
     submitForm() {
-      const that = this;
       const data = {
         title: this.input_title,
         author: window.localStorage.getItem("username"),
@@ -98,60 +80,13 @@ export default {
         release_time: this.input_release_time,
       };
       announceCreateRequest(data)
-        .then(function (response) {
-          that
-            .$confirm("新建公告成功", {
-              confirmButtonText: "查看公告",
-              cancelButtonText: "知道了",
-              type: "success",
-            })
-            .then(() => {
-              that.$router.push({
-                name: "announceDetail",
-                params: { id: id },
-              });
-            });
+        .then(() => {
+          this.$message.success("新建公告成功");
         })
         .catch(() => {
-          that.$message({
-            message: "创建公告失败",
-            type: "warning",
-          });
+          this.$message.warning("新建公告失败");
         });
     },
   },
 };
 </script>
-<style lang="scss" scoped>
-.secondCard {
-  margin-top: 20px;
-}
-
-.mustPic {
-  width: 25px;
-}
-
-.titleLayout {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  //width: 100px;
-}
-.announceDetail {
-  margin-top: 40px;
-}
-
-.timeDetail {
-  margin-top: 40px;
-}
-
-.itemTitle {
-  
-  font-size: 15px;
-  color: #494747;
-}
-
-.margin {
-  margin-top: 10px;
-}
-</style>

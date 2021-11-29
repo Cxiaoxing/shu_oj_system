@@ -17,5 +17,5 @@ export function tagListRequest() {
 }
 
 export function tagApplyRequest() {
-    return _get('/problem_tags/apply')
+    return _get('/problem_tags/apply_changes')
 }

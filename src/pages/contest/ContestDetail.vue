@@ -13,8 +13,8 @@
     >
       <span class="contestStateWord">本场竞赛已开始，还剩余 </span>
       <span class="contestCountdown">
-        {{ countdown.hours }}小时 {{ countdown.minutes }}分
-        {{ countdown.seconds }}秒</span
+        {{ countdown.hours }} hours {{ countdown.minutes }} minutes
+        {{ countdown.seconds }} seconds</span
       >
       <span class="contestStateWord"> 结束</span>
     </div>
@@ -31,194 +31,148 @@
       <span class="contestStateWord">本场竞赛未开始</span>
     </div>
     <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane label="概览" name="first">
-        <div class="cardLayout">
+      <el-tab-pane label="竞赛说明" name="introduction">
+        <el-row :gutter="20">
           <!-- 竞赛信息 -->
-          <el-card class="leftCard">
-            <div class="leftCardTop">
-              <!-- 竞赛名称 -->
-              <div class="contestTitle">{{ contest.title }}</div>
-              <!-- 报名按钮 -->
-              <div>
-                <el-button
-                  v-if="this.contest.is_registered === true"
-                  type="primary"
-                  disabled
-                  >已报名</el-button
-                >
-                <el-button
-                  v-if="contest.is_registered === false && canRegister === true"
-                  type="primary"
-                  @click="goRegister"
-                  >报名</el-button
-                >
-                <el-button
-                  v-if="
-                    contest.is_registered === false && canRegister === false
-                  "
-                  type="primary"
-                  disabled
-                  @click="goRegister"
-                  >报名</el-button
-                >
-              </div>
-            </div>
-            <!-- 竞赛时间 -->
-            <div class="item">
-              <div class="itemRec"></div>
-              <div>
-                <div class="itemTitle">时间</div>
+          <el-col :span="16">
+            <el-card>
+              <div class="row_space">
+                <!-- 竞赛名称 -->
+                <div class="contestTitle">{{ contest.title }}</div>
+                <!-- 报名按钮 -->
                 <div>
-                  <div class="rankItem margin-top-10">
-                    <div class="flex-row" v-if="contest.start_time !== null">
-                      <img class="itemIcon" src="@/assets/img/time.svg" />
-                      <div class="itemContentTimeTitle">开始:</div>
-                      <div class="itemContentTime">
-                        {{ formatTime(contest.start_time) }}
-                      </div>
-                    </div>
-                    <div
-                      v-if="contest.end_time !== null"
-                      class="flex-row margin-left-30"
-                    >
-                      <img class="itemIcon" src="@/assets/img/time.svg" />
-                      <div class="itemContentTimeTitle">结束:</div>
-                      <div class="itemContentTime">
-                        {{ formatTime(contest.end_time) }}
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    v-if="contest.seal_time !== null"
-                    class="flex-row margin-top-5"
+                  <el-button
+                    v-if="this.contest.is_registered === true"
+                    type="primary"
+                    disabled
+                    >已报名</el-button
                   >
-                    <img class="itemIcon" src="@/assets/img/time.svg" />
-                    <div class="itemContentTimeTitle">封榜:</div>
-                    <div class="itemContentTime">
-                      {{ formatTime(contest.seal_time) }}
+                  <el-button
+                    v-else-if="canRegister === true"
+                    type="primary"
+                    @click="goRegister"
+                    >报名</el-button
+                  >
+                  <el-button v-else type="primary" disabled>报名</el-button>
+                </div>
+              </div>
+
+              <!-- 竞赛描述 -->
+              <mavon-editor
+                v-if="contest.introduction !== ''"
+                style="min-height: 400px; margin-top: 20px"
+                :value="contest.introduction"
+                :subfield="false"
+                :defaultOpen="'preview'"
+                :toolbarsFlag="false"
+                :boxShadow="false"
+              />
+              <div v-else class="itemContent">暂无描述</div>
+            </el-card>
+          </el-col>
+
+          <!-- 排行榜 -->
+          <el-col :span="8">
+            <el-card>
+              <div>
+                <span class="contestTitle">时间</span>
+              </div>
+              <!-- 竞赛时间 -->
+              <div class="editorBackground margin_top_20">
+                <div>
+                  <div class="row_space">
+                    <div>
+                      <i class="el-icon-date" />
+                      <span class="timeContentTitle">开始时间</span>
+                    </div>
+                    <div class="itemContent">
+                      {{ formatTime(contest.start_time) }}
+                    </div>
+                  </div>
+                  <div class="row_space margin_top_10">
+                    <div>
+                      <i class="el-icon-date" />
+                      <span class="timeContentTitle">结束时间</span>
+                    </div>
+                    <div class="itemContent">
+                      {{ formatTime(contest.end_time) }}
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-            <!-- 竞赛描述 -->
-            <div class="item">
-              <div class="itemRec"></div>
-              <div>
-                <div class="itemTitle">描述</div>
-                <div
-                  v-if="contest.introduction !== ''"
-                  class="itemContent margin-top-10"
-                  style="white-space: normal; word-break: break-all"
-                >
-                  <span style="word-wrap: break-word">{{
-                    contest.introduction
-                  }}</span>
+                <div class="row_space margin_top_10">
+                  <div>
+                    <i class="el-icon-date" />
+                    <span class="timeContentTitle">封榜时间</span>
+                  </div>
+                  <div class="itemContent">
+                    {{ formatTime(contest.seal_time) }}
+                  </div>
                 </div>
-                <div v-if="contest.introduction === ''" class="itemContent">
-                  暂无描述
-                </div>
-              </div>
-            </div>
-          </el-card>
-          <!-- 排行榜 -->
-          <el-card class="rightCard">
-            <div class="rightCardTop">
-              <div class="rightCardTop">
-                <img class="rankIcon" src="@/assets/img/trophy.svg" />
-                <span class="contestTitle" style="margin-left: 10px"
-                  >排行榜</span
-                >
-              </div>
-              <div class="flex-row">
-                <img class="itemIcon" src="@/assets/img/time.svg" />
-                <span class="itemContentTimeTitle">更新: </span>
-                <span class="itemContentTime">{{
-                  formatTime(contest.start_time)
-                }}</span>
-              </div>
-            </div>
-            <div
-              v-if="ranklist.length === 1 && ACLPermissions === true"
-              class="rightCardBody flex-col"
-            >
-              <img class="noContextPic" src="@/assets/img/nocontext.svg" />
-              <span class="itemContent margin-top-10">暂无排名</span>
-            </div>
-            <div v-if="ACLPermissions === false" class="rightCardBody flex-col">
-              <img class="noContextPic" src="@/assets/img/noPermissions.svg" />
-              <span class="itemContent margin-top-10"
-                >未报名，暂无查看权限</span
-              >
-            </div>
-            <div
-              v-if="ranklist.length !== 1 && ACLPermissions === true"
-              class="rightCardBody"
-            >
-              <div v-for="(rank, index) in ranklist" :key="index">
-                <div class="rankItem" v-if="rank.is_unrated == false">
-                  <div class="rankOrder">第 {{ rank.rank }} 名</div>
-                  <div class="rankUser">{{ rank.username }}</div>
-                  <div class="rankTime">{{ secondFormat(rank.time_cost) }}</div>
+                <div class="row_space margin_top_10">
+                  <div>
+                    <i class="el-icon-time" />
+                    <span class="timeContentTitle">比赛时长</span>
+                  </div>
+                  <div class="itemContent">
+                    {{ calculateTime(contest.start_time, contest.end_time) }}
+                    hours
+                  </div>
                 </div>
               </div>
-            </div>
-            <div
-              v-if="ranklist.length !== 1 && ACLPermissions === true"
-              class="rankDetailLink"
-            >
-              <a class="rankDetail" @click.stop="goRankDetail()">详情</a>
-            </div>
-          </el-card>
-        </div>
+            </el-card>
+          </el-col>
+        </el-row>
       </el-tab-pane>
-      <el-tab-pane label="题目列表" name="second">
+
+      <el-tab-pane label="题目列表" name="problem_list">
         <el-card>
-          <el-table :data="contestSubmissionList">
+          <el-table
+            :data="contestSubmissionList"
+            @row-click="jumpToProblemDetail"
+          >
             <template slot="empty">
               <div
                 v-if="ACLPermissions === true"
-                class="rightCardBody flex-col"
+                class="margin_top_20 flex_col"
               >
                 <img class="noContextPic" src="@/assets/img/nocontext.svg" />
-                <span class="itemContent margin-top-10">暂无数据</span>
+                <span class="itemContent margin_top_10">暂无数据</span>
               </div>
               <div
                 v-if="ACLPermissions === false"
-                class="rightCardBody flex-col"
+                class="margin_top_20 flex_col"
               >
                 <img
                   class="noContextPic"
                   src="@/assets/img/noPermissions.svg"
                 />
-                <span class="itemContent margin-top-10"
+                <span class="itemContent margin_top_10"
                   >未报名，暂无查看权限</span
                 >
               </div>
             </template>
-            <el-table-column prop="inner_id" width="80" label="ID">
-            </el-table-column>
-            <el-table-column prop="out_problem.info.title" label="名称">
-            </el-table-column>
-            <el-table-column label="操作" width="150">
+            <el-table-column prop="inner_id" width="80" label="ID" />
+            <el-table-column prop="is_accepted" width="30">
               <template slot-scope="scope">
-                <!-- 答题按钮 -->
-                <el-button
-                  size="small"
-                  type="primary"
-                  @click="
-                    goProblemDetail(
-                      scope.row.region,
-                      scope.row.out_problem.id,
-                      scope.row.inner_id
-                    )
-                  "
-                  >答题</el-button
-                >
+                <i
+                  class="el-icon-success mySubmission"
+                  v-if="scope.row.is_accepted"
+                />
+              </template>
+            </el-table-column>
+            <el-table-column prop="out_problem.info.title" label="题目名称" />
+            <el-table-column prop="submit_times" label="提交次数" width="150" />
+            <el-table-column prop="accept_times" label="通过率" width="150">
+              <template slot-scope="scope">
+                <el-progress
+                  :text-inside="true"
+                  :stroke-width="20"
+                  :percentage="passingRateCalculate(scope.row)"
+                  color="#1db7b5"
+                ></el-progress>
               </template>
             </el-table-column>
           </el-table>
-          <!-- 分页 -->
           <el-pagination
             background
             hide-on-single-page
@@ -227,13 +181,13 @@
             :current-page="currentPage"
             layout="prev, pager, next, jumper"
             :total="problemTotal"
-            style="margin-top: 30px; text-align: center"
+            class="table_pagination"
           >
           </el-pagination>
         </el-card>
       </el-tab-pane>
 
-      <el-tab-pane label="排行榜" name="third">
+      <el-tab-pane label="排行榜" name="rank">
         <el-card>
           <div class="tableBar">
             <el-button size="small" @click="getRankList()"
@@ -244,13 +198,13 @@
             <template slot="empty">
               <div
                 v-if="ACLPermissions === false"
-                class="rightCardBody flex-col"
+                class="margin_top_20 flex_col"
               >
                 <img
                   class="noContextPic"
                   src="@/assets/img/noPermissions.svg"
                 />
-                <span class="itemContent margin-top-10"
+                <span class="itemContent margin_top_10"
                   >未报名，暂无查看权限</span
                 >
               </div>
@@ -299,99 +253,8 @@
         </el-card>
       </el-tab-pane>
 
-      <el-tab-pane label="提交状态" name="fourth">
-        <el-card>
-          <div class="tableBar">
-            <el-button size="small" @click="getStateList()">刷新列表</el-button>
-          </div>
-          <!-- 列表区域 -->
-          <el-table :data="statelist" @row-click="handleClickSubmission">
-            <template slot="empty">
-              <div v-if="submissionTotal === 0" class="rightCardBody flex-col">
-                <img class="noContextPic" src="@/assets/img/nocontext.svg" />
-                <span class="itemContent margin-top-10">暂无数据</span>
-              </div>
-            </template>
-            <el-table-column label="提交时间" width="200">
-              <template slot-scope="scope">
-                {{ formatTime(scope.row.submit_time) }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="problem_id" label="题目ID" width="100">
-            </el-table-column>
-            <el-table-column label="判题状态">
-              <template slot-scope="scope">
-                <el-tag
-                  :type="
-                    scope.row.state == 'Finished'
-                      ? 'success'
-                      : scope.row.state == 'Pending'
-                      ? ''
-                      : scope.row.state == 'Waiting'
-                      ? 'info'
-                      : ''
-                  "
-                  size="small"
-                >
-                  {{ scope.row.state }}</el-tag
-                >
-              </template>
-            </el-table-column>
-            <el-table-column label="判题结果">
-              <template slot-scope="scope">
-                <el-tag
-                  v-if="scope.row.state === 'Finished'"
-                  effect="dark"
-                  :type="
-                    scope.row.err !== null
-                      ? 'warning'
-                      : scope.row.err === null && scope.row.is_accepted == true
-                      ? 'success'
-                      : scope.row.err === null && scope.row.is_accepted == false
-                      ? 'danger'
-                      : 'success'
-                  "
-                  size="small"
-                >
-                  {{
-                    resultFormtype(scope.row.err, scope.row.is_accepted)
-                  }}</el-tag
-                >
-              </template>
-            </el-table-column>
-            <el-table-column label="用时">
-              <template slot-scope="scope">
-                {{ submissionTimeFormat(scope.row.max_time) }}
-              </template>
-            </el-table-column>
-            <el-table-column label="内存"
-              ><template slot-scope="scope">
-                {{ submissionMemoryFormat(scope.row.max_memory) }}
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="language"
-              label="语言"
-              width="100"
-            ></el-table-column>
-            <el-table-column
-              prop="user_id"
-              label="用户"
-              width="50"
-            ></el-table-column>
-          </el-table>
-          <el-pagination
-            background
-            hide-on-single-page
-            @current-change="getStateList"
-            :page-size="pageSize"
-            :current-page="currentPage"
-            layout="prev, pager, next, jumper"
-            :total="submissionTotal"
-            style="margin-top: 30px; text-align: center"
-          >
-          </el-pagination>
-        </el-card>
+      <el-tab-pane label="提交状态" name="submission_list">
+        <SubmissionTable :region="region" />
       </el-tab-pane>
     </el-tabs>
     <!-- 输入密码弹窗 -->
@@ -411,18 +274,20 @@
 <script>
 import moment from "moment";
 import {
-  contestListRequest,
+  contestInfoRequest,
   contestRankRequest,
   contestRegisterRequest,
   contestProblemListRequest,
 } from "@/request/contestRequest";
-import { submissionListRequest } from "@/request/submissonRequest";
+import SubmissionTable from "@/components/submission/SubmissionTable.vue";
+import { passingRateCalculate } from "@/assets/config";
+
 export default {
+  components: { SubmissionTable },
   data() {
     return {
-      ctitle: "", // 接受上一个页面的参数
-      contest: [], // 所获取到的竞赛信息
       region: "",
+      contest: [], // 所获取到的竞赛信息
       showPasswordDialog: false, // 控制输入密码弹窗
       canRegister: "", // 是否允许报名
       password: "",
@@ -436,7 +301,7 @@ export default {
       problemTotal: null,
       acmTotal: null,
       submissionTotal: null,
-      activeName: "first",
+      activeName: "introduction",
       problem_block: [],
       countdown: {
         hours: 0,
@@ -445,37 +310,30 @@ export default {
       },
     };
   },
-  async created() {
-    this.ctitle = this.$route.params.title;
+  created() {
     this.region = this.$route.params.region;
     this.getContest();
-    this.getRankList();
+    this.getContestProblemList();
   },
   methods: {
     // 获取竞赛信息
     getContest() {
-      const that = this;
-      const params = {
-        title_filter: this.ctitle,
-        limit: 1,
-        offset: 0,
-      };
-      contestListRequest(params)
-        .then(function (response) {
-          that.contest = response.list[0];
-          let contest = response.list[0];
-          that.judgeCanRegister();
+      contestInfoRequest(this.region)
+        .then((response) => {
+          this.contest = response;
+          this.judgeCanRegister();
           if (
-            contest.state === "Running" ||
-            contest.state === "SealedRunning"
+            response.state === "Running" ||
+            response.state === "SealedRunning"
           ) {
-            that.calculateCountdown(contest.end_time);
+            this.calculateCountdown(response.end_time);
           }
         })
         .catch(function (error) {
           console.log(error);
         });
     },
+
     // 获取排名
     getRankList() {
       const that = this;
@@ -492,10 +350,18 @@ export default {
           }
         });
     },
+
     // 格式化展示时间
     formatTime(time) {
       return moment(time).format("YYYY-MM-DD HH:mm:ss");
     },
+
+    calculateTime(start, end) {
+      const start_time = moment(start);
+      const end_time = moment(end);
+      return end_time.diff(start_time, "hours", true).toFixed(1);
+    },
+
     // 倒计时
     calculateCountdown(end_time) {
       clearInterval(this.go);
@@ -577,6 +443,7 @@ export default {
           });
         });
     },
+
     // 计算当前比赛是否开始
     judgeIsStart() {
       let startDate = new Date(this.formatTime(this.contest.start_time));
@@ -586,74 +453,27 @@ export default {
       let leftTime = now - start;
       if (leftTime <= 0) {
         return true;
-      } else {
-        return false;
       }
-    },
-    // 开始比赛，跳转至比赛提交页
-    startTheContest() {
-      let region = this.region;
-      const that = this;
-      that.$router.push({
-        name: "contestProblemList",
-        params: { region: region },
-      });
-    },
-    // 查看排行榜详情
-    goRankDetail() {
-      this.activeName = "third";
-    },
-    // 获取提交状态列表
-    getStateList(currentPage = 1) {
-      const that = this;
-      const params = {
-        limit: this.pageSize,
-        offset: this.pageSize * (currentPage - 1),
-        region_filter: this.region,
-      };
-      submissionListRequest(params)
-        .then(function (response) {
-          that.currentPage = currentPage;
-          that.statelist = response.list;
-          that.submissionTotal = response.total;
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+      return false;
     },
 
-    // 判断判题结果，返回对应文字
-    resultFormtype(err, is_accepted) {
-      if (err != null) {
-        return "Compile Error";
-      } else {
-        if (is_accepted == true) {
-          return "Accepted";
-        } else {
-          return "Unaccepted";
-        }
-      }
-    },
-
-    handleClick(tab, event) {
-      if (tab.name == "fourth") {
-        this.getStateList();
-      } else if (tab.name == "second") {
-        this.getContestProblemList(this.region);
-      } else if (tab.name == "third") {
+    handleClick(tab) {
+      if (tab.name === "problem_list") {
+        this.getContestProblemList(this.currentPage);
+      } else if (tab.name === "rank") {
         this.getRankList();
       }
     },
 
     // 获取该竞赛的题目列表
-    getContestProblemList(re, currentPage = 1) {
+    getContestProblemList(currentPage = 1) {
       const that = this;
       const params = {
         inner_id_order: true,
         limit: this.pageSize,
         offset: this.pageSize * (currentPage - 1),
       };
-      contestProblemListRequest(re, params)
+      contestProblemListRequest(this.region, params)
         .then(function (response) {
           that.currentPage = currentPage;
           that.contestSubmissionList = response.list;
@@ -664,18 +484,16 @@ export default {
         });
     },
 
+    passingRateCalculate,
+
     // 点击题目跳转至题目详情
-    goProblemDetail(re, pid, inner_id) {
-      let region = re;
-      let id = pid;
-      const that = this;
-      let routeUrl = this.$router.resolve({
+    jumpToProblemDetail(row) {
+      const routeUrl = this.$router.resolve({
         name: "contestProblemDetail",
         params: {
-          region: region,
-          id: id,
-          inner_id: inner_id,
-          total: that.problemTotal,
+          region: row.region,
+          inner_id: row.inner_id,
+          total: this.problemTotal,
         },
       });
       window.open(routeUrl.href, "_blank");
@@ -683,11 +501,11 @@ export default {
 
     // 跳转至提交结果详情
     handleClickSubmission(row) {
-      const id = window.localStorage.getItem("id");
+      const user_id = window.localStorage.getItem("id");
       if (
         (this.contest.state === "Running" ||
           this.contest.state === "SealedRunning") &&
-        row.user_id !== id
+        row.user_id !== user_id
       ) {
         // 比赛中且非本用户请求时不能跳转
         this.$message({
@@ -707,14 +525,7 @@ export default {
       let m = moment.duration(seconds, "seconds");
       return Math.floor(m.asHours()) + ":" + m.minutes() + ":" + m.seconds();
     },
-    // 友好展示提交耗时
-    submissionTimeFormat(time) {
-      if (time === null) {
-        return "--";
-      } else {
-        return time + " ms";
-      }
-    },
+    
     // 友好展示提交内存
     submissionMemoryFormat(memory) {
       if (memory === null) {
@@ -729,21 +540,21 @@ export default {
     // 判断当前是否允许报名
     judgeCanRegister() {
       if (this.contest.state === "Preparing") {
-        return (this.canRegister = true);
+        this.canRegister = true;
       } else if (
         this.contest.state === "Running" ||
         this.contest.state === "SealedRunning"
       ) {
         if (this.contest.settings.register_after_start === true) {
-          return (this.canRegister = true);
+          this.canRegister = true;
         } else {
-          return (this.canRegister = false);
+          this.canRegister = false;
         }
       } else if (this.contest.state === "Ended") {
         if (this.contest.settings.public_after_end === true) {
-          return (this.canRegister = true);
+          this.canRegister = true;
         } else {
-          return (this.canRegister = false);
+          this.canRegister = false;
         }
       }
     },
@@ -751,6 +562,12 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+/deep/.el-tabs__item:focus.is-active.is-focus:not(:active) {
+  box-shadow: none;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
 /deep/ .el-alert__title {
   font-size: 20px !important;
   font-weight: 450;
@@ -782,183 +599,24 @@ export default {
   font-weight: 600;
   color: #3370ff;
 }
-.cardLayout {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.leftCard {
-  width: 64%;
-}
-.leftCardTop {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-}
 
 .contestTitle {
   font-size: 28px;
-  font-style: normal;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 45px;
   letter-spacing: 0em;
-  text-align: left;
-  color: #494747;
-}
-.item {
-  display: flex;
-  flex-direction: row;
-  margin-top: 24px;
+  color: $title_font_color;
 }
 
-.itemRec {
-  width: 5px;
-  height: 20px;
-  background: #3370ff;
-  border-radius: 5px;
-}
-
-.itemTitle {
-  font-style: normal;
+.timeContentTitle {
   font-weight: 450;
-  font-size: 16px;
-  margin-left: 6px;
-  color: #494747;
+  margin: 0px 18px 0px 6px;
+  color: $title_font_color;
 }
 
 .itemContent {
-  font-style: normal;
-  font-weight: normal;
-  font-size: 14px;
-  // line-height: 17px;
-  color: #505050;
-  margin-left: 6px;
-  //margin-top: 5px;
-}
-
-.itemContentTimeTitle {
-  font-style: normal;
-  font-weight: normal;
-  font-size: 14px;
-  color: #bebdbd;
-  margin-left: 4px;
-}
-
-.itemContentTime {
-  font-style: normal;
-  font-weight: 500;
-  font-size: 14px;
-  color: #505050;
-  margin-left: 10px;
-}
-
-.rightCard {
-  width: 34%;
-}
-
-.rightCardTop {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.rankIcon {
-  width: 30px;
-}
-
-.rightCardBody {
-  margin-top: 24px;
-}
-
-.rankItem {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.rankDetail {
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 25px;
-  letter-spacing: 0em;
-  text-align: left;
-  color: #3370ff;
-  &:hover {
-    color: #2d8cf0;
-    border-bottom: 1px solid #2d8cf0;
-  }
-}
-
-.rankDetailLink {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  margin-top: 30px;
-}
-
-.rankUser {
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 25px;
-  letter-spacing: 0em;
-  text-align: left;
-  color: #505050;
-}
-
-.rankTime {
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 25px;
-  letter-spacing: 0em;
-  text-align: left;
-  color: #606060;
-}
-
-.rankOrder {
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 25px;
-  letter-spacing: 0em;
-  text-align: left;
-  color: #505050;
-}
-
-.itemIcon {
-  width: 18px;
-}
-.flex-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-.flex-row-sb {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.flex-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.margin-left-30 {
-  margin-left: 30px;
-}
-
-.margin-top-10 {
-  margin-top: 10px;
-}
-
-.margin-top-5 {
-  margin-top: 5px;
+  font-weight: bold;
+  color: $important_font_color;
 }
 
 .noContextPic {
@@ -970,5 +628,11 @@ export default {
   justify-content: flex-end;
   align-items: center;
   margin-bottom: 10px;
+}
+
+.mySubmission {
+  font-size: 20px;
+  display: flex;
+  color: #5fc931;
 }
 </style>

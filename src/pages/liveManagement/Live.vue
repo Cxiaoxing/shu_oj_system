@@ -1,7 +1,7 @@
 <template>
   <div class="pusher">
     <el-button type="primary" v-if="liveState === false" @click="createLive"
-      >创建直播</el-button
+      >新建直播</el-button
     >
     <div class="flex">
       <div class="settingBar" v-if="liveState === true">
@@ -51,7 +51,7 @@
 
 <script>
 import TWebLive from "tweblive";
-// 1、创建 Pusher（推流）对象
+// 1、新建 Pusher（推流）对象
 let pusher = TWebLive.createPusher({ userID: "chenxiangxiang" });
 export default {
   data() {
@@ -77,7 +77,7 @@ export default {
   created() {},
   mounted() {},
   methods: {
-    // 创建直播
+    // 新建直播
     createLive() {
       this.dialogVisible = true;
     },

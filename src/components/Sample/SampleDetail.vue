@@ -3,6 +3,14 @@
     <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item
+        :to="{ name: 'problemDetail', params: { id: problem_id } }"
+        >{{ problemtitle }}</el-breadcrumb-item
+      >
+      <el-breadcrumb-item
+        :to="{ name: 'sampleList', params: { id: problem_id } }"
+        >管理标程</el-breadcrumb-item
+      >
       <el-breadcrumb-item>提交详情</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 编译成功，提交通过提示 -->
@@ -45,28 +53,13 @@
           justify-content: space-between;
         "
       >
-        <div
-          style="
-            
-            font-size: 20px;
-            font-weight: 500;
-            color: #303133;
-          "
-        >
+        <div style="font-size: 20px; font-weight: 500">
           {{ problemtitle }}
         </div>
         <div>
           <!-- 状态显示 -->
           <div>
-            <span
-              style="
-                
-                font-size: 16px;
-                font-weight: 500;
-                color: #303133;
-              "
-              >State
-            </span>
+            <span style="font-size: 16px; font-weight: 500">State </span>
             <!-- 根据不同状态显示不同颜色的标签: Finished:绿色，Pending：蓝色，Waiting：灰色 -->
             <el-tag
               effect="dark"
@@ -86,19 +79,12 @@
           </div>
           <!-- 提交时间 -->
           <div>
-            <span
-              style="
-                
-                font-size: 16px;
-                font-weight: 500;
-                color: #303133;
-              "
+            <span style="font-size: 16px; font-weight: 500; color: #303133"
               >When
             </span>
-            <span
-              style=" font-size: 14px; color: #606a78"
-              >{{ formatTime(subTime) }}</span
-            >
+            <span style="font-size: 14px; color: #606a78">{{
+              formatTime(subTime)
+            }}</span>
           </div>
         </div>
       </div>
@@ -110,52 +96,57 @@
         </div>
         <div style="font-size: 14px">暂未完成判题，请稍后查看</div>
       </div>
-      <!-- 已完成判题，编译错误，展示编译错误信息 -->
-      <div v-if="state == 'Finished' && err !== null">
+      <!-- 编译错误，展示编译错误信息 -->
+      <div v-else-if="err !== null">
         <div style="color: #f54a45">错误原因：</div>
         <div style="font-size: 14px; margin-top: 5px">{{ error_reason }}</div>
       </div>
 
-      <!-- 已完成判题&编译正确，展示测试点信息 -->
-      <div v-if="state == 'Finished' && err === null">
-        <div style="font-size: 16px; font-weight: 500">测试点详情</div>
-
+      <!-- 已完成判题且编译正确，展示测试点信息 -->
+      <div v-else>
+        <div style="font-size: 20px; font-weight: 450">
+          <span>测试点详情</span>
+          <el-link
+            type="primary"
+            :underline="false"
+            target="_black"
+            style="margin-left: 12px; font-size: 14px"
+            :href="`${BASE_URL}/problems/${problem_id}/test_case`"
+            >下载到本地
+            <i class="el-icon-download" />
+          </el-link>
+        </div>
         <div
-          v-for="(testCase, index) in testCase"
-          :index="index + ''"
-          :key="index"
-          class="timeLine"
-        >
-          <div class="timeLineLeft">
-            <div class="timeLineCircle">
-              <img
-                v-if="testCase.result === 'SUCCESS'"
-                class="timeLineImage"
-                src="@/assets/img/right.svg"
-              />
-              <img
-                v-if="testCase.result !== 'SUCCESS'"
-                class="timeLineImage"
-                src="@/assets/img/wrong.svg"
-              />
-            </div>
-            <div class="timeLineLine"></div>
-          </div>
-          <div class="timeLineRight">
-            <div class="timeLineTitle">Case {{ index + 1 }}</div>
-            <div class="timeLineContext">
-              <span class="timeLineContextTitle">{{ testCase.result }}</span>
-              <el-row style="margin-top: 8px">
-                <el-col class="timeLineContextWord" :span="8"
-                  >CPU Time: {{ testCase.cpu_time }} ms</el-col
+          class="someTip"
+          v-html="'绿色: SUCCESS&emsp;&ensp;红色: WRONG_ANSWER'"
+        />
+        <div class="testCaseWrap scrollbar">
+          <div
+            v-for="(item, index) in testCase"
+            :index="index + ''"
+            :key="index"
+          >
+            <div
+              class="testCase"
+              :style="
+                item.result === 'SUCCESS'
+                  ? { 'background-color': '#5fc931' }
+                  : { 'background-color': '#f05459' }
+              "
+            >
+              <div class="testCaseTitle"># Case {{ index + 1 }}</div>
+              <div class="testCaseContent">
+                <span class="testCaseContentTitle"> CPU Time:</span>
+                <span class="testCaseContentDetail">
+                  {{ item.cpu_time }} ms</span
                 >
-                <el-col class="timeLineContextWord" :span="8"
-                  >Memory: {{ testCase.memory }} B</el-col
+              </div>
+              <div class="testCaseContent">
+                <span class="testCaseContentTitle">Memory:</span>
+                <span class="testCaseContentDetail">
+                  {{ submissionMemoryFormat(item.memory) }}</span
                 >
-                <el-col class="timeLineContextWord" :span="8"
-                  >Output: {{ testCase.output }}</el-col
-                >
-              </el-row>
+              </div>
             </div>
           </div>
         </div>
@@ -177,11 +168,14 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/theme/idea.css"; // 白色
 import "codemirror/mode/python/python.js"; // python
 
-import { sampleResultRequest } from "@/request/sampleRequest";
-import { problemInfoPrivateRequest } from '@/request/problemRequest';
+import { sampleInfoRequest } from "@/request/sampleRequest";
+import { problemInfoPrivateRequest } from "@/request/problemRequest";
+import { BASE_URL } from "@/assets/config";
+
 export default {
   data() {
     return {
+      BASE_URL,
       // 代码编辑器默认配置
       options: {
         tabSize: 2, // 缩进格式
@@ -197,6 +191,7 @@ export default {
       },
       code: "", // 所提交的代码值
       uuid: "",
+      problem_id: null,
       problemtitle: "",
       subResult: "3", //提交结果：0-成功；1-失败；2-编译错误
       err: null,
@@ -206,14 +201,8 @@ export default {
       state: "",
       language: "",
       testCase: [],
-      timelinecolor: "",
-      timelinecolor: {
-        success: "#00b42a",
-        unsuccess: "#f54a45",
-      },
-
-      // 题目提交结果
-      submission: [],
+      standardTestCaseData: "",
+      submission: [], // 题目提交结果
     };
   },
   created() {
@@ -223,30 +212,14 @@ export default {
     }
   },
   methods: {
-    // 获取题目信息
-    getProblem: function (region) {
-      const that = this;
-      problemInfoPrivateRequest(region)
-        .then(function (response) {
-          that.problemtitle = response.info.title;
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    },
-
-    // 格式化展示时间
-    formatTime(time) {
-      return moment(time).format("YYYY-MM-DD HH:mm:ss");
-    },
-
     // 获取结果
     getResult: function (uuid) {
       const that = this;
-      sampleResultRequest(uuid)
+      sampleInfoRequest(uuid)
         .then(function (response) {
           console.log(response);
           that.getProblem(response.submission.problem_id);
+          that.problem_id = response.submission.problem_id;
           that.subTime = response.submission.submit_time;
           that.code = response.submission.settings.src;
           that.state = response.submission.state;
@@ -275,11 +248,37 @@ export default {
           console.log(error);
         });
     },
-    colors(index) {
-      if (index == "SUCCESS") {
-        return "#00b42a";
+    // 获取题目信息
+    getProblem(problem_id) {
+      problemInfoPrivateRequest(problem_id)
+        .then((response) => {
+          this.problemtitle = response.info.title;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
+
+    // 格式化展示时间
+    formatTime(time) {
+      return moment(time).format("YYYY-MM-DD HH:mm:ss");
+    },
+    // 友好展示提交耗时
+    submissionTimeFormat(time) {
+      if (time === null) {
+        return "--";
       } else {
-        return "#f54a45";
+        return time + " ms";
+      }
+    },
+    // 友好展示提交内存
+    submissionMemoryFormat(memory) {
+      if (memory === null) {
+        return "--";
+      } else {
+        // 1048576 = 1024 * 1024
+        let t = parseInt(memory) / 1048576;
+        return String(t.toFixed(0)) + " MB";
       }
     },
   },
@@ -311,98 +310,40 @@ export default {
 .noContextPic {
   width: 150px;
 }
-.testCase {
+
+.testCaseWrap {
+  max-height: 300px;
   display: flex;
-  flex-direction: row;
   flex-wrap: wrap;
 }
-
-.testCaseItem {
-  margin: 10px;
-  padding-top: 5px;
-  height: 180px;
-  width: 180px;
-  color: #ffffff;
-}
-.testCaseIndex {
-  font-size: 18px;
-  font-weight: 400;
-}
-.success {
-  background-color: #00b42a;
-}
-.warning {
-  background-color: #f54a45;
-  border-radius: 10px;
-}
-.content {
-  margin-top: 20px;
-}
-.timeLine {
+.testCase {
+  margin: 8px;
+  width: 120px;
+  height: 130px;
   display: flex;
-  flex-direction: row;
-  margin-top: 30px;
+  flex-wrap: wrap;
+  align-content: center;
+  padding-left: 23px;
+  color: white;
 }
-.timeLineLeft {
-  display: flex;
-  flex-direction: column;
-}
-.timeLineRight {
-  display: flex;
-  flex-direction: column;
-  margin-left: 30px;
-}
-.timeLineCircle {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background-color: #f0f1f2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.timeLineImage {
-  width: 25px;
-}
-.timeLineTitle {
-  
-  font-size: 16px;
-  font-style: normal;
+.testCaseTitle {
+  font-size: 15px;
   font-weight: 600;
-  line-height: 24px;
-  letter-spacing: 0px;
-  text-align: left;
-  color: #081023;
+  margin-bottom: 8px;
 }
-
-.timeLineContext {
-  background-color: #f5f6f7;
-  margin-top: 12px;
-  padding: 16px 24px 16px 24px;
-  width: 954px;
-  border-radius: 4px;
-}
-
-.timeLineContextTitle {
-  
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: 22px;
-  letter-spacing: 0px;
-  text-align: left;
-  color: #081023;
-}
-
-.timeLineContextWord {
-  
+.testCaseContent {
   font-size: 12px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 14px;
   letter-spacing: 0px;
-  text-align: left;
-  color: #606a78;
+}
+.testCaseContentTitle {
+  font-weight: 450;
+  margin-right: 6px;
+}
+.testCaseDownload .el-link.el-link--default {
+  font-size: 5px;
+  color: #00fdfd;
+}
+.testCaseDownload .el-link.el-link--default:hover {
+  color: #275ac0;
 }
 </style>

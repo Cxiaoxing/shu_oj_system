@@ -16,6 +16,10 @@ export function contestListRequest(params) {
     return _get('/contests', params)
 }
 
+export function contestInfoRequest(region) {
+    return _get(`/contests/${region}`)
+}
+
 export function contestRankRequest(region) {
     return _get(`/contests/${region}/rank_acm`)
 }
@@ -26,4 +30,17 @@ export function contestRegisterRequest(region, data = {}) {
 
 export function contestProblemListRequest(region, params) {
     return _get(`/regions/${region}`, params)
+}
+
+// 小组赛
+export function contestAddLinkGroupRequest(region, data) {
+    return _post(`/contests/${region}`, data)
+}
+
+export function contestDeleteLinkGroupRequest(region, group_id) {
+    return _delete(`/contests/${region}/${group_id}`)
+}
+
+export function contestLinkGroupListRequest(region) {
+    return _get(`/contests/${region}/groups`)
 }

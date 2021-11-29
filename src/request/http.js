@@ -1,9 +1,7 @@
 import axios from 'axios';
 import { BASE_URL } from "@/assets/config";
 // 1. 根据环境配置默认请求地址
-if (process.env.NODE_ENV == 'development') { axios.defaults.baseURL = '/api'; }
-else if (process.env.NODE_ENV == 'debug') { axios.defaults.baseURL = BASE_URL; }
-else if (process.env.NODE_ENV == 'production') { axios.defaults.baseURL = BASE_URL; }
+axios.defaults.baseURL = BASE_URL;
 // 2. 设置请求超时
 axios.defaults.timeout = 10000
 // 3. 自动携带cookie

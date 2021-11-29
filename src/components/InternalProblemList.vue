@@ -1,24 +1,32 @@
 <template>
   <div>
     <el-card style="margin-top: 20px">
-      <!-- 搜索与添加区域 -->
-      <el-row :gutter="40">
+      <el-row>
         <el-col :span="20">
           <ProblemSearchBar :searchProblemList="searchProblemList" />
         </el-col>
-        <el-col :span="1" :offset="1">
-          <el-button type="primary" @click="addProblemDialogVisible = true"
+        <el-col :span="2" :offset="2">
+          <el-button
+            type="primary"
+            @click="addProblemDialogVisible = true"
+            plain
             >添加题目</el-button
           >
         </el-col>
       </el-row>
-      <!-- 列表区域 -->
+
       <el-table :data="problemList" style="margin-top: 20px">
-        <el-table-column prop="inner_id" width="80" label="ID">
-        </el-table-column>
-        <el-table-column prop="out_problem.info.title" label="名称">
-        </el-table-column>
-        <el-table-column prop="out_problem.info.tags" label="标签">
+        <el-table-column prop="inner_id" label="ID" width="80" />
+        <el-table-column
+          prop="out_problem.info.title"
+          label="题目名称"
+          min-width="200"
+        />
+        <el-table-column
+          prop="out_problem.info.tags"
+          label="标签"
+          min-width="150"
+        >
           <template slot-scope="scope">
             <el-tag
               style="margin-right: 5px"
@@ -28,7 +36,11 @@
             >
           </template>
         </el-table-column>
-        <el-table-column prop="out_problem.info.difficulty" label="难度">
+        <el-table-column
+          prop="out_problem.info.difficulty"
+          label="难度"
+          width="150"
+        >
           <template slot-scope="scope">
             <el-tag
               effect="dark"
@@ -51,22 +63,24 @@
             <el-tag effect="dark" type="danger" v-else>Hard </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="submit_times" label="提交次数"></el-table-column>
-        <el-table-column
-          prop="accept_times"
-          label="通过率"
-          :formatter="passingRateFormtype"
-        >
-        </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column prop="submit_times" label="提交次数" width="150" />
+        <el-table-column prop="accept_times" label="通过率" width="150">
           <template slot-scope="scope">
-            <!-- 修改按钮 -->
+            <el-progress
+              :text-inside="true"
+              :stroke-width="20"
+              :percentage="passingRateCalculate(scope.row)"
+              color="#1db7b5"
+            ></el-progress>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="150">
+          <template slot-scope="scope">
             <el-button
               size="small"
               @click="goProblemDetail(scope.row.out_problem.id)"
               >查看</el-button
             >
-            <!-- 删除按钮 -->
             <el-button
               type="danger"
               size="small"
@@ -81,7 +95,6 @@
           </template>
         </el-table-column>
       </el-table>
-      <!-- 分页 -->
       <el-pagination
         background
         hide-on-single-page
@@ -90,10 +103,11 @@
         :current-page="currentPage"
         layout="prev, pager, next, jumper"
         :total="total"
-        style="margin-top: 30px; text-align: center"
+        class="table_pagination"
       >
       </el-pagination>
     </el-card>
+
     <!-- 添加题目弹窗 -->
     <addProblemDialog
       :region="region"
@@ -110,6 +124,8 @@ import {
 } from "@/request/problemRequest";
 import ProblemSearchBar from "./ProblemSearchBar.vue";
 import AddProblemDialog from "./AddProblemDialog.vue";
+import { passingRateCalculate } from "@/assets/config";
+
 export default {
   components: {
     ProblemSearchBar,
@@ -128,7 +144,7 @@ export default {
       tag_filter: [],
       difficulty_filter: "",
       currentPage: 1,
-      pageSize: 10,
+      pageSize: 8,
       total: null,
       addProblemDialogVisible: false,
     };
@@ -167,25 +183,24 @@ export default {
       this.getProblemList();
     },
 
+    passingRateCalculate,
+
     // 点击题目跳转至题目详情
     goProblemDetail(id) {
-      this.$router.push({
+      const routeData = this.$router.resolve({
         name: "problemDetail",
         params: { id: id },
       });
+      window.open(routeData.href, "_blank");
     },
 
     // 删除region中的题目
     goDeleteProblem(id, title) {
-      this.$confirm(
-        "此操作将从region中删除题目 【" + title + "】 , 是否继续?",
-        "提示",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-        }
-      )
+      this.$confirm("此操作将删除题目 【" + title + "】，是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
         .then(() => {
           problemDeleteFromRegionRequest(this.region, id)
             .then(() => {

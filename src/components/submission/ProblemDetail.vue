@@ -3,7 +3,7 @@
     <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item :to="{ path: '/practice' }">题库</el-breadcrumb-item>
+      <el-breadcrumb-item>题目列表</el-breadcrumb-item>
       <el-breadcrumb-item>{{ problem_info.title }}</el-breadcrumb-item>
     </el-breadcrumb>
     <el-row :gutter="20">
@@ -12,14 +12,16 @@
         <el-card>
           <!-- 题目区域 -->
           <div>
-            <div style="display: flex; justify-content: space-between">
+            <div class="problemHead">
               <span class="problemTitle">{{ problem_info.title }}</span>
+              <el-button size="medium" @click="jumpToMySubmission()"
+                >我的提交</el-button
+              >
             </div>
             <!-- 题目详情 -->
-            <div class="scrollbar" style="height: 480px">
+            <div class="scrollbar" style="height: 560px">
               <div>
                 <mavon-editor
-                  class="margin_top_20"
                   :value="problem_contents.description"
                   :subfield="false"
                   :defaultOpen="'preview'"
@@ -34,7 +36,7 @@
                   v-bind:key="index"
                   class="sampleDetail"
                 >
-                  <div class="sampleTitle">示例 {{ index + 1 }}</div>
+                  <div class="sampleTitle"># 样例 {{ index + 1 }}</div>
                   <div class="sampleDisplay">
                     <div class="sampleDetailWord">
                       输入：{{ example.input }}
@@ -70,20 +72,8 @@
             v-model="code"
             :options="options"
           ></codemirror>
-          <div
-            style="
-              width: 100%;
-              margin-top: 20px;
-              display: flex;
-              justify-content: flex-end;
-            "
-          >
-            <el-button
-              class="margin_top_20"
-              type="primary"
-              @click="submitCode()"
-              >提交</el-button
-            >
+          <div class="buttonWrap">
+            <el-button type="primary" @click="submitCode()">提交</el-button>
           </div>
         </el-card>
       </el-col>
@@ -93,7 +83,7 @@
       <span>提交成功！</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">知道了</el-button>
-        <el-button type="primary" @click="goProblemResult()"
+        <el-button type="primary" @click="jumpToSubmissionDetail()"
           >查看详情</el-button
         >
       </span>
@@ -110,18 +100,20 @@ import "codemirror/mode/python/python.js"; // python
 // import "codemirror/mode/clike/clike.js"; //java
 
 import { problemInfoFromRegionRequest } from "@/request/problemRequest";
-import { submissionRequest } from "@/request/submissonRequest";
+import { submissionCreateRequest } from "@/request/submissionRequest";
 
 export default {
   data() {
     return {
-      id: 0, //接受前一个页面传来的id值
+      region: "",
+      problem_id: null,
+      inner_id: null,
+
       uuid: "",
       problem_info: {}, //题目基础信息
       problem_contents: {}, //题目描述
       dialogVisible: false, //控制查看题目详情弹窗
       code: "", // 代码编辑器绑定的值
-      // 代码编辑器配置
       options: {
         tabSize: 2, // 缩进格式
         theme: "idea", // 主题，对应主题库 JS 需要提前引入
@@ -158,25 +150,22 @@ export default {
           label: "C++",
         },
       ],
-      // 默认语言
       language: "cpp",
-      // 查看结果定时器
-      timer: null,
     };
   },
   created() {
-    this.id = this.$route.params.id;
-    this.getProblem(this.id);
+    this.region = this.$route.params.region;
+    this.problem_id = this.$route.params.problem_id;
+    this.inner_id = this.$route.params.inner_id;
+    this.getProblem(this.$route.params.inner_id);
   },
   methods: {
     // 获取题目详情
-    getProblem: function (id) {
-      const that = this;
-      problemInfoFromRegionRequest("set_main", id)
-        .then(function (response) {
-          console.log(response);
-          that.problem_info = response.info;
-          that.problem_contents = response.contents;
+    getProblem(inner_id) {
+      problemInfoFromRegionRequest(this.region, inner_id)
+        .then((response) => {
+          this.problem_info = response.info;
+          this.problem_contents = response.contents;
         })
         .catch(function (error) {
           console.log(error);
@@ -188,19 +177,17 @@ export default {
     },
     // 提交代码
     submitCode: function () {
-      const that = this;
       const data = {
         src: this.code,
         language: this.language,
       };
-      submissionRequest("set_main", this.id, data)
-        .then(function (response) {
-          that.dialogVisible = true;
-          that.uuid = response;
+      submissionCreateRequest(this.region, this.inner_id, data)
+        .then((response) => {
+          this.dialogVisible = true;
+          this.uuid = response;
         })
-        .catch(function (error) {
-          console.log(error);
-          that.$message({
+        .catch(() => {
+          this.$message({
             message: "提交失败",
             type: "warning",
           });
@@ -208,12 +195,22 @@ export default {
     },
 
     // 跳转至题目结果详情
-    goProblemResult() {
-      const that = this;
-      let uuid = that.uuid;
-      that.$router.push({
+    jumpToSubmissionDetail() {
+      this.$router.push({
         name: "submissionDetail",
-        params: { uuid: uuid },
+        params: { uuid: this.uuid },
+      });
+    },
+
+    // 跳转到我的提交
+    jumpToMySubmission() {
+      this.$router.push({
+        name: "problemSubmissionList",
+        params: {
+          region: this.region,
+          problem_id: this.problem_id,
+          inner_id: this.inner_id,
+        },
       });
     },
   },
@@ -224,21 +221,16 @@ export default {
 </script>
 
 <style lang="scss" >
-.cardLayout {
+.problemHead {
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
+  margin-bottom: 20px;
 }
-.rightcard {
-  width: 50%;
-}
-.leftcard {
-  width: 48%;
-}
+
 .problemTitle {
   font-size: 30px;
   font-weight: 400;
-  color: #404040;
+  color: $title_font_color;
 }
 
 .sample {
@@ -278,7 +270,8 @@ export default {
 }
 
 .CodeMirror {
-  height: 380px;
+  border: 1px solid $codeMirror_border_color;
+  height: 500px;
 }
 
 .CodeMirror-scroll {

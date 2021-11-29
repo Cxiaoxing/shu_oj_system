@@ -1,14 +1,22 @@
 /* 全局样式表 */
+
+// 新建表单的样式
+@import "./createForm.scss";
+
 // 主题色
 $key_title_color: #3b4a5c;
-$key_color: rgb(39, 90, 192);
-$key_color_light: rgb(96, 161, 240);
+$key_color: #275ac0;
+$key_color_light: #f5f9fd;
 $background_color: #f8f8f8;
 
 // 字体色
+$title_font_color: #3d3d3d;
 $important_font_color: #5a5a5a;
 $ordinary_font_color: #606060;
 $unimportant_font_color: #adadad;
+
+// 代码编辑器边框色
+$codeMirror_border_color: #eeeeee;
 
 .el-breadcrumb {
     margin-bottom: 15px;
@@ -33,13 +41,57 @@ $unimportant_font_color: #adadad;
     margin-top: 20px;
 }
 
-.margin_bottom_10{
+.margin_bottom_10 {
     margin-bottom: 10px;
 }
 
-//靠右按钮包裹
+// 提示
+.someTip {
+    color: $ordinary_font_color;
+    font-size: 10px;
+    margin: 5px 0px 10px 0px;
+}
+
+//   列表分页
+.table_pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.row_space {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex_row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.flex_col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+// 和movon-editor一样的背景
+.editorBackground {
+    background-color: $background_color;
+    padding: 25px;
+}
+
+// 右下按钮
 .buttonWrap {
     margin-top: 20px;
     display: flex;
     justify-content: flex-end;
+}
+
+// 单个搜索框
+.singleSearchBar {
+    width: 500px !important;
+    margin-bottom: 20px;
 }

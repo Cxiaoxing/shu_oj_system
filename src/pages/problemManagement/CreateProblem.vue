@@ -1,20 +1,17 @@
 <template>
   <div>
-    <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>题库管理</el-breadcrumb-item>
-      <el-breadcrumb-item>创建题目</el-breadcrumb-item>
+      <el-breadcrumb-item>新建题目</el-breadcrumb-item>
     </el-breadcrumb>
-    <!-- 卡片视图区域，展示批量导入入口 -->
-    <el-card class="firstCard">
-      <div style="font-size: 20px; font-weight: 400; color: #303133">
-        批量创建题目
-      </div>
+
+    <el-card>
+      <div class="create-form-title">批量新建题目</div>
       <el-divider></el-divider>
       <el-upload
-        ref="upload"
-        :action="BASE_URL + '/problems'"
+        :action="`${BASE_URL}/problems/batch_create`"
+        :with-credentials="true"
         accept=".zip"
         :show-file-list="true"
         :file-list="fileList"
@@ -22,42 +19,38 @@
         :on-success="handleSuccess"
         :on-error="handleError"
       >
-        <el-button type="primary">上传文件压缩包</el-button>
+        <el-button type="primary">上传题目文件压缩包</el-button>
       </el-upload>
       <el-link
-        class="linkWord"
+        class="someTip"
         target="_blank"
         href="https://www.feishu.cn/docs/doccnw7qEdpKQ3N46ERmzSbaS5f#"
-        >如何批量创建题目？</el-link
+        >如何批量新建题目？</el-link
       >
     </el-card>
-    <!-- 添加题目 -->
-    <el-card class="secondCard">
-      <div style="font-size: 20px; font-weight: 400; color: #303133">
-        创建题目
-      </div>
+
+    <el-card class="margin_top_20">
+      <div class="create-form-title">新建题目</div>
       <el-divider></el-divider>
-      <!-- 题目标题&标签 -->
-      <el-row :gutter="30" style="margin-top: 20px">
-        <!-- 标题 -->
-        <el-col :span="12">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">标题</span>
-          </div>
-          <el-input
-            placeholder="请输入标题"
-            v-model="input_title"
-            clearable
-            style="margin-top: 10px; font-size: 14px"
-          >
-          </el-input>
-        </el-col>
-        <!-- 标签 -->
-        <el-col :span="12">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">标签</span>
+
+      <div class="create-form-row-wrap">
+        <div class="create-form-label-wrap">
+          <img class="required_img" src="@/assets/img/required_field.svg" />
+          <span class="text">题目名称</span>
+        </div>
+        <el-input
+          placeholder="请输入题目名称"
+          v-model="title"
+          class="create-form-value-wrap"
+        >
+        </el-input>
+      </div>
+
+      <el-row :gutter="30" class="create-form-row-wrap">
+        <el-col :span="9">
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">标签</span>
             <el-link
               type="primary"
               :underline="false"
@@ -67,11 +60,11 @@
             >
           </div>
           <el-select
-            v-model="input_tags"
+            v-model="tags"
             multiple
             filterable
             placeholder="请选择标签"
-            style="margin-top: 10px; font-size: 14px; width: 100%"
+            class="create-form-value-wrap"
           >
             <el-option
               v-for="item in tagOptions"
@@ -82,24 +75,15 @@
             </el-option>
           </el-select>
         </el-col>
-      </el-row>
-      <!-- 难度、判题方式、公开输出 -->
-      <el-row :gutter="30" style="margin-top: 40px">
-        <!-- 难度 -->
-        <el-col :span="8">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">难度</span>
+        <el-col :span="5">
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">难度</span>
           </div>
           <el-select
-            v-model="difficultyValue"
+            v-model="difficulty"
             placeholder="请选择难度"
-            style="
-              margin-top: 10px;
-
-              font-size: 14px;
-              width: 100%;
-            "
+            class="create-form-value-wrap"
           >
             <el-option
               v-for="item in difficultyOptions"
@@ -110,21 +94,15 @@
             </el-option>
           </el-select>
         </el-col>
-        <!-- 判题方式 -->
-        <el-col :span="8">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">判题方式</span>
+        <el-col :span="5">
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">判题方式</span>
           </div>
           <el-select
             v-model="judgeValue"
             placeholder="请选择判题方式"
-            style="
-              margin-top: 10px;
-
-              font-size: 14px;
-              width: 100%;
-            "
+            class="create-form-value-wrap"
           >
             <el-option
               v-for="item in judgeOptions"
@@ -135,21 +113,15 @@
             </el-option>
           </el-select>
         </el-col>
-        <!-- 是否展示输出 -->
-        <el-col :span="8">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">输出展示</span>
+        <el-col :span="5">
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">输出展示</span>
           </div>
           <el-select
             v-model="opaque_output"
-            placeholder="请选择是否展示输出内容"
-            style="
-              margin-top: 10px;
-
-              font-size: 14px;
-              width: 100%;
-            "
+            placeholder="请选择是否展示输出"
+            class="create-form-value-wrap"
           >
             <el-option
               v-for="item in outputOptions"
@@ -161,92 +133,80 @@
           </el-select>
         </el-col>
       </el-row>
-      <!-- 高性能时间限制 & 高性能内存限制 & 其他时间限制 & 其他内存限制 -->
-      <el-row :gutter="30" style="margin-top: 40px">
-        <!-- 高性能时间限制 -->
+
+      <div class="create-form-row-wrap">
+        <div class="create-form-label-wrap">
+          <img class="required_img" src="@/assets/img/required_field.svg" />
+          <span class="text">题目说明</span>
+        </div>
+        <div class="create-form-value-wrap">
+          <mavon-editor v-model="description"></mavon-editor>
+        </div>
+      </div>
+
+      <el-row :gutter="30" class="create-form-row-wrap">
         <el-col :span="6">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">高性能时间限制(ms)</span>
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">高性能时间限制(ms)</span>
           </div>
           <el-input
-            placeholder="请输入高性能时间限制值，单位 ms"
+            placeholder="请输入高性能时间限制值(单位: ms)"
             v-model.number="high_performance_max_cpu_time"
-            clearable
-            style="margin-top: 10px; font-size: 14px"
+            class="create-form-value-wrap"
           >
           </el-input>
         </el-col>
-        <!-- 高性能内存限制 -->
         <el-col :span="6">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">高性能内存限制(B)</span>
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">其他时间限制(ms)</span>
           </div>
           <el-input
-            placeholder="请输入高性能内存限制值，单位 B"
-            v-model.number="high_performance_max_memory"
-            clearable
-            style="margin-top: 10px; font-size: 14px"
-          >
-          </el-input>
-        </el-col>
-        <!-- 其他时间限制 -->
-        <el-col :span="6">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">其他时间限制(ms)</span>
-          </div>
-          <el-input
-            placeholder="请输入其他时间限制值，单位 ms"
+            placeholder="请输入其他时间限制值(单位: ms)"
             v-model.number="other_max_cpu_time"
-            clearable
-            style="margin-top: 10px; font-size: 14px"
+            class="create-form-value-wrap"
           >
           </el-input>
         </el-col>
-        <!-- 其他内存限制 -->
         <el-col :span="6">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">其他内存限制(B)</span>
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">高性能内存限制(B)</span>
           </div>
           <el-input
-            placeholder="请输入其他内存限制值，单位 B"
+            placeholder="请输入高性能内存限制值(单位: B)"
+            v-model.number="high_performance_max_memory"
+            class="create-form-value-wrap"
+          >
+          </el-input>
+        </el-col>
+        <el-col :span="6">
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">其他内存限制(B)</span>
+          </div>
+          <el-input
+            placeholder="请输入其他内存限制值(单位: B)"
             v-model.number="other_max_memory"
-            clearable
-            style="margin-top: 10px; font-size: 14px"
+            class="create-form-value-wrap"
           >
           </el-input>
         </el-col>
       </el-row>
-      <!-- 难度、判题方式、公开输出 -->
-      <!-- 题目描述 -->
-      <div class="problemDetail">
-        <div class="titleLayout">
-          <img class="mustPic" src="@/assets/img/required_field.svg" />
-          <span class="itemTitle">描述</span>
+
+      <div class="create-form-row-wrap">
+        <div class="create-form-label-wrap">
+          <img class="required_img" src="@/assets/img/required_field.svg" />
+          <span class="text">样例</span>
         </div>
-        <!-- 富文本编辑器 -->
-        <div style="margin-top: 10px">
-          <mavon-editor v-model="input_description"></mavon-editor>
-        </div>
-      </div>
-      <!-- 样例 -->
-      <div class="sampleDetail">
-        <!-- title -->
-        <div class="titleLayout">
-          <img class="mustPic" src="@/assets/img/required_field.svg" />
-          <span class="itemTitle">样例</span>
-        </div>
-        <!-- 动态表单 -->
         <el-form
           ref="createSampleFormRef"
           :hide-required-asterisk="true"
           :inline="true"
           :model="createSampleForm"
           label-position="left"
-          style="margin-left: 10px; margin-top: 10px"
+          class="create-form-value-wrap"
         >
           <div
             v-for="(item, index) in createSampleForm.dynamicItem"
@@ -303,9 +263,38 @@
             </el-form-item>
           </div>
         </el-form>
+
+        <div class="create-form-row-wrap">
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">测试数据</span>
+          </div>
+          <div
+            class="someTip"
+            v-html="
+              `请将所有测试用例打包在一个.zip文件中上传，所有输入、输出文件要在压缩包的根目录，
+                且文件名为从1开始的连续数字。<br>
+                例如: &nbsp;普通判题方式: 1.in, 1.out, 2.in, 2.out, 3.in, 3.out
+                <br>&emsp;&emsp;&emsp;特殊判题方式: 1.in, 2.in, 3.in`
+            "
+          />
+          <el-upload
+            ref="uploadTestCase"
+            :action="`${BASE_URL}/problems/${problem_id}/test_case`"
+            accept=".zip"
+            :limit="1"
+            :auto-upload="false"
+            :on-success="handleSuccess"
+            :on-error="handleError"
+            :on-exceed="handleExceed"
+          >
+            <el-button type="primary" plain>上传测试数据压缩包</el-button>
+          </el-upload>
+        </div>
       </div>
-      <div style="width: 100%; display: flex; justify-content: flex-end">
-        <el-button type="primary" @click="submitProblem()">创建题目</el-button>
+
+      <div class="create-form-button-wrap">
+        <el-button type="primary" @click="submitProblem()">新建题目</el-button>
       </div>
     </el-card>
 
@@ -316,22 +305,20 @@
       width="38%"
       @close="editTagsDialogClosed"
     >
-      <el-button type="primary" size="medium" @click="createTag()"
-        >新建</el-button
+      <el-button type="primary" plain size="medium" @click="createTag()"
+        >新建标签</el-button
       >
-      <el-table :data="tagOptions" class="margin_top_20">
+      <el-table :data="tagOptions">
         <el-table-column prop="id" label="ID"> </el-table-column>
         <el-table-column prop="name" label="标签名"> </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="200">
           <template slot-scope="scope">
-            <!-- 修改按钮 -->
             <el-button
               type="primary"
               size="small"
               @click="showEditTagMessageBox(scope.row.id)"
               >编辑</el-button
             >
-            <!-- 删除按钮 -->
             <el-button
               type="danger"
               size="small"
@@ -359,23 +346,17 @@ export default {
   data() {
     return {
       BASE_URL,
-      // 上传的文件列表
-      fileList: [],
-      problemList: [],
-      // 新建题目时的标题
-      input_title: "",
-      // 新建题目时的标签
-      input_tags: [],
-      input_description: "",
-      // 新建题目时的难度
-      difficultyValue: "",
+      fileList: [], // 批量上传的题目文件列表
+      title: "",
+      tags: [],
+      description: "",
+      difficulty: "",
       judgeValue: "",
       high_performance_max_cpu_time: "",
       high_performance_max_memory: "",
       other_max_cpu_time: "",
       other_max_memory: "",
       opaque_output: "",
-      // 新建题目时的样例表单
       createSampleForm: {
         dynamicItem: [
           {
@@ -384,29 +365,26 @@ export default {
           },
         ],
       },
-      // 新建题目时的标签选择
       editTagsDialogVisible: false,
       tagOptions: [],
-      // 新建题目时的困难度选择
       difficultyOptions: [
         {
           value: 0,
-          label: "入门",
-        },
-        {
-          value: 1,
-          label: "简单",
-        },
-        {
-          value: 2,
-          label: "中等",
+          label: "Navie",
         },
         {
           value: 3,
-          label: "困难",
+          label: "Easy",
+        },
+        {
+          value: 5,
+          label: "Middle",
+        },
+        {
+          value: 8,
+          label: "Hard",
         },
       ],
-      // 新建题目时的判题方式选择
       judgeOptions: [
         {
           value: false,
@@ -417,7 +395,6 @@ export default {
           label: "特殊",
         },
       ],
-      // 新建题目时的是否展示输出内容选择
       outputOptions: [
         {
           value: false,
@@ -428,6 +405,7 @@ export default {
           label: "展示",
         },
       ],
+      problem_id: null, // 新建题目成功后返回id
     };
   },
 
@@ -557,13 +535,14 @@ export default {
           });
         });
     },
-    // 文件上传成功提示函数
-    handleSuccess(res, file, fileList) {
+    handleSuccess() {
       this.$message.success("文件上传成功");
     },
-    // 文件上传失败提示函数
-    handleError(err, file, fileList) {
+    handleError() {
       this.$message.error("文件上传失败");
+    },
+    handleExceed() {
+      this.$message.warning("最多只能上传一个文件");
     },
     // 删除 sample 函数
     deleteSampleItem(item, index) {
@@ -576,16 +555,14 @@ export default {
         output: "",
       });
     },
-    // 创建题目函数
+    // 新建题目函数
     submitProblem() {
       const data = {
-        info: {
-          title: this.input_title,
-          tags: this.input_tags,
-          difficulty: this.difficultyValue,
-        },
+        title: this.title,
+        tags: this.tags,
+        difficulty: this.difficulty,
         contents: {
-          description: this.input_description,
+          description: this.description,
           example_count: this.createSampleForm.dynamicItem.length,
           examples: this.createSampleForm.dynamicItem,
         },
@@ -599,17 +576,19 @@ export default {
           test_case_count: 0,
         },
       };
-      const that = this;
       problemCreateRequest(data)
-        .then(function (response) {
-          // 提示用户创建成功
-          that.$message({
-            message: "添加题目成功",
+        .then((response) => {
+          this.problem_id = response;
+          this.$message({
+            message: "添加题目成功，正在上传测试数据...",
             type: "success",
           });
+          setTimeout(() => {
+            this.$refs.uploadTestCase.submit();
+          }, 1000);
         })
-        .catch(function (error) {
-          that.$message({
+        .catch((error) => {
+          this.$message({
             message: "添加题目失败",
             type: "warning",
           });
@@ -620,44 +599,6 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.secondCard {
-  margin-top: 20px;
-}
-
-.mustPic {
-  width: 25px;
-}
-
-.titleLayout {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  //width: 100px;
-}
-.problemDetail {
-  margin-top: 40px;
-}
-
-.sampleDetail {
-  margin-top: 40px;
-}
-
-.itemTitle {
-  font-size: 15px;
-  color: #494747;
-}
-
-.flex-row {
-  display: flex;
-  flex-direction: row;
-}
-
-.linkWord {
-  font-size: 12px;
-  color: #494747;
-  font-weight: 400;
-}
-
 .inputWord {
   width: 400px;
   font-size: 14px;

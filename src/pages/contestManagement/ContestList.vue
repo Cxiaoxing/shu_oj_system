@@ -1,33 +1,30 @@
 <template>
   <div>
-    <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>竞赛管理</el-breadcrumb-item>
       <el-breadcrumb-item>竞赛列表</el-breadcrumb-item>
     </el-breadcrumb>
 
-    <!-- 卡片视图区域，展示竞赛列表 -->
     <el-card>
-      <!-- 搜索与添加区域 -->
-      <el-row>
-        <el-col :span="8">
-          <el-input
-            size="medium"
-            placeholder="请输入想要搜索的竞赛名称"
-            v-model="searchInput"
-            @keyup.enter.native="getContestList()"
-          >
-            <el-button
-              slot="append"
-              icon="el-icon-search"
-              @click="getContestList()"
-            ></el-button>
-          </el-input>
-        </el-col>
-      </el-row>
-      <!-- 列表区域 -->
-      <el-table :data="contestlist" style="margin-top: 20px">
+      <el-input
+        placeholder="请输入想要搜索的竞赛名称"
+        v-model="searchInput"
+        @keyup.enter.native="getContestList()"
+        class="singleSearchBar"
+      >
+        <el-button
+          slot="append"
+          icon="el-icon-search"
+          @click="getContestList()"
+        ></el-button>
+      </el-input>
+
+      <el-table
+        :data="contestlist"
+        style="margin-top: 20px"
+        @row-click="handleClickProblem"
+      >
         <el-table-column prop="region" label="域"> </el-table-column>
         <el-table-column prop="title" label="竞赛名称"></el-table-column>
         <el-table-column prop="start_time" label="开始时间">
@@ -40,32 +37,28 @@
             {{ formatTime(scope.row.end_time) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="300px">
           <template slot-scope="scope">
-            <!-- 查看按钮 -->
-            <el-button
-              size="small"
-              @click="handleClickProblem(scope.row.region)"
-              >查看</el-button
-            >
-            <!-- 修改按钮 -->
             <el-button
               type="primary"
               size="small"
-              @click="showEditDialog(scope.$index)"
+              @click.stop="showEditDialog(scope.$index)"
               >修改</el-button
             >
-            <!-- 删除按钮 -->
             <el-button
               type="danger"
               size="small"
-              @click="deleteContest(scope.row.region, scope.row.title)"
+              @click.stop="deleteContest(scope.row.region, scope.row.title)"
               >删除</el-button
+            >
+            <el-button
+              size="small"
+              @click.stop="showLinkGroups(scope.row.region)"
+              >查看小组</el-button
             >
           </template>
         </el-table-column>
       </el-table>
-      <!-- 分页 -->
       <el-pagination
         background
         hide-on-single-page
@@ -74,7 +67,7 @@
         :current-page="currentPage"
         layout="prev, pager, next, jumper"
         :total="total"
-        style="margin-top: 30px; text-align: center"
+        class="table_pagination"
       >
       </el-pagination>
     </el-card>
@@ -82,207 +75,212 @@
     <!-- 修改竞赛弹窗 -->
     <el-dialog
       title="修改竞赛"
-      :visible.sync="modifyContestDialogVisible"
+      :visible.sync="editContestDialogVisible"
       width="75%"
     >
-      <!-- 内容主体区域 -->
-      <el-row :gutter="30" style="margin-top: 20px">
-        <el-col :span="12">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">域</span>
-          </div>
-          <div style="padding-left: 16px">{{ modify_region }}</div>
-        </el-col>
-        <el-col :span="12">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">竞赛名称</span>
+      <div class="create-form-row-wrap">
+        <div class="create-form-label-wrap">
+          <img class="required_img" src="@/assets/img/required_field.svg" />
+          <span class="text">竞赛域名</span>
+        </div>
+        <el-input
+          placeholder="请输入竞赛域名"
+          v-model="region"
+          class="create-form-value-wrap"
+        >
+          <template slot="prepend">contest_</template>
+        </el-input>
+      </div>
+
+      <el-row :gutter="30" class="create-form-row-wrap">
+        <el-col :span="8">
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">竞赛名称</span>
           </div>
           <el-input
-            placeholder="请输入竞赛的名称"
-            v-model="modify_title"
-            clearable
-            style="margin-top: 10px;  font-size: 14px"
+            placeholder="请输入竞赛名称"
+            v-model="title"
+            class="create-form-value-wrap"
           >
           </el-input>
         </el-col>
-      </el-row>
-      <!-- 竞赛描述 -->
-      <div class="problemDetail">
-        <div class="titleLayout">
-          <span class="itemTitle">相关介绍</span>
-        </div>
-        <!-- 富文本编辑器 -->
-        <div style="margin-top: 10px">
-          <mavon-editor
-            v-model="modify_introduction"
-            class="margin"
-          ></mavon-editor>
-        </div>
-      </div>
-      <!-- 时间、密码 -->
-      <el-row :gutter="30" style="margin-top: 40px">
-        <!-- 开始时间 -->
-        <el-col :span="6">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">开始时间</span>
-          </div>
-          <div class="block">
-            <el-date-picker
-              v-model="startTime"
-              value-format="yyyy-MM-ddTHH:mm:ss"
-              format="yyyy-MM-dd HH:mm:ss"
-              type="datetime"
-              placeholder="选择开始时间"
-              class="margin"
-            >
-            </el-date-picker>
-          </div>
-        </el-col>
-        <!-- 结束时间 -->
-        <el-col :span="6">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">结束时间</span>
-          </div>
-          <el-date-picker
-            v-model="endTime"
-            value-format="yyyy-MM-ddTHH:mm:ss"
-            format="yyyy-MM-dd HH:mm:ss"
-            type="datetime"
-            placeholder="选择结束时间"
-            class="margin"
-          >
-          </el-date-picker>
-        </el-col>
-        <!-- 封榜时间 -->
-        <el-col :span="6">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">封榜时间</span>
-          </div>
-          <el-date-picker
-            v-model="sealTime"
-            value-format="yyyy-MM-ddTHH:mm:ss"
-            format="yyyy-MM-dd HH:mm:ss"
-            type="datetime"
-            placeholder="选择封榜时间"
-            class="margin"
-          >
-          </el-date-picker>
-        </el-col>
-        <!-- 竞赛密码 -->
-        <el-col :span="6">
-          <div class="titleLayout" v-if="is_modify_password === false">
-            <span class="itemTitle">是否修改竞赛密码</span>
-          </div>
-          <el-switch
-            v-model="is_modify_password"
-            class="margin"
-            v-if="is_modify_password === false"
-          >
-          </el-switch>
-          <div class="titleLayout" v-if="is_modify_password">
-            <span class="itemTitle">修改竞赛密码&emsp;</span>
-            <el-switch v-model="is_modify_password"> </el-switch>
+        <el-col :span="8">
+          <div class="create-form-label-wrap">
+            <el-switch v-model="isUpdatePassword"> </el-switch>
+            <span class="text" style="margin-left: 15px">修改竞赛密码</span>
           </div>
           <el-input
             v-model="password"
             placeholder="请输入竞赛密码"
-            class="margin"
-            v-if="is_modify_password"
+            class="create-form-value-wrap"
+            :disabled="!isUpdatePassword"
           >
           </el-input>
         </el-col>
-      </el-row>
-      <!-- settings选择-->
-      <el-row :gutter="30" style="margin-top: 40px">
-        <!-- 比赛开始后是否能注册参加比赛 -->
         <el-col :span="8">
-          <div class="titleLayout">
-            <span class="itemTitle">比赛开始后是否能注册参加比赛</span>
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">竞赛类型</span>
           </div>
-          <el-switch v-model="register_after_start" class="margin"> </el-switch>
-        </el-col>
-        <!-- 比赛开始后注册是否参与排名 -->
-        <el-col :span="8">
-          <div class="titleLayout">
-            <span class="itemTitle">比赛开始后注册是否参与排名</span>
-          </div>
-          <el-switch v-model="unrate_after_start" class="margin"> </el-switch>
-        </el-col>
-        <!-- 比赛开始前是否能查看题目 -->
-        <el-col :span="8">
-          <div class="titleLayout">
-            <span class="itemTitle">比赛开始前是否能查看题目</span>
-          </div>
-          <el-switch v-model="view_before_start" class="margin"> </el-switch>
+          <el-select
+            placeholder="请选择竞赛类型"
+            v-model="contestType"
+            class="create-form-value-wrap"
+          >
+            <el-option
+              v-for="item in contestTypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+            </el-option>
+          </el-select>
         </el-col>
       </el-row>
-      <el-row :gutter="30" style="margin-top: 40px">
-        <!-- 比赛结束后是否能查看题目 -->
+
+      <el-row :gutter="30" class="create-form-row-wrap">
         <el-col :span="8">
-          <div class="titleLayout">
-            <span class="itemTitle">比赛结束后是否能查看题目</span>
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">开始时间</span>
           </div>
-          <el-switch v-model="view_after_end" class="margin"> </el-switch>
+          <el-date-picker
+            placeholder="请选择竞赛开始时间"
+            v-model="startTime"
+            class="create-form-value-wrap"
+            value-format="yyyy-MM-ddTHH:mm:ss"
+            format="yyyy-MM-dd HH:mm:ss"
+            type="datetime"
+          >
+          </el-date-picker>
         </el-col>
-        <!-- 比赛结束后是否公开 -->
         <el-col :span="8">
-          <div class="titleLayout">
-            <span class="itemTitle">比赛结束后是否公开</span>
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">结束时间</span>
           </div>
-          <el-switch v-model="public_after_end" class="margin"> </el-switch>
+          <el-date-picker
+            placeholder="请选择竞赛结束时间"
+            v-model="endTime"
+            class="create-form-value-wrap"
+            value-format="yyyy-MM-ddTHH:mm:ss"
+            format="yyyy-MM-dd HH:mm:ss"
+            type="datetime"
+          >
+          </el-date-picker>
         </el-col>
-        <!-- 比赛结束后是否还能提交 -->
         <el-col :span="8">
-          <div class="titleLayout">
-            <span class="itemTitle">比赛结束后是否还能提交</span>
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">封榜时间</span>
           </div>
-          <el-switch v-model="submit_after_end" class="margin"> </el-switch>
+          <el-date-picker
+            placeholder="请选择竞赛封榜时间"
+            v-model="sealTime"
+            class="create-form-value-wrap"
+            value-format="yyyy-MM-ddTHH:mm:ss"
+            format="yyyy-MM-dd HH:mm:ss"
+            type="datetime"
+          >
+          </el-date-picker>
         </el-col>
       </el-row>
-      <div
-        style="
-          margin-top: 30px;
-          width: 100%;
-          display: flex;
-          justify-content: flex-end;
-        "
-      >
-        <el-button type="primary" @click="modifyContest()">修改竞赛</el-button>
+
+      <div class="create-form-row-wrap">
+        <div class="create-form-label-wrap">
+          <span class="text">竞赛说明</span>
+        </div>
+        <div class="create-form-value-wrap">
+          <mavon-editor v-model="introduction"></mavon-editor>
+        </div>
+      </div>
+
+      <el-row :gutter="30" class="create-form-row-wrap">
+        <el-col :span="8">
+          <div class="create-form-switch-item">
+            <el-switch v-model="view_before_start"> </el-switch>
+            <span class="text">比赛开始前能查看题目</span>
+          </div>
+        </el-col>
+        <el-col :span="8">
+          <div class="create-form-switch-item">
+            <el-switch v-model="register_after_start"> </el-switch>
+            <span class="text">比赛开始后能报名参加比赛</span>
+          </div>
+        </el-col>
+        <el-col :span="8">
+          <div class="create-form-switch-item">
+            <el-switch v-model="unrate_after_start"> </el-switch>
+            <span class="text">比赛开始后报名能参与排名</span>
+          </div>
+        </el-col>
+      </el-row>
+      <el-row :gutter="30" class="create-form-row-wrap">
+        <el-col :span="8">
+          <div class="create-form-switch-item">
+            <el-switch v-model="view_after_end"> </el-switch>
+            <span class="text">比赛结束后能查看题目</span>
+          </div>
+        </el-col>
+        <el-col :span="8">
+          <div class="create-form-switch-item">
+            <el-switch v-model="submit_after_end"> </el-switch>
+            <span class="text">比赛结束后能提交</span>
+          </div>
+        </el-col>
+        <el-col :span="8">
+          <div class="create-form-switch-item">
+            <el-switch v-model="public_after_end"> </el-switch>
+            <span class="text">比赛结束后题目公开</span>
+          </div>
+        </el-col>
+      </el-row>
+
+      <div class="create-form-button-wrap">
+        <el-button type="primary" @click="editContest()">修改竞赛</el-button>
       </div>
     </el-dialog>
+
+    <LinkGroupsDialog
+      :region="linkGroupsRegion"
+      :linkGroupsDialogVisible="linkGroupsDialogVisible"
+      :closeDialog="closeLinkGroupsDialog"
+    />
   </div>
 </template>
 
 <script>
 import moment from "moment";
-import { contestListRequest, contestEditRequest, contestDeleteRequest } from "@/request/contestRequest";
+import {
+  contestListRequest,
+  contestEditRequest,
+  contestDeleteRequest,
+} from "@/request/contestRequest";
+import LinkGroupsDialog from "@/components/LinkGroupsDialog.vue";
 export default {
+  components: {
+    LinkGroupsDialog,
+  },
   data() {
     return {
-      // 获取到的题目列表
+      // 展示
       contestlist: [],
-      // 搜索输入内容
       searchInput: "",
-      // 当前页
       currentPage: 1,
-      // 每页记录数
-      pageSize: 7,
-      // 总记录数
+      pageSize: 8,
       total: null,
-      // 控制修改竞赛弹窗展示
-      modifyContestDialogVisible: false,
-      // 修改竞赛内容
-      modify_region: "",
-      modify_title: "",
-      modify_introduction: "",
+
+      // 修改
+      editContestDialogVisible: false,
+      region: "",
+      title: "",
+      introduction: "",
+      contestType: "",
       startTime: "",
       endTime: "",
       sealTime: "",
+      isUpdatePassword: false, // 是否修改密码
       password: "",
       register_after_start: true,
       unrate_after_start: true,
@@ -290,8 +288,20 @@ export default {
       view_after_end: true,
       public_after_end: false,
       submit_after_end: true,
-      // 是否修改密码
-      is_modify_password: false,
+
+      contestTypeOptions: [
+        {
+          label: "公开赛",
+          value: "open_contest",
+        },
+        {
+          label: "小组赛",
+          value: "group_contest",
+        },
+      ],
+
+      linkGroupsRegion: "",
+      linkGroupsDialogVisible: false,
     };
   },
   created() {
@@ -300,40 +310,37 @@ export default {
   methods: {
     // 获取竞赛列表
     getContestList(currentPage = 1) {
-      const that = this;
       const params = {
         title_filter: this.searchInput,
         limit: this.pageSize,
         offset: this.pageSize * (currentPage - 1),
       };
       contestListRequest(params)
-        .then(function (response) {
-          that.currentPage = currentPage;
-          that.contestlist = response.list;
-          that.total = response.total;
+        .then((response) => {
+          this.currentPage = currentPage;
+          this.contestlist = response.list;
+          this.total = response.total;
         })
-        .catch(function (error) {
-          console.log(error);
+        .catch(() => {
+          this.$message.warning("获取竞赛列表失败");
         });
     },
 
     // 查看竞赛题目详情
-    handleClickProblem(re) {
-      let region = re;
-      const that = this;
-      that.$router.push({
+    handleClickProblem(row) {
+      this.$router.push({
         name: "contestDetailList",
-        params: { region: region },
+        params: { region: row.region },
       });
     },
 
     // 展示修改竞赛弹窗
     showEditDialog(index) {
-      // 获取需要修改的竞赛原信息
-      let contestInfo = this.contestlist[index];
-      this.modify_region = contestInfo.region;
-      this.modify_title = contestInfo.title;
-      this.modify_introduction = contestInfo.introduction;
+      const contestInfo = this.contestlist[index];
+      this.region = contestInfo.region;
+      this.title = contestInfo.title;
+      this.introduction = contestInfo.introduction;
+      this.contestType = contestInfo.self_type;
       this.startTime = contestInfo.start_time;
       this.endTime = contestInfo.end_time;
       this.sealTime = contestInfo.seal_time;
@@ -344,68 +351,50 @@ export default {
       this.view_after_end = contestInfo.settings.view_after_end;
       this.public_after_end = contestInfo.settings.public_after_end;
       this.submit_after_end = contestInfo.settings.submit_after_end;
-      this.is_modify_password = false;
-      this.modifyContestDialogVisible = true;
+      this.isUpdatePassword = false;
+      this.editContestDialogVisible = true;
     },
 
     // 发起修改竞赛请求
-    modifyContest() {
-      var data = {};
-      if (this.is_modify_password) {
-        data = {
-          new_title: this.modify_title,
-          new_introduction: this.modify_introduction,
-          new_start_time: this.startTime,
-          new_end_time: this.endTime,
-          new_seal_time: this.sealTime,
-          new_password: this.password,
-          new_settings: {
-            register_after_start: this.register_after_start,
-            unrate_after_start: this.unrate_after_start,
-            view_before_start: this.view_before_start,
-            view_after_end: this.view_after_end,
-            public_after_end: this.public_after_end,
-            submit_after_end: this.submit_after_end,
-          },
-        };
-      } else {
-        data = {
-          new_title: this.modify_title,
-          new_introduction: this.modify_introduction,
-          new_start_time: this.startTime,
-          new_end_time: this.endTime,
-          new_seal_time: this.sealTime,
-          new_settings: {
-            register_after_start: this.register_after_start,
-            unrate_after_start: this.unrate_after_start,
-            view_before_start: this.view_before_start,
-            view_after_end: this.view_after_end,
-            public_after_end: this.public_after_end,
-            submit_after_end: this.submit_after_end,
-          },
-        };
+    editContest() {
+      const data = {
+        new_title: this.title,
+        new_introduction: this.introduction,
+        new_password: this.password,
+        new_self_type: this.contestType,
+        new_start_time: this.startTime,
+        new_end_time: this.endTime,
+        new_seal_time: this.sealTime,
+        new_settings: {
+          register_after_start: this.register_after_start,
+          unrate_after_start: this.unrate_after_start,
+          view_before_start: this.view_before_start,
+          view_after_end: this.view_after_end,
+          public_after_end: this.public_after_end,
+          submit_after_end: this.submit_after_end,
+        },
+      };
+      if (!this.isUpdatePassword) {
+        delete data["new_password"];
       }
-      const that = this;
-      contestEditRequest(this.modify_region, data)
-        .then(function (response) {
-          // 提示用户创建成功
-          that.$message({
+      contestEditRequest(this.region, data)
+        .then(() => {
+          this.$message({
             message: "修改竞赛成功",
             type: "success",
           });
-          that.modifyContestDialogVisible = false;
-          that.getContestList();
+          this.editContestDialogVisible = false;
+          this.getContestList();
         })
-        .catch(function (error) {
-          that.$message({
+        .catch(() => {
+          this.$message({
             message: "修改竞赛失败",
             type: "warning",
           });
-          console.log(error);
         });
     },
     // 删除竞赛
-    deleteContest(contestid, title) {
+    deleteContest(region, title) {
       this.$confirm(
         "此操作将永久删除竞赛 【" + title + "】 , 是否继续?",
         "提示",
@@ -416,32 +405,29 @@ export default {
         }
       )
         .then(() => {
-          const that = this;
-          contestDeleteRequest(contestid)
-            .then(function (response) {
-              //重新获取竞赛列表
-              that.getContestList();
-              // 提示用户删除成功
-              that.$message({
-                message: "删除成功",
-                type: "success",
-              });
+          contestDeleteRequest(region)
+            .then(() => {
+              this.getContestList(this.currentPage);
+              this.$message.success("删除成功");
             })
-            .catch(function (error) {
-              that.$message({
-                message: "删除失败",
-                type: "warning",
-              });
-              console.log(error);
+            .catch(() => {
+              this.$message.warning("删除失败");
             });
         })
         .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除",
-          });
+          this.$message.info("已取消删除");
         });
     },
+
+    // 小组赛链接的小组列表
+    showLinkGroups(region) {
+      this.linkGroupsRegion = region;
+      this.linkGroupsDialogVisible = true;
+    },
+    closeLinkGroupsDialog() {
+      this.linkGroupsDialogVisible = false;
+    },
+
     // 格式化展示时间
     formatTime(time) {
       return moment(time).format("YYYY-MM-DD HH:mm:ss");
@@ -449,34 +435,4 @@ export default {
   },
 };
 </script>
-
-<style lang='scss' scoped>
-.editpic {
-  width: 25px;
-}
-
-.mustPic {
-  width: 25px;
-}
-
-.titleLayout {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  //width: 100px;
-}
-.problemDetail {
-  margin-top: 40px;
-}
-
-.itemTitle {
-  
-  font-size: 15px;
-  color: #494747;
-}
-
-.margin {
-  margin-top: 10px;
-}
-</style>
 

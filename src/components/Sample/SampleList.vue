@@ -7,7 +7,9 @@
       <el-breadcrumb-item :to="{ path: '/problemManage/list' }"
         >题目列表</el-breadcrumb-item
       >
-      <el-breadcrumb-item>{{ problemtitle }}</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ name: 'problemDetail', params: { id } }">{{
+        problemtitle
+      }}</el-breadcrumb-item>
       <el-breadcrumb-item>管理标程</el-breadcrumb-item>
     </el-breadcrumb>
 
@@ -69,9 +71,8 @@
                 >
               </template>
             </el-table-column>
-            <el-table-column prop="language" label="语言"></el-table-column>
-            <el-table-column label="操作">
-              <!-- 查看标程详情按钮 -->
+            <el-table-column prop="language" label="语言" width="100"></el-table-column>
+            <el-table-column label="操作" width="200">
               <template slot-scope="scope">
                 <el-button
                   size="small"
@@ -102,7 +103,7 @@ import {
 export default {
   data() {
     return {
-      id: "", //接受前一个页面传来的 problemid
+      id: null, //接受前一个页面传来的 problemid
       problemtitle: "",
       // 查询到的用户列表
       sampleList: [],
@@ -187,17 +188,9 @@ export default {
         });
     },
     // 点击题目跳转至提交结果详情
-    handleClickProblem: function (id) {
-      let uuid = id;
-      const that = this;
-      that.$router.push({ name: "sampleResultDetail", params: { uuid: uuid } });
+    handleClickProblem: function (uuid) {
+      this.$router.push({ name: "sampleDetail", params: { uuid } });
     },
   },
 };
 </script>
-
-<style lang='scss' scoped>
-.editpic {
-  width: 25px;
-}
-</style>

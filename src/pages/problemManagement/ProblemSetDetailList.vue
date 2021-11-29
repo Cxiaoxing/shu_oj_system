@@ -11,15 +11,15 @@
     </el-breadcrumb>
 
     <!-- 卡片视图区域，展示题目列表 -->
-    <RegionProblemList :region="$route.params.region" />
+    <ProblemList :region="$route.params.region" />
   </div>
 </template>
 
 <script>
-import RegionProblemList from "@/components/RegionProblemList.vue";
+import ProblemList from "@/components/InternalProblemList.vue";
 export default {
   components: {
-    RegionProblemList,
+    ProblemList,
   },
 };
 </script>

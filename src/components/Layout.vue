@@ -36,14 +36,19 @@
             :router="true"
           >
             <!-- 首页 -->
-            <el-menu-item index="/welcome">
+            <el-menu-item index="/home">
               <i class="el-icon-s-home"></i>
               <span slot="title">首页</span>
             </el-menu-item>
             <!-- 题库（对外） -->
-            <el-menu-item index="/practice" id="problemSet">
+            <el-menu-item index="/practice" id="practice">
               <i class="el-icon-menu"></i>
               <span slot="title">题库</span>
+            </el-menu-item>
+            <!-- 题集（对外） -->
+            <el-menu-item index="/problemSet" id="problemSet">
+              <i class="el-icon-s-grid"></i>
+              <span slot="title">题集</span>
             </el-menu-item>
             <!-- 竞赛（对外） -->
             <el-menu-item index="/contest" id="contest">
@@ -51,7 +56,7 @@
               <span slot="title">竞赛</span>
             </el-menu-item>
             <!-- 提交状态（对外） -->
-            <el-menu-item index="/status" id="submission">
+            <el-menu-item index="/submissionStatus" id="submission">
               <i class="el-icon-s-order"></i>
               <span slot="title">提交状态</span>
             </el-menu-item>
@@ -71,19 +76,22 @@
               </template>
               <el-menu-item index="/userManage/list">用户列表</el-menu-item>
               <el-menu-item index="/userManage/create">添加用户</el-menu-item>
+              <el-menu-item index="/userManage/groupList"
+                >小组列表</el-menu-item
+              >
             </el-submenu>
             <!-- 题库管理-->
             <el-submenu index="2" v-if="isAdminRole">
               <template slot="title">
-                <i class="el-icon-s-grid"></i>
+                <i class="el-icon-s-help"></i>
                 <span>题目管理</span>
               </template>
               <el-menu-item index="/problemManage/list">题目列表</el-menu-item>
+              <el-menu-item index="/problemManage/create"
+                >新建题目</el-menu-item
+              >
               <el-menu-item index="/problemManage/setList"
                 >题集列表</el-menu-item
-              >
-              <el-menu-item index="/problemManage/create"
-                >创建题目</el-menu-item
               >
             </el-submenu>
             <!-- 竞赛管理 -->
@@ -94,7 +102,7 @@
               </template>
               <el-menu-item index="/contestManage/list">竞赛列表</el-menu-item>
               <el-menu-item index="/contestManage/create"
-                >创建竞赛</el-menu-item
+                >新建竞赛</el-menu-item
               >
             </el-submenu>
             <!-- todo: 直播管理 -->
@@ -107,7 +115,7 @@
                 <span>直播管理</span>
               </template>
               <el-menu-item index="/liveManage/live"
-                >创建直播</el-menu-item
+                >新建直播</el-menu-item
               >
             </el-submenu> -->
             <!-- 公告管理 -->
@@ -201,18 +209,17 @@ export default {
           this.$router.push("/login");
           break;
         case "logout":
-          const that = this;
           userLogoutRequest()
-            .then(function () {
-              that.$router.push("/home");
+            .then(() => {
+              this.$router.push("/home");
               window.location.reload();
-              that.$message({
+              this.$message({
                 message: "退出登陆成功",
                 type: "success",
               });
             })
-            .catch(function (error) {
-              that.$message({
+            .catch(() => {
+              this.$message({
                 message: "退出登录失败",
                 type: "warning",
               });
@@ -255,6 +262,7 @@ export default {
 .collapse_icon {
   cursor: pointer;
   margin-top: 10px;
+  margin-bottom: 10px;
   display: flex;
   justify-content: center;
   i:hover {

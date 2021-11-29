@@ -79,30 +79,30 @@
         </div>
       </div>
       <el-divider></el-divider>
-      <!-- 暂未完成判题 -->
-      <div class="noContextBlock" v-if="state !== 'Finished'">
-        <div>
-          <img class="noContextPic" src="@/assets/img/nocontext.svg" />
-        </div>
-        <div style="font-size: 14px">暂未完成判题，请稍后查看</div>
-      </div>
-      <!-- 已完成判题，但比赛期间不能查看提交详情 -->
-      <div class="noContextBlock" v-else-if="contestRunning === true">
+      <!-- 但比赛期间不能查看提交详情 -->
+      <div class="noContextBlock" v-if="contestRunning === true">
         <div>
           <img class="noContextPic" src="@/assets/img/nocontext.svg" />
         </div>
         <div style="font-size: 14px">比赛期间不能查看提交详情</div>
       </div>
-      <!-- 已完成判题，编译错误，展示编译错误信息 -->
+      <!-- 暂未完成判题 -->
+      <div class="noContextBlock" v-else-if="state !== 'Finished'">
+        <div>
+          <img class="noContextPic" src="@/assets/img/nocontext.svg" />
+        </div>
+        <div style="font-size: 14px">暂未完成判题，请稍后查看</div>
+      </div>
+      <!-- 编译错误 -->
       <div v-else-if="err !== null">
         <div style="color: #f54a45">编译错误原因：</div>
         <div style="font-size: 14px; margin-top: 5px">{{ error_reason }}</div>
       </div>
-      <!-- 已完成判题&编译正确，展示测试点信息 -->
+      <!-- 已完成判题且编译正确，展示测试点信息 -->
       <div v-else>
         <div style="font-size: 20px; font-weight: 450">测试点详情</div>
         <div
-          class="testCaseTip"
+          class="someTip"
           v-html="'绿色: SUCCESS&emsp;&ensp;红色: WRONG_ANSWER'"
         />
         <div class="testCaseWrap scrollbar">
@@ -122,18 +122,13 @@
               <div class="testCaseTitle"># Case {{ index + 1 }}</div>
               <div class="testCaseContent">
                 <span class="testCaseContentTitle"> CPU Time:</span>
-                <span class="testCaseContentDetail">
-                  {{ item.cpu_time }} ms</span
-                >
+                <span> {{ item.cpu_time }} ms</span>
               </div>
               <div class="testCaseContent">
                 <span class="testCaseContentTitle">Memory:</span>
-                <span class="testCaseContentDetail">
-                  {{ submissionMemoryFormat(item.memory) }}</span
-                >
+                <span> {{ submissionMemoryFormat(item.memory) }}</span>
               </div>
               <div class="testCaseDownload" v-if="item.result !== 'SUCCESS'">
-                <!-- todo: 测试点数据下载 -->
                 <el-popover title="标准输入数据" trigger="click">
                   <div style="max-width: 500px">{{ standardTestCaseData }}</div>
                   <el-link
@@ -142,7 +137,7 @@
                     :underline="false"
                     target="_black"
                     style="margin-top: 8px"
-                    :href="`${BASE_URL}/problems/${problem_id}/test_case/${item.test_case}?input=true`"
+                    :href="`${BASE_URL}/regions/${region}/${problem_id}/test_case/${item.test_case}?input=true`"
                     >下载到本地</el-link
                   >
                   <el-link
@@ -163,7 +158,7 @@
                     :underline="false"
                     target="_black"
                     style="margin-top: 8px"
-                    :href="`${BASE_URL}/problems/${problem_id}/test_case/${item.test_case}?input=false`"
+                    :href="`${BASE_URL}/regions/${region}/${problem_id}/test_case/${item.test_case}?input=false`"
                     >下载到本地</el-link
                   >
                   <el-link
@@ -198,13 +193,13 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/theme/idea.css"; // 白色
 import "codemirror/mode/python/python.js"; // python
 import {
-  problemInfoFromRegionRequest,
-  problemTestCaseRequest,
+  problemTitleRequest,
+  problemSingleTestCaseInfoRequest,
 } from "@/request/problemRequest";
 import {
-  submissionLimitedResultRequest,
-  submissionResultRequest,
-} from "@/request/submissonRequest";
+  submissionLimitedInfoRequest,
+  submissionInfoRequest,
+} from "@/request/submissionRequest";
 import { BASE_URL } from "@/assets/config";
 
 export default {
@@ -226,6 +221,7 @@ export default {
       },
       code: "", // 所提交的代码值
       uuid: "",
+      region: "",
       problem_id: "",
       problemTitle: "",
       subResult: "3", //提交结果：0-成功；1-失败；2-编译错误
@@ -248,44 +244,16 @@ export default {
     }
   },
   methods: {
-    // 获取题目信息
-    getProblem: function (region, problem_id) {
-      const that = this;
-      problemInfoFromRegionRequest(region, problem_id)
-        .then(function (response) {
-          that.problemTitle = response.info.title;
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    },
-
-    // 格式化展示时间
-    formatTime(time) {
-      return moment(time).format("YYYY-MM-DD HH:mm:ss");
-    },
-
-    // 友好展示提交内存
-    submissionMemoryFormat(memory) {
-      if (memory === null) {
-        return "--";
-      } else {
-        // 1048576 = 1024 * 1024
-        let t = parseInt(memory) / 1048576;
-        return String(t.toFixed(0)) + " MB";
-      }
-    },
-
     // 获取结果
     getResult: function (uuid) {
       const that = this;
       const requestFunction = this.contestRunning
-        ? submissionLimitedResultRequest
-        : submissionResultRequest;
-      // 比赛已结束
+        ? submissionLimitedInfoRequest
+        : submissionInfoRequest;
       requestFunction(uuid)
         .then(function (response) {
-          that.getProblem(response.region, response.problem_id);
+          that.getProblemTitle(response.problem_id);
+          that.region = response.region;
           that.problem_id = response.problem_id;
           that.subTime = response.submit_time;
           that.code = response.settings.src;
@@ -315,20 +283,43 @@ export default {
           console.log(error);
         });
     },
-    colors(index) {
-      if (index == "SUCCESS") {
-        return "#00b42a";
+
+    // 获取题目信息
+    getProblemTitle(problem_id) {
+      problemTitleRequest(problem_id)
+        .then((response) => {
+          this.problemTitle = response.info.title;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
+
+    // 格式化展示时间
+    formatTime(time) {
+      return moment(time).format("YYYY-MM-DD HH:mm:ss");
+    },
+
+    // 友好展示提交内存
+    submissionMemoryFormat(memory) {
+      if (memory === null) {
+        return "--";
       } else {
-        return "#f54a45";
+        // 1048576 = 1024 * 1024
+        let t = parseInt(memory) / 1048576;
+        return String(t.toFixed(0)) + " MB";
       }
     },
 
     downloadTestCase(test_case_id, isInput) {
-      problemTestCaseRequest(this.problem_id, test_case_id, isInput).then(
-        (response) => {
-          this.standardTestCaseData = response;
-        }
-      );
+      problemSingleTestCaseInfoRequest(
+        this.region,
+        this.problem_id,
+        test_case_id,
+        isInput
+      ).then((response) => {
+        this.standardTestCaseData = response;
+      });
     },
   },
   components: {
@@ -360,11 +351,6 @@ export default {
   width: 150px;
 }
 
-.testCaseTip {
-  color: $unimportant_font_color;
-  font-size: 8px;
-  margin-bottom: 10px;
-}
 .testCaseWrap {
   max-height: 300px;
   display: flex;

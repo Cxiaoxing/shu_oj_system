@@ -1,0 +1,48 @@
+// 标题
+.create-form-title {
+    font-size: 20px;
+}
+
+// 每一行输入的最外层包裹
+.create-form-row-wrap {
+    margin-bottom: 30px;
+}
+
+// 每一项输入的label
+.create-form-label-wrap {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 25px;
+    .required_img {
+        width: 25px;
+        height: 25px;
+    }
+    .text {
+        font-size: 16px;
+        color: #3d3d3d;
+    }
+}
+
+// 每一项输入的值
+.create-form-value-wrap {
+    margin-top: 10px;
+    width: 100% !important;
+}
+
+// switch开关
+.create-form-switch-item{
+    margin: 15px 0px 5px 0px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    .text{
+        margin-left: 15px;
+    }
+}
+
+// 提交按钮包裹
+.create-form-button-wrap {
+    display: flex;
+    justify-content: flex-end;
+}

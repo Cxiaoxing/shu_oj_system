@@ -9,11 +9,9 @@
 
     <!-- 卡片视图区域，展示题目列表 -->
     <el-card>
-      <!-- 搜索与添加区域 -->
-      <el-row :gutter="40">
-        <el-col :span="8">
+      <el-row>
+        <el-col :span="10">
           <el-input
-            size="medium"
             placeholder="请输入你想要搜索的题集名称"
             v-model="searchInput"
             @keyup.enter.native="getProblemSetList()"
@@ -25,18 +23,19 @@
             ></el-button>
           </el-input>
         </el-col>
-        <el-col :span="1" :offset="1">
-          <el-button type="primary" @click="addProblemSetDialogVisible = true"
-            >新建题集</el-button
+        <!-- todo: 此功能后端暂时不能提供 
+        <el-col :span="2.5" :offset="9">
+          <el-button type="primary" @click="openAddContestDialog()" plain
+            >新建竞赛</el-button
           >
         </el-col>
-        <el-col :span="2" :offset="10">
+        -->
+        <el-col :span="2" :offset="12">
           <el-button
-            v-if="multipleSelection.length != 0"
             type="primary"
+            @click="addProblemSetDialogVisible = true"
             plain
-            @click="addContestDialogVisible = true"
-            >创建竞赛</el-button
+            >新建题集</el-button
           >
         </el-col>
       </el-row>
@@ -46,39 +45,48 @@
         :data="problemSetList"
         style="margin-top: 20px"
         @selection-change="handleSelectionChange"
+        @row-click="jumpToProblemSetDetail"
       >
-        <el-table-column type="selection" width="55"> </el-table-column>
-        <el-table-column prop="region" label="域" width="200"></el-table-column>
-        <el-table-column prop="title" label="题集名称" show-overflow-tooltip>
+        <!-- <el-table-column type="selection" width="55"> -->
         </el-table-column>
-        <el-table-column prop="introduction" label="简介" show-overflow-tooltip>
+        <el-table-column
+          prop="region"
+          label="域"
+          min-width="150"
+          show-overflow-tooltip
+        ></el-table-column>
+        <el-table-column
+          prop="title"
+          label="题集名称"
+          min-width="200"
+          show-overflow-tooltip
+        >
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column
+          prop="introduction"
+          label="简介"
+          min-width="500"
+          show-overflow-tooltip
+        >
+        </el-table-column>
+        <el-table-column prop="is_released" label="发布状态" width="150">
           <template slot-scope="scope">
-            <!-- 查看按钮 -->
-            <el-button
-              size="small"
-              @click="handleClickProblem(scope.row.region)"
-              >查看</el-button
-            >
-            <!-- 修改按钮 -->
+            <el-switch v-model="scope.row.is_released" @click="changeReleaseStatus(scope.row)"/>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="150">
+          <template slot-scope="scope">
             <el-button
               type="primary"
               size="small"
-              @click="
-                showEditDialog(
-                  scope.row.region,
-                  scope.row.title,
-                  scope.row.introduction
-                )
-              "
+              @click.stop="showEditDialog(scope.row)"
               >修改</el-button
             >
-            <!-- 删除按钮 -->
             <el-button
               type="danger"
               size="small"
-              @click="deleteProblemSet(scope.row.region, scope.row.title)"
+              @click.stop="deleteProblemSet(scope.row.region, scope.row.title)"
+              v-if="scope.row.region !== 'set_main'"
               >删除</el-button
             >
           </template>
@@ -93,14 +101,14 @@
         :current-page="currentPage"
         layout="prev, pager, next, jumper"
         :total="total"
-        style="margin-top: 30px; text-align: center"
+        class="table_pagination"
       >
       </el-pagination>
     </el-card>
 
     <!-- 新建题集弹窗 -->
     <el-dialog
-      title="创建题集"
+      title="新建题集"
       :visible.sync="addProblemSetDialogVisible"
       width="50%"
       @close="addProblemSetDialogClosed"
@@ -131,13 +139,14 @@
         <el-form-item label="简介" prop="introduction">
           <el-input
             type="textarea"
+            :rows="5"
             v-model="addProblemSetForm.introduction"
-            placeholder="请输题集简介"
+            placeholder="请输入题集简介"
           ></el-input>
         </el-form-item>
       </el-form>
-      <div style="width: 100%; display: flex; justify-content: flex-end">
-        <el-button type="primary" @click="addProblemSet()">创建</el-button>
+      <div class="buttonWrap">
+        <el-button type="primary" @click="addProblemSet()">新建</el-button>
       </div>
     </el-dialog>
 
@@ -148,7 +157,6 @@
       width="50%"
       @close="modifyProblemSetDialogClosed"
     >
-      <!-- 内容主体区域 -->
       <el-form
         :model="addProblemSetForm"
         :rules="addProblemSetFormRules"
@@ -169,8 +177,9 @@
         <el-form-item label="简介" prop="introduction">
           <el-input
             type="textarea"
+            :rows="5"
             v-model="addProblemSetForm.introduction"
-            placeholder="请输题集简介"
+            placeholder="请输入题集简介"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -179,14 +188,13 @@
       </div>
     </el-dialog>
 
-    <!-- 创建竞赛弹窗 -->
+    <!-- 新建竞赛弹窗 -->
     <el-dialog
-      title="创建竞赛"
+      title="新建竞赛"
       :visible.sync="addContestDialogVisible"
       width="50%"
       @close="addContestDialogClosed"
     >
-      <!-- 内容主体区域 -->
       <el-form
         :model="addContestForm"
         :rules="addContestFormRules"
@@ -255,7 +263,7 @@
         </el-row>
       </el-form>
       <div style="width: 100%; display: flex; justify-content: flex-end">
-        <el-button type="primary" @click="createContest()">创建</el-button>
+        <el-button type="primary" @click="createContest()">新建</el-button>
       </div>
     </el-dialog>
   </div>
@@ -272,31 +280,22 @@ import {
 export default {
   data() {
     return {
-      // 获取到的题集列表
       problemSetList: [],
-      // 搜索输入内容
       searchInput: "",
-      // 当前页
       currentPage: 1,
-      // 每页记录数
-      pageSize: 10,
-      // 总记录数
+      pageSize: 8,
       total: null,
-      // 多选
       multipleSelection: [],
-      // 控制创建题集弹窗
       addProblemSetDialogVisible: false,
-      // 控制创建竞赛弹窗
       addContestDialogVisible: false,
-      // 控制修改题集弹窗
       modifyProblemSetDialogVisible: false,
-      // 创建题集表单
+      // 新建题集表单
       addProblemSetForm: {
         region: "",
         title: "",
         introduction: "",
       },
-      // 创建竞赛表单
+      // 新建竞赛表单
       addContestForm: {
         region: "",
         title: "",
@@ -305,7 +304,7 @@ export default {
         endTime: "",
         password: "",
       },
-      // 创建题集时的表单验证规则对象
+      // 新建题集时的表单验证规则对象
       addProblemSetFormRules: {
         region: [{ required: true, message: "请输入域名", trigger: "blur" }],
         title: [{ required: true, message: "请输入题集名称", trigger: "blur" }],
@@ -313,7 +312,7 @@ export default {
           { required: false, message: "请输入题集相关介绍", trigger: "blur" },
         ],
       },
-      // 创建竞赛时的表单验证规则对象
+      // 新建竞赛时的表单验证规则对象
       addContestFormRules: {
         region: [{ required: true, message: "请输入域名", trigger: "blur" }],
         title: [{ required: true, message: "请输入竞赛名称", trigger: "blur" }],
@@ -352,7 +351,8 @@ export default {
           console.log(error);
         });
     },
-    // 预验证创建题集表单
+
+    // 预验证新建题集表单
     addProblemSet() {
       this.$refs.addProblemSetFormRef.validate((valid) => {
         if (valid) {
@@ -364,7 +364,7 @@ export default {
       });
     },
 
-    // 发起创建题集请求
+    // 发起新建题集请求
     addProblemSetRequest: function () {
       const data = {
         region: "set_" + this.addProblemSetForm.region,
@@ -427,7 +427,18 @@ export default {
       console.log(val);
     },
 
-    // 创建竞赛函数
+    openAddContestDialog() {
+      if (this.multipleSelection.length) {
+        this.addContestDialogVisible = true;
+      } else {
+        this.$message({
+          message: "请至少选一个题集",
+          type: "warning",
+        });
+      }
+    },
+
+    // 新建竞赛函数
     createContest() {
       console.log(this.addContestForm.startTime);
       const data = {
@@ -456,11 +467,11 @@ export default {
     },
 
     // 展示修改题集弹窗
-    showEditDialog(region, title, introduction) {
+    showEditDialog(row) {
       this.addProblemSetForm = {
-        region: region,
-        title: title,
-        introduction: introduction,
+        region: row.region,
+        title: row.title,
+        introduction: row.introduction,
       };
       this.modifyProblemSetDialogVisible = true;
     },
@@ -504,17 +515,17 @@ export default {
         });
     },
 
-    // 监听创建竞赛对话框的关闭事件
+    // 监听新建竞赛对话框的关闭事件
     addContestDialogClosed() {
       this.$refs.addContestFormRef.resetFields();
     },
 
-    // 监听创建题集对话框的关闭事件
+    // 监听新建题集对话框的关闭事件
     addProblemSetDialogClosed() {
       this.$refs.addProblemSetFormRef.resetFields();
     },
 
-    // 修改创建题集对话框的关闭事件
+    // 修改新建题集对话框的关闭事件
     modifyProblemSetDialogClosed() {
       this.addProblemSetForm = {
         region: "",
@@ -523,33 +534,32 @@ export default {
       };
     },
 
-    //  根据困难度筛选
-    filterDifficulty(value, row) {
-      return row.info.difficulty === value;
-    },
-    // 根绝发布状态筛选
-    filterReleaseStatus(value, row) {
-      return row.is_released === value;
+    // 改变发布状态
+    changeReleaseStatus(row) {
+      console.log(row);
+      // const data = { target_state: probleminfo.is_released };
+      // const that = this;
+      // problemStatusChangeRequest(probleminfo.id, data)
+      //   .then(function (response) {
+      //     that.$message({
+      //       message: "修改成功",
+      //       type: "success",
+      //     });
+      //   })
+      //   .catch(function (error) {
+      //     that.$message({
+      //       message: "修改失败",
+      //       type: "warning",
+      //     });
+      //   });
     },
     // 查看题集详情
-    handleClickProblem: function (re) {
-      let region = re;
-      const that = this;
-      that.$router.push({
+    jumpToProblemSetDetail(row) {
+      this.$router.push({
         name: "problemSetDetailList",
-        params: { region: region },
+        params: { region: row.region },
       });
     },
   },
 };
 </script>
-
-<style lang='scss' scoped>
-.editpic {
-  width: 25px;
-}
-.tagsLayout {
-  margin-right: 5px;
-}
-</style>
-

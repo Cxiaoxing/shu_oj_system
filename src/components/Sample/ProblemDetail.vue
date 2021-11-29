@@ -3,7 +3,7 @@
     <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>题库管理</el-breadcrumb-item>
+      <el-breadcrumb-item>题目管理</el-breadcrumb-item>
       <el-breadcrumb-item :to="{ path: '/problemManage/list' }"
         >题目列表</el-breadcrumb-item
       >
@@ -12,37 +12,48 @@
     <!-- 卡片 -->
     <el-row :gutter="20">
       <el-col :span="12">
-        <el-card style="height: 100%">
+        <el-card>
           <!-- 题目区域 -->
           <div>
-            <div style="display: flex; justify-content: space-between">
+            <div class="problemHead">
               <span class="problemTitle">{{ problem_info.title }}</span>
-              <el-button size="medium" @click="goSampleList()"
+              <el-button
+                size="medium"
+                @click="
+                  () => {
+                    $router.push({ name: 'sampleList', params: { id } });
+                  }
+                "
                 >管理标程</el-button
               >
             </div>
             <!-- 题目详情 -->
-            <div>
-              <mavon-editor
-                class="problemContent"
-                :value="problem_contents.description"
-                :subfield="false"
-                :defaultOpen="'preview'"
-                :toolbarsFlag="false"
-                :boxShadow="false"
-              />
-            </div>
-            <!--样例 -->
-            <div v-if="problem_contents.example_count != 0" class="sample">
-              <div
-                v-for="(example, index) in problem_contents.examples"
-                v-bind:key="index"
-                class="sampleDetail"
-              >
-                <div class="sampleTitle">示例 {{ index + 1 }}</div>
-                <div class="sampleDisplay">
-                  <div class="sampleDetailWord">输入：{{ example.input }}</div>
-                  <div class="sampleDetailWord">输出：{{ example.output }}</div>
+            <div class="scrollbar" style="height: 560px">
+              <div>
+                <mavon-editor
+                  :value="problem_contents.description"
+                  :subfield="false"
+                  :defaultOpen="'preview'"
+                  :toolbarsFlag="false"
+                  :boxShadow="false"
+                />
+              </div>
+              <!--样例 -->
+              <div v-if="problem_contents.example_count != 0" class="sample">
+                <div
+                  v-for="(example, index) in problem_contents.examples"
+                  v-bind:key="index"
+                  class="sampleDetail"
+                >
+                  <div class="sampleTitle"># 样例 {{ index + 1 }}</div>
+                  <div class="sampleDisplay">
+                    <div class="sampleDetailWord">
+                      输入：{{ example.input }}
+                    </div>
+                    <div class="sampleDetailWord">
+                      输出：{{ example.output }}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -56,11 +67,7 @@
             <!-- 编程语言选择区 -->
             <div>
               <span style="">语言：</span>
-              <el-select
-                class="codeLanSel"
-                v-model="language"
-                placeholder="请选择编程语言"
-              >
+              <el-select v-model="language" placeholder="请选择编程语言">
                 <el-option
                   v-for="item in languages"
                   :key="item.value"
@@ -71,24 +78,12 @@
               </el-select>
             </div>
             <codemirror
-              class="codeEditor"
+              class="margin_top_20"
               v-model="code"
               :options="options"
             ></codemirror>
-            <div
-              style="
-                width: 100%;
-                margin-top: 20px;
-                display: flex;
-                justify-content: flex-end;
-              "
-            >
-              <el-button
-                class="submitButton"
-                type="primary"
-                @click="submitCode(id)"
-                >提交</el-button
-              >
+            <div class="buttonWrap">
+              <el-button type="primary" @click="submitCode(id)">提交</el-button>
             </div>
           </div>
         </el-card>
@@ -106,11 +101,10 @@ import "codemirror/theme/rubyblue.css"; // 蓝绿色
 import "codemirror/theme/darcula.css"; // 黑色
 import "codemirror/theme/elegant.css"; // 白色
 import "codemirror/theme/idea.css"; // 白色
-// 代码高亮
-import "codemirror/mode/python/python.js"; // python
-import { sampleRequest } from "@/request/sampleRequest";
+import "codemirror/mode/python/python.js"; // 代码高亮
+// import "codemirror/mode/clike/clike.js";
+import { sampleCreateRequest } from "@/request/sampleRequest";
 import { problemInfoPrivateRequest } from "@/request/problemRequest";
-// import "codemirror/mode/clike/clike.js"; //java
 
 export default {
   data() {
@@ -118,8 +112,7 @@ export default {
       id: 0, //接受前一个页面传来的id值
       problem_info: {}, //题目基础信息
       problem_contents: {}, //题目描述
-      code: "\n\n\n\n\n\n", // 代码编辑器绑定的值
-      // 代码编辑器默认配置
+      code: "", // 代码编辑器绑定的值
       options: {
         tabSize: 2, // 缩进格式
         theme: "idea", // 主题，对应主题库 JS 需要提前引入
@@ -189,16 +182,20 @@ export default {
         src: this.code,
         language: this.language,
       };
-      sampleRequest(data)
+      sampleCreateRequest(data)
         .then(function (response) {
-          that.$confirm("提交成功", {
-            confirmButtonText: "查看详情",
-            cancelButtonText: "知道了",
-            type: "success",
-          })
-            .then(() => {
-              that.$router.push({ name: "sampleResultDetail", params: { uuid: response } });
+          that
+            .$confirm("提交成功", {
+              confirmButtonText: "查看详情",
+              cancelButtonText: "知道了",
+              type: "success",
             })
+            .then(() => {
+              that.$router.push({
+                name: "sampleDetail",
+                params: { uuid: response },
+              });
+            });
         })
         .catch(function (error) {
           console.log(error);
@@ -208,12 +205,6 @@ export default {
           });
         });
     },
-    // 管理标程
-    goSampleList() {
-      const that = this;
-      let id = this.id;
-      that.$router.push({ name: "sampleList", params: { id: id } });
-    },
   },
   components: {
     codemirror,
@@ -222,21 +213,16 @@ export default {
 </script>
 
 <style lang="scss" >
+.problemHead {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
 .problemTitle {
-  
   font-size: 30px;
   font-weight: 400;
   color: #404040;
-}
-
-.problemContent {
-  margin-top: 20px;
-  
-  background-color: #ffffff;
-}
-
-.codeEditor {
-  margin-top: 20px;
 }
 
 .sample {
@@ -259,7 +245,6 @@ export default {
   margin-top: 24px;
 }
 .sampleTitle {
-  
   font-size: 24px;
   font-weight: 600;
   line-height: 1.25;
@@ -268,28 +253,19 @@ export default {
   border-bottom: 1px solid #eaecef;
 }
 .sampleDetailWord {
-  
   font-size: 16px;
   margin-top: 0px;
   margin-bottom: 5px;
   line-height: 1.5;
 }
 
-.codeLanSel {
-  margin-top: 30px;
-}
-
-.submitButton {
-  margin-top: 20px;
-}
-
 .CodeMirror {
-  border: 1px solid #eee;
-  height: auto;
+  border: 1px solid $codeMirror_border_color;
+  height: 500px;
 }
 
 .CodeMirror-scroll {
-  height: auto;
+  height: 100%;
   overflow-y: hidden;
   overflow-x: auto;
 }

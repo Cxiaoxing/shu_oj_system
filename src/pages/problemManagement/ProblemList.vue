@@ -12,20 +12,28 @@
       <!-- 搜索区域 -->
       <ProblemSearchBar :searchProblemList="searchProblemList" />
       <!-- 列表区域 -->
-      <el-table :data="problemlist" style="margin-top: 20px">
-        <el-table-column prop="id" width="80" label="ID"> </el-table-column>
-        <el-table-column prop="info.title" label="题目"> </el-table-column>
+      <el-table
+        :data="problemlist"
+        style="margin-top: 20px"
+        @row-click="jumpToProblemDetail"
+      >
+        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column
+          prop="info.title"
+          label="题目名称"
+          show-overflow-tooltip
+        />
         <el-table-column prop="info.tags" label="标签">
           <template slot-scope="scope">
             <el-tag
-              class="tagsLayout"
+              style="margin-right: 5px"
               v-for="(item, index) in scope.row.info.tags"
               :key="index"
               >{{ item }}</el-tag
             >
           </template>
         </el-table-column>
-        <el-table-column prop="info.difficulty" label="难度">
+        <el-table-column prop="info.difficulty" label="难度" width="150">
           <template slot-scope="scope">
             <el-tag
               effect="dark"
@@ -48,44 +56,24 @@
             <el-tag effect="dark" type="danger" v-else>Hard </el-tag>
           </template>
         </el-table-column>
-        <el-table-column
-          prop="is_released"
-          label="发布状态"
-          width="150"
-          :filters="[
-            { text: '已发布', value: true },
-            { text: '未发布', value: false },
-          ]"
-          :filter-method="filterReleaseStatus"
-          filter-placement="bottom-end"
-        >
+        <el-table-column prop="is_released" label="发布状态" width="150">
           <template slot-scope="scope">
-            <el-switch
-              v-model="scope.row.is_released"
-              @change="problrmStatusChange(scope.row)"
-            >
-            </el-switch>
+            <el-switch v-model="scope.row.is_released" disabled> </el-switch>
           </template>
         </el-table-column>
 
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="150">
           <template slot-scope="scope">
-            <!-- 查看题目按钮 -->
-            <el-button size="small" @click="handleClickProblem(scope.row.id)"
-              >查看</el-button
-            >
-            <!-- 修改按钮 -->
             <el-button
               type="primary"
               size="small"
-              @click="showEditDialog(scope.row.id)"
+              @click.stop="showEditDialog(scope.row.id)"
               >修改</el-button
             >
-            <!-- 删除按钮 -->
             <el-button
               type="danger"
               size="small"
-              @click="deleteProblem(scope.row.id, scope.row.info.title)"
+              @click.stop="deleteProblem(scope.row.id, scope.row.info.title)"
               >删除</el-button
             >
           </template>
@@ -99,7 +87,7 @@
         :current-page="currentPage"
         layout="prev, pager, next, jumper"
         :total="total"
-        style="margin-top: 30px; text-align: center"
+        class="table_pagination"
       >
       </el-pagination>
     </el-card>
@@ -107,67 +95,54 @@
     <!-- 修改题目弹窗 -->
     <el-dialog
       title="修改题目"
-      :visible.sync="modifyProblemDialogVisible"
+      :visible.sync="editProblemDialogVisible"
       width="75%"
+      @close="closeEditProblemDialog"
     >
-      <!-- 题目标题&标签 -->
-      <el-row :gutter="30" style="margin-top: 20px">
-        <!-- 标题 -->
-        <el-col :span="12">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-size: 16px">标题</span>
-          </div>
-          <el-input
-            placeholder="请输入标题"
-            v-model="input_title"
-            clearable
-            style="margin-top: 10px; font-size: 14px"
-          >
-          </el-input>
-        </el-col>
-        <!-- 标签 -->
-        <el-col :span="12">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-size: 16px">标签</span>
+      <div class="create-form-row-wrap">
+        <div class="create-form-label-wrap">
+          <img class="required_img" src="@/assets/img/required_field.svg" />
+          <span class="text">题目名称</span>
+        </div>
+        <el-input
+          placeholder="请输入题目名称"
+          v-model="title"
+          class="create-form-value-wrap"
+        >
+        </el-input>
+      </div>
+
+      <el-row :gutter="30" class="create-form-row-wrap">
+        <el-col :span="9">
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">标签</span>
           </div>
           <el-select
-            v-model="input_tags"
+            v-model="tags"
             multiple
             filterable
-            allow-create
-            default-first-option
             placeholder="请选择标签"
-            style="
-              margin-top: 10px;
-
-              font-size: 14px;
-              width: 100%;
-            "
+            class="create-form-value-wrap"
           >
             <el-option
               v-for="item in tagOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             >
             </el-option>
           </el-select>
         </el-col>
-      </el-row>
-      <!-- 难度、判题方式、公开输出 -->
-      <el-row :gutter="30" style="margin-top: 40px">
-        <!-- 难度 -->
-        <el-col :span="8">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-size: 16px">难度</span>
+        <el-col :span="5">
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">难度</span>
           </div>
           <el-select
-            v-model="difficultyValue"
+            v-model="difficulty"
             placeholder="请选择难度"
-            style="margin-top: 10px; font-size: 14px; width: 100%"
+            class="create-form-value-wrap"
           >
             <el-option
               v-for="item in difficultyOptions"
@@ -178,21 +153,15 @@
             </el-option>
           </el-select>
         </el-col>
-        <!-- 判题方式 -->
-        <el-col :span="8">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-size: 16px">判题方式</span>
+        <el-col :span="5">
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">判题方式</span>
           </div>
           <el-select
             v-model="judgeValue"
             placeholder="请选择判题方式"
-            style="
-              margin-top: 10px;
-
-              font-size: 14px;
-              width: 100%;
-            "
+            class="create-form-value-wrap"
           >
             <el-option
               v-for="item in judgeOptions"
@@ -203,16 +172,15 @@
             </el-option>
           </el-select>
         </el-col>
-        <!-- 是否展示输出 -->
-        <el-col :span="8">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-size: 16px">输出展示</span>
+        <el-col :span="5">
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">输出展示</span>
           </div>
           <el-select
             v-model="opaque_output"
-            placeholder="请选择是否展示输出内容"
-            style="margin-top: 10px; font-size: 14px; width: 100%"
+            placeholder="请选择是否展示输出"
+            class="create-form-value-wrap"
           >
             <el-option
               v-for="item in outputOptions"
@@ -224,83 +192,74 @@
           </el-select>
         </el-col>
       </el-row>
-      <!-- 高性能时间限制 & 高性能内存限制 & 其他时间限制 & 其他内存限制 -->
-      <el-row :gutter="30" style="margin-top: 40px">
-        <!-- 高性能时间限制 -->
+
+      <div class="create-form-row-wrap">
+        <div class="create-form-label-wrap">
+          <img class="required_img" src="@/assets/img/required_field.svg" />
+          <span class="text">题目说明</span>
+        </div>
+        <div class="create-form-value-wrap">
+          <mavon-editor v-model="description"></mavon-editor>
+        </div>
+      </div>
+
+      <el-row :gutter="30" class="create-form-row-wrap">
         <el-col :span="6">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-size: 16px">高性能时间限制(ms)</span>
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">高性能时间限制(ms)</span>
           </div>
           <el-input
-            placeholder="请输入高性能时间限制值，单位 ms"
+            placeholder="请输入高性能时间限制值(单位: ms)"
             v-model.number="high_performance_max_cpu_time"
-            clearable
-            style="margin-top: 10px; font-size: 14px"
+            class="create-form-value-wrap"
           >
           </el-input>
         </el-col>
-        <!-- 高性能内存限制 -->
         <el-col :span="6">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-size: 16px">高性能内存限制(B)</span>
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">其他时间限制(ms)</span>
           </div>
           <el-input
-            placeholder="请输入高性能内存限制值，单位 B"
-            v-model.number="high_performance_max_memory"
-            clearable
-            style="margin-top: 10px; font-size: 14px"
-          >
-          </el-input>
-        </el-col>
-        <!-- 其他时间限制 -->
-        <el-col :span="6">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-size: 16px">其他时间限制(ms)</span>
-          </div>
-          <el-input
-            placeholder="请输入其他时间限制值，单位 ms"
+            placeholder="请输入其他时间限制值(单位: ms)"
             v-model.number="other_max_cpu_time"
-            clearable
-            style="margin-top: 10px; font-size: 14px"
+            class="create-form-value-wrap"
           >
           </el-input>
         </el-col>
-        <!-- 其他内存限制 -->
         <el-col :span="6">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span style="font-size: 16px">其他内存限制(B)</span>
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">高性能内存限制(B)</span>
           </div>
           <el-input
-            placeholder="请输入其他内存限制值，单位 B"
+            placeholder="请输入高性能内存限制值(单位: B)"
+            v-model.number="high_performance_max_memory"
+            class="create-form-value-wrap"
+          >
+          </el-input>
+        </el-col>
+        <el-col :span="6">
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">其他内存限制(B)</span>
+          </div>
+          <el-input
+            placeholder="请输入其他内存限制值(单位: B)"
             v-model.number="other_max_memory"
-            clearable
-            style="margin-top: 10px; font-size: 14px"
+            class="create-form-value-wrap"
           >
           </el-input>
         </el-col>
       </el-row>
-      <!-- 难度、判题方式、公开输出 -->
-      <!-- 题目描述 -->
-      <div class="problemDetail">
-        <div class="titleLayout">
-          <img class="mustPic" src="@/assets/img/required_field.svg" />
-          <span>描述</span>
-        </div>
-        <!-- 富文本编辑器 -->
-        <div style="margin-top: 10px">
-          <mavon-editor v-model="input_description"></mavon-editor>
-        </div>
-      </div>
+
       <!-- 样例 -->
-      <div class="sampleDetail">
+      <div class="create-form-row-wrap">
         <!-- title -->
-        <div class="titleLayout">
-          <img class="mustPic" src="@/assets/img/required_field.svg" />
-          <span>样例</span>
+        <div class="create-form-label-wrap">
+          <img class="required_img" src="@/assets/img/required_field.svg" />
+          <span class="text">样例</span>
         </div>
         <!-- 动态表单 -->
         <el-form
@@ -309,7 +268,7 @@
           :inline="true"
           :model="createSampleForm"
           label-position="left"
-          style="margin-left: 10px; margin-top: 10px"
+          class="create-form-value-wrap"
         >
           <div
             v-for="(item, index) in createSampleForm.dynamicItem"
@@ -366,9 +325,51 @@
             </el-form-item>
           </div>
         </el-form>
+
+        <!-- 测试数据上传 -->
+        <div class="create-form-row-wrap">
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">测试数据</span>
+            <el-link
+              type="primary"
+              :underline="false"
+              target="_black"
+              style="margin-left: 12px; font-size: 8px"
+              :href="`${BASE_URL}/problems/${problem_id}/test_case`"
+              >下载到本地
+              <i class="el-icon-download" />
+            </el-link>
+          </div>
+          <div
+            class="someTip"
+            v-html="
+              `上传文件后，点击修改题目则会覆盖原测试数据。<br>
+                请将所有测试用例打包在一个.zip文件中上传，所有输入、输出文件要在压缩包的根目录，
+                且文件名为从1开始的连续数字。<br>
+                例如: &nbsp;普通判题方式: 1.in, 1.out, 2.in, 2.out, 3.in, 3.out
+                <br>&emsp;&emsp;&emsp;特殊判题方式: 1.in, 2.in, 3.in`
+            "
+          />
+          <el-upload
+            ref="uploadTestCase"
+            :action="`${BASE_URL}/problems/${problem_id}/test_case`"
+            accept=".zip"
+            :limit="1"
+            :auto-upload="false"
+            :on-change="handleChange"
+            :on-remove="handleRemove"
+            :on-success="handleSuccess"
+            :on-error="handleError"
+            :on-exceed="handleExceed"
+          >
+            <el-button type="primary" plain>上传测试数据压缩包</el-button>
+          </el-upload>
+        </div>
       </div>
-      <div style="width: 100%; display: flex; justify-content: flex-end">
-        <el-button type="primary" @click="modifyProblem()">修改题目</el-button>
+
+      <div class="create-form-button-wrap">
+        <el-button type="primary" @click="editProblem()">修改题目</el-button>
       </div>
     </el-dialog>
   </div>
@@ -378,11 +379,12 @@
 import {
   problemInfoPrivateRequest,
   problemListPrivateRequest,
-  problemStatusChangeRequest,
   problemEditRequest,
   problemDeleteRequest,
 } from "@/request/problemRequest";
 import ProblemSearchBar from "@/components/ProblemSearchBar.vue";
+import { tagListRequest } from "@/request/tagRequest";
+import { BASE_URL } from "@/assets/config";
 
 export default {
   components: {
@@ -394,27 +396,24 @@ export default {
       tag_filter: [],
       difficulty_filter: "",
       currentPage: 1,
-      pageSize: 7,
+      pageSize: 8,
       total: null,
       problemlist: [],
 
-      // 控制修改题目弹窗
-      modifyProblemDialogVisible: false,
-      // 修改题目时的内容
-      modify_id: "",
-      input_title: "",
-      // 修改题目时的标签
-      input_tags: [],
-      input_description: "",
-      // 修改题目时的难度
-      difficultyValue: "",
+      // 修改题目
+      BASE_URL,
+      editProblemDialogVisible: false,
+      problem_id: "",
+      title: "",
+      tags: [],
+      description: "",
+      difficulty: "",
       judgeValue: "",
       high_performance_max_cpu_time: "",
       high_performance_max_memory: "",
       other_max_cpu_time: "",
       other_max_memory: "",
       opaque_output: "",
-      // 修改题目时的样例表单
       createSampleForm: {
         dynamicItem: [
           {
@@ -423,28 +422,27 @@ export default {
           },
         ],
       },
-      // 修改题目时的标签选择器
+      needUploadTestCase: false,
+      tagNameToId: {}, // name到id的映射
       tagOptions: [],
-      // 修改题目时的困难度选择
       difficultyOptions: [
         {
           value: 0,
-          label: "入门",
+          label: "Navie",
         },
         {
           value: 3,
-          label: "简单",
+          label: "Easy",
         },
         {
           value: 5,
-          label: "中等",
+          label: "Middle",
         },
         {
           value: 8,
-          label: "困难",
+          label: "Hard",
         },
       ],
-      // 修改题目时的判题方式选择
       judgeOptions: [
         {
           value: false,
@@ -455,7 +453,6 @@ export default {
           label: "特殊",
         },
       ],
-      // 修改题目时的是否展示输出内容选择
       outputOptions: [
         {
           value: false,
@@ -470,13 +467,14 @@ export default {
   },
   created() {
     this.getProblemList();
+    this.getTagList();
   },
   methods: {
     // 获取题目列表
     getProblemList: function (currentPage = 1) {
       const that = this;
       const params = {
-        id_order: true,
+        inner_id_order: true,
         title_filter: this.title_filter,
         tag_filter: this.tag_filter,
         difficulty_filter: this.difficulty_filter,
@@ -493,6 +491,18 @@ export default {
           console.log(error);
         });
     },
+    getTagList() {
+      tagListRequest()
+        .then((response) => {
+          this.tagOptions = response.list;
+          response.list.forEach((item) => {
+            this.tagNameToId[item.name] = item.id;
+          });
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
 
     // 搜索题目列表
     searchProblemList(title_filter, tag_filter, difficulty_filter) {
@@ -502,31 +512,9 @@ export default {
       this.getProblemList();
     },
 
-    // 改变题目发布状态
-    problrmStatusChange(probleminfo) {
-      console.log(probleminfo);
-      const data = { target_state: probleminfo.is_released };
-      const that = this;
-      problemStatusChangeRequest(probleminfo.id, data)
-        .then(function (response) {
-          that.$message({
-            message: "修改成功",
-            type: "success",
-          });
-        })
-        .catch(function (error) {
-          that.$message({
-            message: "修改失败",
-            type: "warning",
-          });
-        });
-    },
-
     // 点击题目跳转至题目详情
-    handleClickProblem: function (pid) {
-      let id = pid;
-      const that = this;
-      that.$router.push({ name: "problemDetail", params: { id: id } });
+    jumpToProblemDetail(row) {
+      this.$router.push({ name: "problemDetail", params: { id: row.id } });
     },
 
     // 展示修改题目弹窗
@@ -534,13 +522,14 @@ export default {
       const that = this;
       problemInfoPrivateRequest(problemid)
         .then(function (response) {
-          console.log(response);
           var setProblemInfo = new Promise(function (resolve, reject) {
-            that.modify_id = problemid;
-            that.input_title = response.info.title;
-            that.input_tags = response.info.tags;
-            that.difficultyValue = response.info.difficulty;
-            that.input_description = response.contents.description;
+            that.problem_id = problemid;
+            that.title = response.info.title;
+            that.tags = response.info.tags.map(
+              (item) => that.tagNameToId[item]
+            );
+            that.difficulty = response.info.difficulty;
+            that.description = response.contents.description;
             if (response.contents.example_count != 0) {
               that.createSampleForm.dynamicItem = response.contents.examples;
             }
@@ -555,7 +544,7 @@ export default {
             resolve();
           });
           setProblemInfo.then(function () {
-            that.modifyProblemDialogVisible = true;
+            that.editProblemDialogVisible = true;
           });
         })
         .catch(function (error) {
@@ -573,16 +562,36 @@ export default {
         output: "",
       });
     },
+    // 文件上传提示函数
+    handleChange() {
+      this.needUploadTestCase = true;
+    },
+    handleRemove() {
+      this.needUploadTestCase = false;
+    },
+    handleSuccess() {
+      this.editProblemDialogVisible = false;
+      this.getProblemList(this.currentPage);
+      this.$message.success("修改题目成功");
+    },
+    handleError() {
+      this.$message.error("测试数据上传失败");
+    },
+    handleExceed() {
+      this.$message.warning("最多只能上传一个文件");
+    },
+    closeEditProblemDialog() {
+      this.needUploadTestCase = false;
+      this.$refs.uploadTestCase.clearFiles();
+    },
     // 修改题目函数
-    modifyProblem() {
+    editProblem() {
       const data = {
-        new_info: {
-          title: this.input_title,
-          tags: this.input_tags,
-          difficulty: this.difficultyValue,
-        },
+        new_title: this.title,
+        new_tags: this.tags,
+        new_difficulty: this.difficulty,
         new_contents: {
-          description: this.input_description,
+          description: this.description,
           example_count: this.createSampleForm.dynamicItem.length,
           examples: this.createSampleForm.dynamicItem,
         },
@@ -596,22 +605,19 @@ export default {
           test_case_count: 0,
         },
       };
-      const that = this;
-      problemEditRequest(that.modify_id, data)
-        .then(function (response) {
-          that.modifyProblemDialogVisible = false;
-          that.getProblemList();
-          // 提示用户创建成功
-          that.$message({
-            message: "修改题目成功",
-            type: "success",
-          });
+      problemEditRequest(this.problem_id, data)
+        .then(() => {
+          if (this.needUploadTestCase) {
+            this.$message.success("正在上传测试数据...");
+            this.$refs.uploadTestCase.submit();
+          } else {
+            this.editProblemDialogVisible = false;
+            this.getProblemList(this.currentPage);
+            this.$message.success("修改题目成功");
+          }
         })
-        .catch(function (error) {
-          that.$message({
-            message: "修改题目失败",
-            type: "warning",
-          });
+        .catch((error) => {
+          this.$message.warning("修改题目失败");
           console.log(error);
         });
     },
@@ -631,9 +637,7 @@ export default {
           const that = this;
           problemDeleteRequest(problemid)
             .then(function (response) {
-              //重新获取题目列表
-              that.getProblemList();
-              // 提示用户删除成功
+              that.getProblemList(that.currentPage);
               that.$message({
                 message: "删除成功",
                 type: "success",
@@ -664,36 +668,8 @@ export default {
 </script>
 
 <style lang='scss' scoped>
-.editpic {
-  width: 25px;
-}
-.tagsLayout {
-  margin-right: 5px;
-}
-.secondCard {
-  margin-top: 20px;
-}
-
-.mustPic {
-  width: 25px;
-}
-
-.titleLayout {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  //width: 100px;
-}
-.problemDetail {
-  margin-top: 40px;
-}
-
-.sampleDetail {
-  margin-top: 40px;
-}
 .inputWord {
   width: 400px;
-
   font-size: 14px;
 }
 .marginLeft30 {

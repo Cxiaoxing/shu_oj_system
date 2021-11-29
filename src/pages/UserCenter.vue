@@ -7,7 +7,7 @@
           <!-- 头像区域 -->
           <el-upload
             class="userImageBackground"
-            :action="BASE_URL + '/users/' + userId + '/profile_picture'"
+            :action="`${BASE_URL}/users/${userId}/profile_picture`"
             :show-file-list="false"
             :before-upload="beforeUserImageUpload"
             :on-success="uploadUserImageSuccess"
@@ -201,48 +201,85 @@
       </div>
     </div>
     <!-- 编辑个人信息对话框 -->
-    <el-dialog title="个人信息" :visible.sync="userDialogVisible" width="32%">
-      <el-form
-        :model="updateUserForm"
-        :rules="updateUserFormRules"
-        ref="updateUserFormRef"
-        label-width="auto"
-      >
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="updateUserForm.username"></el-input>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input
-            placeholder="不填写则默认原密码"
-            v-model="updateUserForm.password"
-            type="password"
-            show-password
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="确认密码" prop="password_confirm">
-          <el-input
-            v-model="updateUserForm.password_confirm"
-            type="password"
-            show-password
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="updateUserForm.email"></el-input>
-        </el-form-item>
-        <el-form-item label="学校">
-          <el-input v-model="updateUserForm.school"></el-input>
-        </el-form-item>
-        <el-form-item label="学号">
-          <el-input v-model="updateUserForm.student_number"></el-input>
-        </el-form-item>
-        <el-form-item label="真实姓名">
-          <el-input v-model="updateUserForm.real_name"></el-input>
-        </el-form-item>
-      </el-form>
-      <div class="buttonWrap">
-        <el-button type="primary" size="medium" @click="updateRequest(userId)"
-          >更新个人信息</el-button
+    <el-dialog
+      title="编辑个人信息"
+      :visible.sync="updateUserDialogVisible"
+      width="32%"
+      @close="
+        () => {
+          $refs.updateUserPasswordFormRef.resetFields();
+        }
+      "
+    >
+      <div v-show="isUpdateUserInfo">
+        <el-form
+          :model="updateUserInfoForm"
+          :rules="updateUserInfoFormRules"
+          ref="updateUserInfoFormRef"
+          label-width="auto"
         >
+          <el-form-item label="用户名" prop="username">
+            <el-input v-model="updateUserInfoForm.username"></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="updateUserInfoForm.email"></el-input>
+          </el-form-item>
+          <el-form-item label="学校">
+            <el-input v-model="updateUserInfoForm.school"></el-input>
+          </el-form-item>
+          <el-form-item label="学号">
+            <el-input v-model="updateUserInfoForm.student_number"></el-input>
+          </el-form-item>
+          <el-form-item label="真实姓名">
+            <el-input v-model="updateUserInfoForm.real_name"></el-input>
+          </el-form-item>
+        </el-form>
+        <div class="buttonWrap">
+          <el-button type="primary" plain @click="isUpdateUserInfo = false"
+            >修改密码</el-button
+          >
+          <el-button type="primary" @click="updateUserInfo()"
+            >更新基本信息</el-button
+          >
+        </div>
+      </div>
+      <div v-show="!isUpdateUserInfo">
+        <el-form
+          :model="updateUserPasswordForm"
+          :rules="updateUserPasswordFormRules"
+          ref="updateUserPasswordFormRef"
+          label-width="auto"
+        >
+          <el-form-item label="原密码" prop="old_password">
+            <el-input
+              v-model="updateUserPasswordForm.old_password"
+              type="password"
+              show-password
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="新密码" prop="new_password">
+            <el-input
+              v-model="updateUserPasswordForm.new_password"
+              type="password"
+              show-password
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="确认密码" prop="password_confirm">
+            <el-input
+              v-model="updateUserPasswordForm.password_confirm"
+              type="password"
+              show-password
+            ></el-input>
+          </el-form-item>
+        </el-form>
+        <div class="buttonWrap">
+          <el-button type="primary" plain @click="isUpdateUserInfo = true"
+            >修改基本信息</el-button
+          >
+          <el-button type="primary" @click="updateUserPassword()"
+            >更新密码</el-button
+          >
+        </div>
       </div>
     </el-dialog>
   </div>
@@ -255,49 +292,27 @@ import echarts from "../utils/initEcharts";
 import {
   userCheckOnlineRequest,
   userEditRequest,
+  userResetPasswordRequest,
   userInfoRequest,
   userSubmitDiffcultyInfoRequest,
   userSubmitNumberInfoRequest,
   userSubmitListRequest,
 } from "../request/userRequest";
 require("echarts/theme/macarons"); //引入饼图主题
-import { checkEmail } from "@/assets/config";
-import { BASE_URL } from "@/assets/config";
+import { BASE_URL, checkEmail } from "@/assets/config";
 
 export default {
   components: { CalendarHeatmap },
   data() {
     const confirmPassword = (rule, value, callback) => {
-      if (value === this.registerForm.password) {
+      if (value === this.updateUserPasswordForm.new_password) {
         return callback();
       }
       callback(new Error("请确保两次输入密码一致"));
     };
     return {
-      userDialogVisible: false,
       BASE_URL,
       userInfo: {},
-      updateUserForm: {
-        id: null,
-        username: "",
-        password: "",
-        password_confirm: "",
-        email: "",
-        role: "",
-        school: "",
-        student_number: "",
-        real_name: "",
-      },
-      updateUserFormRules: {
-        username: [
-          { required: true, message: "请输入用户名", trigger: "blur" },
-        ],
-        password_confirm: [{ validator: confirmPassword, trigger: "blur" }],
-        email: [
-          { required: true, message: "请输入邮箱", trigger: "blur" },
-          { validator: checkEmail, trigger: "blur" },
-        ],
-      },
       userId: "",
       submissionslist: [],
       submitCounts: {},
@@ -306,9 +321,46 @@ export default {
       currentPage: 1,
       pageSize: 10,
       total: null,
+      // 修改用户信息
+      updateUserDialogVisible: false,
+      isUpdateUserInfo: true,
+      // 修改基本信息
+      updateUserInfoForm: {
+        username: "",
+        email: "",
+        school: "",
+        student_number: "",
+        real_name: "",
+      },
+      updateUserInfoFormRules: {
+        username: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+        ],
+        email: [
+          { required: true, message: "请输入邮箱", trigger: "blur" },
+          { validator: checkEmail, trigger: "blur" },
+        ],
+      },
+      // 修改密码
+      updateUserPasswordForm: {
+        old_password: "",
+        new_password: "",
+        password_confirm: "",
+      },
+      updateUserPasswordFormRules: {
+        old_password: [
+          { required: true, message: "请输入原密码", trigger: "blur" },
+        ],
+        new_password: [
+          { required: true, message: "请输入新密码", trigger: "blur" },
+        ],
+        password_confirm: [
+          { required: true, message: "请再次输入新密码", trigger: "blur" },
+          { validator: confirmPassword, trigger: "blur" },
+        ],
+      },
     };
   },
-  mounted() {},
   created() {
     this.myDate = new Date();
     const that = this;
@@ -388,43 +440,73 @@ export default {
       this.$message.warning("用户头像上传失败");
     },
 
-    // 打开修改用户弹窗
+    // 打开修改用户信息弹窗
     openEditUserDialog() {
-      this.updateUserForm = this.userInfo;
-      this.userDialogVisible = true;
+      this.updateUserInfoForm = { ...this.userInfo };
+      this.updateUserDialogVisible = true;
+      this.isUpdateUserInfo = true;
     },
-    // 发起修改用户请求
-    updateRequest: function () {
-      this.$refs.updateUserFormRef.validate((valid) => {
-        if (!valid) {
-          return;
+    // 发起修改用户基本信息请求
+    updateUserInfo() {
+      this.$refs["updateUserInfoFormRef"].validate((valid) => {
+        if (valid) {
+          const data = {
+            new_username: this.updateUserInfoForm.username,
+            new_email: this.updateUserInfoForm.email,
+            new_real_name: this.updateUserInfoForm.real_name,
+            new_school: this.updateUserInfoForm.school,
+            new_student_number: this.updateUserInfoForm.student_number,
+          };
+          userEditRequest(this.userId, data)
+            .then(() => {
+              this.updateUserDialogVisible = false;
+              this.getUserInfo();
+              this.$message({
+                message: "更新基本信息成功",
+                type: "success",
+              });
+            })
+            .catch((error) => {
+              this.$message({
+                message: "更新基本信息失败",
+                type: "warning",
+              });
+              console.log(error);
+            });
         }
       });
-      const that = this;
-      const data = {
-        new_username: this.updateUserForm.username,
-        new_email: this.updateUserForm.email,
-        new_password: this.updateUserForm.password,
-        new_real_name: this.updateUserForm.real_name,
-        new_school: this.updateUserForm.school,
-        new_student_number: this.updateUserForm.student_number,
-      };
-      userEditRequest(this.userId, data)
-        .then(function (response) {
-          that.userDialogVisible = false;
-          that.getUserInfo();
-          that.$message({
-            message: "更新用户信息成功",
-            type: "success",
-          });
-        })
-        .catch(function (error) {
-          that.$message({
-            message: "更新用户信息失败",
-            type: "warning",
-          });
-          console.log(error);
-        });
+    },
+    // 发起修改用户密码请求
+    updateUserPassword() {
+      this.$refs["updateUserPasswordFormRef"].validate((valid) => {
+        if (valid) {
+          const data = {
+            by_old_password: true,
+            by_email: false,
+            by_old_password_body: {
+              id: this.userId,
+              old_password: this.updateUserPasswordForm.old_password,
+              new_password: this.updateUserPasswordForm.new_password,
+            },
+          };
+          console.log(data);
+          userResetPasswordRequest(data)
+            .then(() => {
+              this.updateUserDialogVisible = false;
+              this.$message({
+                message: "修改密码成功",
+                type: "success",
+              });
+            })
+            .catch((error) => {
+              this.$message({
+                message: "修改密码失败",
+                type: "warning",
+              });
+              console.log(error);
+            });
+        }
+      });
     },
 
     // 个人提交记录

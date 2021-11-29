@@ -4,57 +4,64 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item :to="{ path: '/contest' }">竞赛</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ name: 'contestDetail', params: { region } }">{{
+        contestTitle
+      }}</el-breadcrumb-item>
       <el-breadcrumb-item>{{ problem_info.title }}</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 题目切换按钮 -->
-    <div class="problem_turning">
+    <div class="problem_turning row_space">
       <el-button
-        class="previous_problem"
         type="primary"
-        icon="el-icon-arrow-left"
-        @click="previous_problem()"
-        v-if="inner_id != 1"
+        plain
+        icon="el-icon-caret-left"
+        @click="changeProblem(-1)"
+        :disabled="inner_id <= 1"
         >上一题</el-button
       >
       <el-button
-        class="after_problem"
         type="primary"
-        @click="after_problem()"
-        v-if="inner_id != total"
-        >下一题<i class="el-icon-arrow-right el-icon--right"></i
+        plain
+        @click="changeProblem(1)"
+        :disabled="inner_id >= total"
+        >下一题<i class="el-icon-caret-right"></i
       ></el-button>
     </div>
-    <!-- 卡片 -->
     <el-row :gutter="20">
       <el-col :span="12">
-        <el-card style="height: 100%">
+        <el-card>
           <!-- 题目区域 -->
           <div>
-            <div style="display: flex; justify-content: space-between">
+            <div class="problemHead">
               <span class="problemTitle">{{ problem_info.title }}</span>
             </div>
             <!-- 题目详情 -->
-            <div>
-              <mavon-editor
-                class="problemContent"
-                :value="problem_contents.description"
-                :subfield="false"
-                :defaultOpen="'preview'"
-                :toolbarsFlag="false"
-                :boxShadow="false"
-              />
-            </div>
-            <!--样例 -->
-            <div v-if="problem_contents.example_count != 0" class="sample">
-              <div
-                v-for="(example, index) in problem_contents.examples"
-                v-bind:key="index"
-                class="sampleDetail"
-              >
-                <div class="sampleTitle">示例 {{ index + 1 }}</div>
-                <div class="sampleDisplay">
-                  <div class="sampleDetailWord">输入：{{ example.input }}</div>
-                  <div class="sampleDetailWord">输出：{{ example.output }}</div>
+            <div class="scrollbar" style="height: 500px">
+              <div>
+                <mavon-editor
+                  :value="problem_contents.description"
+                  :subfield="false"
+                  :defaultOpen="'preview'"
+                  :toolbarsFlag="false"
+                  :boxShadow="false"
+                />
+              </div>
+              <!--样例 -->
+              <div v-if="problem_contents.example_count != 0" class="sample">
+                <div
+                  v-for="(example, index) in problem_contents.examples"
+                  v-bind:key="index"
+                  class="sampleDetail"
+                >
+                  <div class="sampleTitle"># 样例 {{ index + 1 }}</div>
+                  <div class="sampleDisplay">
+                    <div class="sampleDetailWord">
+                      输入：{{ example.input }}
+                    </div>
+                    <div class="sampleDetailWord">
+                      输出：{{ example.output }}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -68,11 +75,7 @@
             <!-- 编程语言选择区 -->
             <div>
               <span style="">语言：</span>
-              <el-select
-                class="codeLanSel"
-                v-model="language"
-                placeholder="请选择编程语言"
-              >
+              <el-select v-model="language" placeholder="请选择编程语言">
                 <el-option
                   v-for="item in languages"
                   :key="item.value"
@@ -83,24 +86,12 @@
               </el-select>
             </div>
             <codemirror
-              class="codeEditor"
+              class="margin_top_20"
               v-model="code"
               :options="options"
             ></codemirror>
-            <div
-              style="
-                width: 100%;
-                margin-top: 20px;
-                display: flex;
-                justify-content: flex-end;
-              "
-            >
-              <el-button
-                class="submitButton"
-                type="primary"
-                @click="submitCode()"
-                >提交</el-button
-              >
+            <div class="buttonWrap">
+              <el-button type="primary" @click="submitCode()">提交</el-button>
             </div>
           </div>
         </el-card>
@@ -118,22 +109,20 @@ import "codemirror/theme/rubyblue.css"; // 蓝绿色
 import "codemirror/theme/darcula.css"; // 黑色
 import "codemirror/theme/elegant.css"; // 白色
 import "codemirror/theme/idea.css"; // 白色
-// 代码高亮
-import "codemirror/mode/python/python.js"; // python
-// import "codemirror/mode/clike/clike.js"; //java
+import "codemirror/mode/python/python.js"; // 代码高亮
 import { problemInfoFromRegionRequest } from "@/request/problemRequest";
-import { submissionRequest } from "@/request/submissonRequest";
+import { submissionCreateRequest } from "@/request/submissionRequest";
 export default {
   data() {
     return {
-      id: 0, //接受前一个页面传来的id值
-      total: 0, //题目总数
+      inner_id: null,
+      total: null, //题目总数
       region: "",
-      inner_id: "",
+      contestTitle: "",
+
       problem_info: {}, //题目基础信息
       problem_contents: {}, //题目描述
       code: "", // 代码编辑器绑定的值
-      // 代码编辑器默认配置
       options: {
         tabSize: 2, // 缩进格式
         theme: "idea", // 主题，对应主题库 JS 需要提前引入
@@ -168,24 +157,21 @@ export default {
           label: "C++",
         },
       ],
-      // 默认语言
       language: "cpp",
-      // 查看结果定时器
-      timer: null,
     };
   },
   created() {
     this.region = this.$route.params.region;
-    this.id = this.$route.params.id;
     this.inner_id = this.$route.params.inner_id;
     this.total = this.$route.params.total;
     this.getProblem();
+    this.getContestTitle(); //todo
   },
   methods: {
     // 获取题目详情
     getProblem: function () {
       const that = this;
-      problemInfoFromRegionRequest(this.region, this.id)
+      problemInfoFromRegionRequest(this.region, this.inner_id)
         .then(function (response) {
           that.problem_info = response.info;
           that.problem_contents = response.contents;
@@ -200,63 +186,36 @@ export default {
     },
     // 提交代码
     submitCode: function () {
-      const that = this;
       const data = {
         src: this.code,
         language: this.language,
       };
-      submissionRequest(this.region, this.id, data)
-        .then(function (response) {
-          that
-            .$confirm("提交成功", {
-              confirmButtonText: "查看结果",
-              cancelButtonText: "知道了",
-              type: "success",
-            })
-            .then(() => {
-              that.$router.push({
-                name: "submissionDetail",
-                params: { uuid: response },
-              });
+      submissionCreateRequest(this.region, this.inner_id, data)
+        .then((response) => {
+          this.$confirm("提交成功", {
+            confirmButtonText: "查看结果",
+            cancelButtonText: "知道了",
+            type: "success",
+          }).then(() => {
+            this.$router.push({
+              name: "submissionDetail",
+              params: { uuid: response },
             });
-        })
-        .catch(function (error) {
-          console.log(error);
-          that.$message({
-            message: "提交失败",
-            type: "warning",
           });
+        })
+        .catch(() => {
+          this.$message.warning("提交失败");
         });
     },
 
-    // 上一题
-    previous_problem() {
-      const that = this;
-      var previous = new Promise(function (resolve, reject) {
-        var inner_id =
-          parseInt(that.inner_id) > 1 ? parseInt(that.inner_id) - 1 : 1;
-        that.inner_id = inner_id;
-        resolve(inner_id);
+    changeProblem(number) {
+      this.$router.push({
+        params: {
+          ...this.$route.params,
+          inner_id: parseInt(this.inner_id) + number,
+        },
       });
-      previous.then(function (inner_id) {
-        that.getProblem(that.region, inner_id);
-      });
-    },
-
-    // 下一题
-    after_problem() {
-      const that = this;
-      var after = new Promise(function (resolve, reject) {
-        let inner_id =
-          parseInt(that.inner_id) < parseInt(that.total)
-            ? parseInt(that.inner_id) + 1
-            : parseInt(that.total);
-        that.inner_id = inner_id;
-        resolve(inner_id);
-      });
-      after.then(function (inner_id) {
-        that.getProblem(that.region, inner_id);
-      });
+      window.location.reload();
     },
   },
   components: {
@@ -267,35 +226,25 @@ export default {
 
 <style lang="scss" >
 .problem_turning {
-  margin-bottom: 10px;
-  background-color: rgb(255, 255, 255);
-  width: 100%;
-  height: 35px;
+  margin-bottom: 12px;
+  padding: 6px 20px;
+  background-color: white;
+  border-radius: 4px;
+  border: 1px solid #ebeef5;
+  transition: 0.3s;
+  box-shadow: 0 2px 12px 0 $codeMirror_border_color;
 }
 
-.previous_problem {
-  float: left;
-}
-
-.after_problem {
-  float: right;
+.problemHead {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
 
 .problemTitle {
-  
   font-size: 30px;
   font-weight: 400;
   color: #404040;
-}
-
-.problemContent {
-  margin-top: 20px;
-  
-  background-color: #ffffff;
-}
-
-.codeEditor {
-  margin-top: 20px;
 }
 
 .sample {
@@ -304,6 +253,7 @@ export default {
   background-color: rgb(251, 251, 251);
   border-radius: 4px;
 }
+
 .sampleDisplay {
   margin-top: 16px;
   margin-bottom: 24px;
@@ -317,8 +267,8 @@ export default {
   flex-direction: column;
   margin-top: 24px;
 }
+
 .sampleTitle {
-  
   font-size: 24px;
   font-weight: 600;
   line-height: 1.25;
@@ -326,29 +276,21 @@ export default {
   font-size: 1.5em;
   border-bottom: 1px solid #eaecef;
 }
+
 .sampleDetailWord {
-  
   font-size: 16px;
   margin-top: 0px;
   margin-bottom: 5px;
   line-height: 1.5;
 }
 
-.codeLanSel {
-  margin-top: 30px;
-}
-
-.submitButton {
-  margin-top: 20px;
-}
-
 .CodeMirror {
-  border: 1px solid #eee;
-  height: auto;
+  border: 1px solid $codeMirror_border_color;
+  height: 440px;
 }
 
 .CodeMirror-scroll {
-  height: auto;
+  height: 100%;
   overflow-y: hidden;
   overflow-x: auto;
 }

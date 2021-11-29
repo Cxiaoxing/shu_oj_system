@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import '../assets/styles/element-variables.scss'
-import { Button, Alert, DatePicker, Option, OptionGroup, Timeline, Tabs, TabPane, Tag, Pagination, Carousel, CarouselItem, Divider, Link, Select, Dialog, Switch, Dropdown, DropdownItem, DropdownMenu, MessageBox, Upload, Form, FormItem, Input, Container, Header, Main, Submenu, MenuItem, Menu, MenuItemGroup, Aside, Breadcrumb, BreadcrumbItem, Card, Row, Col, Table, TableColumn, Message, TimelineItem, Popover } from 'element-ui'
+import { Button, Alert, DatePicker, Option, OptionGroup, Timeline, Tabs, TabPane, Tag, Pagination, Carousel, CarouselItem, Divider, Link, Select, Dialog, Switch, Dropdown, DropdownItem, DropdownMenu, MessageBox, Upload, Form, FormItem, Input, Container, Header, Main, Submenu, MenuItem, Menu, MenuItemGroup, Aside, Breadcrumb, BreadcrumbItem, Card, Row, Col, Table, TableColumn, Message, TimelineItem, Popover, Progress } from 'element-ui'
 
 Vue.use(Button)
 Vue.use(Tabs)
@@ -43,6 +43,7 @@ Vue.use(Alert)
 Vue.use(Timeline)
 Vue.use(TimelineItem)
 Vue.use(Popover)
+Vue.use(Progress)
 Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm
 Vue.prototype.$prompt = MessageBox.prompt

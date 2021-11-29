@@ -1,21 +1,17 @@
 <template>
   <div>
-    <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
       <el-breadcrumb-item>用户列表</el-breadcrumb-item>
     </el-breadcrumb>
 
-    <!-- 卡片视图区域，展示题目列表 -->
     <el-card>
       <div>
-        <!-- 搜索区域与添加区域 -->
         <div>
           <el-row>
-            <el-col :span="8">
+            <el-col :span="10">
               <el-input
-                size="medium"
                 placeholder="请输入想要搜索的用户名称"
                 v-model="searchInput"
                 @keyup.enter.native="getUserList()"
@@ -27,11 +23,8 @@
                 ></el-button>
               </el-input>
             </el-col>
-            <el-col :span="1" :offset="11">
-              <el-button
-                v-if="multipleSelection.length != 0"
-                type="primary"
-                @click="handleExport()"
+            <el-col :span="2" :offset="12">
+              <el-button type="primary" @click="handleExport()" plain
                 >导出数据</el-button
               >
             </el-col>
@@ -41,13 +34,22 @@
         <div>
           <el-table
             :data="userlist"
-            style="margin-top: 20px"
+            style="margin-top: 15px"
             @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="55"> </el-table-column>
             <el-table-column prop="id" label="ID" width="80"> </el-table-column>
-            <el-table-column prop="username" label="用户名"> </el-table-column>
-            <el-table-column prop="email" label="邮箱"></el-table-column>
+            <el-table-column
+              prop="username"
+              label="用户名"
+              show-overflow-tooltip
+            >
+            </el-table-column>
+            <el-table-column
+              prop="email"
+              label="邮箱"
+              show-overflow-tooltip
+            ></el-table-column>
             <el-table-column
               prop="role"
               label="角色"
@@ -58,16 +60,14 @@
             </el-table-column>
             <el-table-column prop="real_name" label="真实姓名">
             </el-table-column>
-            <el-table-column label="操作">
+            <el-table-column label="操作" width="150">
               <template slot-scope="scope">
-                <!-- 修改按钮 -->
                 <el-button
                   type="primary"
                   size="small"
                   @click="showEditDialog(scope.row.id)"
                   >编辑</el-button
                 >
-                <!-- 删除按钮 -->
                 <el-button
                   type="danger"
                   size="small"
@@ -86,7 +86,7 @@
             :current-page="currentPage"
             layout="prev, pager, next, jumper"
             :total="total"
-            style="margin-top: 30px; text-align: center"
+            class="table_pagination"
           >
           </el-pagination>
         </div>
@@ -109,7 +109,7 @@
         <el-form-item label="用户名" prop="username">
           <el-input v-model="userInfo.username"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
+        <el-form-item label="新密码" prop="password">
           <el-input
             v-model="userInfo.password"
             type="password"
@@ -173,14 +173,12 @@ export default {
     return {
       searchInput: "",
       currentPage: 1,
-      pageSize: 7,
+      pageSize: 8,
       total: null,
       userlist: [],
 
       editDialogVisible: false,
-      deleteDialogVisible: false,
       multipleSelection: [],
-      userId: "",
       userInfo: {},
       userInfoRules: {
         username: [
@@ -222,8 +220,24 @@ export default {
       if (this.multipleSelection.length) {
         this.downloadLoading = true;
         import("@/vendor/Export2Excel").then((excel) => {
-          const tHeader = ["用户ID", "用户名", "邮箱", "用户角色"];
-          const filterVal = ["id", "username", "email", "role"];
+          const tHeader = [
+            "用户ID",
+            "用户名",
+            "邮箱",
+            "用户角色",
+            "学校",
+            "学号",
+            "真实姓名",
+          ];
+          const filterVal = [
+            "id",
+            "username",
+            "email",
+            "role",
+            "school",
+            "student_number",
+            "real_name",
+          ];
           const list = this.multipleSelection;
           const data = this.formatJson(filterVal, list);
           excel.export_json_to_excel({
@@ -235,7 +249,7 @@ export default {
         });
       } else {
         this.$message({
-          message: "请至少选一项数据",
+          message: "请至少选一个用户",
           type: "warning",
         });
       }
@@ -256,7 +270,7 @@ export default {
     getUserList: function (currentPage = 1) {
       const that = this;
       const params = {
-        id_order: true,
+        inner_id_order: true,
         username_filter: this.searchInput,
         limit: this.pageSize,
         offset: this.pageSize * (currentPage - 1),
@@ -283,10 +297,11 @@ export default {
       const that = this;
       userInfoRequest(region)
         .then(function (response) {
-          const update_password = { 
-            "password": "",
-            "password_confirm": "" }
-          that.userInfo = {...response, ...update_password}
+          const update_password = {
+            password: "",
+            password_confirm: "",
+          };
+          that.userInfo = { ...response, ...update_password };
         })
         .catch(function (error) {
           console.log(error);
@@ -426,9 +441,3 @@ export default {
   },
 };
 </script>
-
-<style lang='scss' scoped>
-.editpic {
-  width: 25px;
-}
-</style>

@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     title="添加题目"
-    :visible.sync="addProblemDialogVisible"
+    :visible="addProblemDialogVisible"
     width="63%"
     @close="closeDialog"
   >
@@ -52,7 +52,7 @@
       :current-page="currentPage"
       layout="prev, pager, next, jumper"
       :total="total"
-      style="margin-top: 30px; text-align: center"
+      class="table_pagination"
     >
     </el-pagination>
     <div style="width: 100%; display: flex; justify-content: flex-end">
@@ -68,7 +68,7 @@
 <script>
 import {
   problemListPrivateRequest,
-  ProblemAddRegionRequest,
+  ProblemAddFromRegionRequest,
 } from "@/request/problemRequest";
 import ProblemSearchBar from "@/components/ProblemSearchBar.vue";
 
@@ -76,7 +76,7 @@ export default {
   props: {
     region: {
       type: String,
-      false: "",
+      default: "",
     },
     addProblemDialogVisible: {
       type: Boolean,
@@ -84,7 +84,6 @@ export default {
     },
     closeDialog: {
       type: Function,
-      default: () => {},
     },
   },
   components: {
@@ -111,7 +110,7 @@ export default {
     getProblemList(currentPage = 1) {
       const that = this;
       const params = {
-        id_order: true,
+        inner_id_order: true,
         title_filter: this.title_filter,
         tag_filter: this.tag_filter,
         difficulty_filter: this.difficulty_filter,
@@ -149,7 +148,7 @@ export default {
       const data = {
         problem_ids: this.problem_ids,
       };
-      ProblemAddRegionRequest(this.region, data)
+      ProblemAddFromRegionRequest(this.region, data)
         .then(() => {
           this.$message({
             message: "添加题目成功",

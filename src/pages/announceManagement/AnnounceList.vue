@@ -7,58 +7,45 @@
       <el-breadcrumb-item>公告列表</el-breadcrumb-item>
     </el-breadcrumb>
 
-    <!-- 卡片视图区域，展示题目列表 -->
     <el-card>
-      <!-- 搜索区域 -->
-      <div>
-        <el-row :gutter="40">
-          <el-col :span="10">
-            <el-input
-              placeholder="请输入想要搜索的公告标题"
-              v-model="searchInput"
-              @keyup.enter.native="getAnnounceList()"
-            >
-              <el-button
-                slot="append"
-                icon="el-icon-search"
-                @click="getAnnounceList()"
-              ></el-button>
-            </el-input>
-          </el-col>
-          <el-col :span="8">
-            <el-button type="primary" @click="addAnnounceDialogVisible = true"
-              >新建公告</el-button
-            >
-          </el-col>
-        </el-row>
-      </div>
-      <!-- 列表区域 -->
+      <el-input
+        class="singleSearchBar"
+        placeholder="请输入想要搜索的公告标题"
+        v-model="searchInput"
+        @keyup.enter.native="getAnnounceList()"
+      >
+        <el-button
+          slot="append"
+          icon="el-icon-search"
+          @click="getAnnounceList()"
+        ></el-button>
+      </el-input>
+
       <el-table
         :data="announceList"
-        style="margin-top: 20px"
+        @row-click="jumpToAnnounceDetail"
       >
         <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="title" label="标题" />
-        <el-table-column prop="release_time" :formatter="formatTime" label="发布时间" />
-        <el-table-column prop="author" label="发布人" />
-        <el-table-column label="操作">
+        <el-table-column prop="title" label="标题" min-width="450" />
+        <el-table-column
+          prop="release_time"
+          :formatter="formatTime"
+          label="发布时间"
+          width="250"
+        />
+        <el-table-column prop="author" label="发布人" min-width="150" />
+        <el-table-column label="操作" width="150">
           <template slot-scope="scope">
             <el-button
               type="primary"
               size="small"
-              @click="checkAnnounce(scope.row.id)"
-              >查看</el-button
-            >
-            <el-button
-              type="primary"
-              size="small"
-              @click="openEditDialog(scope.row.id)"
+              @click.stop="openEditDialog(scope.row.id)"
               >编辑</el-button
             >
             <el-button
               type="danger"
               size="small"
-              @click="deleteAnnounce(scope.row.id, scope.row.title)"
+              @click.stop="deleteAnnounce(scope.row.id, scope.row.title)"
               >删除</el-button
             >
           </template>
@@ -72,30 +59,31 @@
         :current-page="currentPage"
         layout="prev, pager, next, jumper"
         :total="total"
-        style="margin-top: 30px; text-align: center"
+        class="table_pagination"
       >
       </el-pagination>
     </el-card>
+
     <!-- 编辑公告弹窗 -->
     <el-dialog title="编辑公告" :visible.sync="editDialogVisible" width="80%">
-      <el-row :gutter="30">
+      <el-row :gutter="30" class="create-form-row-wrap">
         <el-col :span="12">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">公告名称</span>
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">公告名称</span>
           </div>
           <el-input
             placeholder="请输入公告的名称"
             v-model="new_announceInfo.title"
             clearable
-            style="margin-top: 10px;  font-size: 14px"
+            class="create-form-value-wrap"
           >
           </el-input>
         </el-col>
         <el-col :span="12">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">发布时间</span>
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">发布时间</span>
           </div>
           <el-date-picker
             v-model="new_announceInfo.release_time"
@@ -104,34 +92,25 @@
             type="datetime"
             placeholder="选择发布时间"
             style="width: 100%"
-            class="margin"
+            class="create-form-value-wrap"
           >
           </el-date-picker>
         </el-col>
       </el-row>
-      <!-- 公告描述 -->
-      <div class="announceDetail">
-        <div class="titleLayout">
-          <img class="mustPic" src="@/assets/img/required_field.svg" />
-          <span class="itemTitle">公告详情</span>
+
+      <div class="create-form-row-wrap">
+        <div class="create-form-label-wrap">
+          <img class="required_img" src="@/assets/img/required_field.svg" />
+          <span class="text">公告详情</span>
         </div>
-        <!-- 富文本编辑器 -->
-        <div style="margin-top: 10px">
-          <mavon-editor
-            v-model="new_announceInfo.contents"
-            class="margin"
-          ></mavon-editor>
-        </div>
+        <mavon-editor
+          v-model="new_announceInfo.contents"
+          class="create-form-value-wrap"
+        ></mavon-editor>
       </div>
-      <div
-        style="
-          margin-top: 30px;
-          width: 100%;
-          display: flex;
-          justify-content: flex-end;
-        "
-      >
-        <el-button type="primary" @click="submitForm()">更新公告</el-button>
+
+      <div class="create-form-button-wrap">
+        <el-button type="primary" @click="updateAnnounce()">更新公告</el-button>
       </div>
     </el-dialog>
   </div>
@@ -163,11 +142,11 @@ export default {
     this.getAnnounceList();
   },
   methods: {
-    formatTime: function(row) {
+    formatTime: function (row) {
       return moment(row.release_time).format("YYYY-MM-DD HH:mm:ss");
     },
 
-    getAnnounceList(currentPage = 1) {  
+    getAnnounceList(currentPage = 1) {
       const that = this;
       const params = {
         title_filter: this.searchInput,
@@ -186,10 +165,10 @@ export default {
         });
     },
 
-    checkAnnounce(id) {
+    jumpToAnnounceDetail(row) {
       this.$router.push({
         name: "announceDetail",
-        params: { id },
+        params: { id: row.id },
       });
     },
 
@@ -219,6 +198,7 @@ export default {
             message: "更新公告成功",
             type: "success",
           });
+          that.editDialogVisible = false;
           that.getAnnounceList();
         })
         .catch(() => {
@@ -229,21 +209,28 @@ export default {
         });
     },
 
-    deleteAnnounce(id) {
-      const that = this;
-      announceDeleteRequest(id)
-        .then(function (response) {
-          that.$message({
-            message: "删除公告成功",
-            type: "success",
-          });
-          that.getAnnounceList();
+    deleteAnnounce(id, title) {
+      this.$confirm(
+        "此操作将永久删除公告 【" + title + "】 , 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          announceDeleteRequest(id)
+            .then(() => {
+              this.getAnnounceList(this.currentPage);
+              this.$message.success("删除成功");
+            })
+            .catch(() => {
+              this.$message.warning("删除失败");
+            });
         })
         .catch(() => {
-          that.$message({
-            message: "删除公告失败",
-            type: "warning",
-          });
+          this.$message.info("已取消删除");
         });
     },
   },

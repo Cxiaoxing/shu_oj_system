@@ -27,7 +27,7 @@
       </div>
       <div>
         <mavon-editor
-          class="contents"
+          class="margin_top_20"
           :value="announceInfo.contents"
           :subfield="false"
           :defaultOpen="'preview'"
@@ -38,24 +38,24 @@
     </el-card>
     <!-- 编辑弹窗 -->
     <el-dialog title="编辑公告" :visible.sync="editDialogVisible" width="80%">
-      <el-row :gutter="30">
+      <el-row :gutter="30" class="create-form-row-wrap">
         <el-col :span="12">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">公告名称</span>
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">公告名称</span>
           </div>
           <el-input
             placeholder="请输入公告的名称"
             v-model="new_announceInfo.title"
             clearable
-            style="margin-top: 10px;  font-size: 14px"
+            class="create-form-value-wrap"
           >
           </el-input>
         </el-col>
         <el-col :span="12">
-          <div class="titleLayout">
-            <img class="mustPic" src="@/assets/img/required_field.svg" />
-            <span class="itemTitle">发布时间</span>
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">发布时间</span>
           </div>
           <el-date-picker
             v-model="new_announceInfo.release_time"
@@ -64,38 +64,29 @@
             type="datetime"
             placeholder="选择发布时间"
             style="width: 100%"
-            class="margin"
+            class="create-form-value-wrap"
           >
           </el-date-picker>
         </el-col>
       </el-row>
-      <!-- 公告描述 -->
-      <div class="announceDetail">
-        <div class="titleLayout">
-          <img class="mustPic" src="@/assets/img/required_field.svg" />
-          <span class="itemTitle">公告详情</span>
+
+      <div class="create-form-row-wrap">
+        <div class="create-form-label-wrap">
+          <img class="required_img" src="@/assets/img/required_field.svg" />
+          <span class="text">公告详情</span>
         </div>
-        <!-- 富文本编辑器 -->
-        <div style="margin-top: 10px">
-          <mavon-editor
-            v-model="new_announceInfo.contents"
-            class="margin"
-          ></mavon-editor>
-        </div>
+        <mavon-editor
+          v-model="new_announceInfo.contents"
+          class="create-form-value-wrap"
+        ></mavon-editor>
       </div>
-      <div
-        style="
-          margin-top: 30px;
-          width: 100%;
-          display: flex;
-          justify-content: flex-end;
-        "
-      >
+      
+      <div class="create-form-button-wrap">
         <el-button type="primary" @click="submitForm()">更新公告</el-button>
       </div>
     </el-dialog>
   </div>
-</template>@/request/announceRequest
+</template>
 
 <script>
 import moment from "moment";
@@ -156,6 +147,7 @@ export default {
             message: "更新公告成功",
             type: "success",
           });
+          that.editDialogVisible = false;
           that.getAnnounceInfo(that.id);
         })
         .catch(() => {
@@ -171,64 +163,24 @@ export default {
 
 <style lang="scss" >
 .title {
-  
   font-size: 30px;
   font-weight: 400;
-  color: #404040;
+  color: $title_font_color;
 }
 
 .edit_button {
   text-align: right;
 }
 
-.contents {
-  margin-top: 20px;
-  
-  background-color: #ffffff;
-}
-
 .inscribe {
   display: flex;
   margin-top: 10px;
-  color: #bebebe;
-  border-top: #bebebe solid 1px;
-  border-bottom: #bebebe solid 1px;
+  color: $unimportant_font_color;
+  border-top: $unimportant_font_color solid 1px;
+  border-bottom: $unimportant_font_color solid 1px;
   width: fit-content;
   span {
     margin: 0px 6px;
   }
-}
-
-// 弹窗内
-.secondCard {
-  margin-top: 20px;
-}
-
-.mustPic {
-  width: 25px;
-}
-
-.titleLayout {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  //width: 100px;
-}
-.announceDetail {
-  margin-top: 40px;
-}
-
-.timeDetail {
-  margin-top: 40px;
-}
-
-.itemTitle {
-  
-  font-size: 15px;
-  color: #494747;
-}
-
-.margin {
-  margin-top: 10px;
 }
 </style>

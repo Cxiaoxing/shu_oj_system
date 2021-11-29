@@ -1,72 +1,48 @@
 <template>
   <div>
-    <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>竞赛</el-breadcrumb-item>
     </el-breadcrumb>
+
     <el-card>
-      <!-- 头部区域 -->
-      <div class="header">
-        <!-- 搜索竞赛 -->
-        <el-row>
-          <el-col :span="10">
-            <el-input
-              placeholder="请输入竞赛名称"
-              v-model="searchInput"
-              @keyup.enter.native="getContestList()"
-            >
-              <el-button
-                slot="append"
-                icon="el-icon-search"
-                @click="getContestList()"
-              ></el-button>
-            </el-input>
-          </el-col>
-        </el-row>
-        <!-- 竞赛状态 filter -->
-      </div>
-      <!-- 竞赛列表展示区域 -->
+      <el-input
+        class="singleSearchBar"
+        placeholder="请输入想要搜索的竞赛名称"
+        v-model="searchInput"
+        @keyup.enter.native="getContestList()"
+      >
+        <el-button
+          slot="append"
+          icon="el-icon-search"
+          @click="getContestList()"
+        ></el-button>
+      </el-input>
+
       <div>
-        <div id="contest-list">
-          <li v-for="(contest, index) in contestlist" :key="index">
+        <div class="contestWrap">
+          <div
+            v-for="(contest, index) in contestlist"
+            :key="index"
+            @click="goContest(contest.region)"
+            class="contestItem"
+          >
             <el-row type="flex" justify="space-between" align="middle">
               <img class="trophy" src="@/assets/img/trophy.svg" />
               <el-col :span="18" class="contest-main">
-                <div class="title">
-                  <a
-                    class="entry"
-                    @click.stop="goContest(contest.title, contest.region)"
-                  >
-                    {{ contest.title }}
-                  </a>
-                </div>
+                <div class="title">{{ contest.title }}</div>
                 <div class="detail">
-                  <div class="detailItem">
-                    <img
-                      v-if="contest.start_time !== null"
-                      class="icon"
-                      src="@/assets/img/cal.svg"
-                    />
-                    <span
-                      v-if="contest.start_time !== null"
-                      class="detailItemWord"
-                      >{{ formatTime(contest.start_time) }}</span
-                    >
+                  <div class="contestTime">
+                    <i class="el-icon-date" />
+                    <span class="contestTimeWord">{{
+                      formatTime(contest.start_time)
+                    }}</span>
                   </div>
-                  <div class="detailItem">
-                    <img
-                      v-if="contest.end_time !== null"
-                      class="icon"
-                      src="@/assets/img/time.svg"
-                    />
-                    <span
-                      v-if="contest.end_time !== null"
-                      class="detailItemWord"
-                      >{{
-                        getDuration(contest.start_time, contest.end_time)
-                      }}</span
-                    >
+                  <div class="contestTime">
+                    <i class="el-icon-time" />
+                    <span class="contestTimeWord">{{
+                      getDuration(contest.start_time, contest.end_time)
+                    }}</span>
                   </div>
                 </div>
               </el-col>
@@ -97,11 +73,9 @@
                 >
               </el-col>
             </el-row>
-          </li>
+          </div>
         </div>
       </div>
-
-      <!-- 分页 -->
       <el-pagination
         background
         hide-on-single-page
@@ -110,7 +84,7 @@
         :current-page="currentPage"
         layout="prev, pager, next, jumper"
         :total="total"
-        style="margin-top: 30px; text-align: center"
+        class="table_pagination"
       >
       </el-pagination>
     </el-card>
@@ -124,15 +98,10 @@ import { contestListRequest } from "@/request/contestRequest.js";
 export default {
   data() {
     return {
-      // 获取到的竞赛列表
       contestlist: [],
-      // 搜索输入内容
       searchInput: "",
-      // 当前页
       currentPage: 1,
-      // 每页记录数
       pageSize: 6,
-      // 总记录数
       total: null,
     };
   },
@@ -162,73 +131,57 @@ export default {
         });
     },
     // 格式化展示时间
-    formatTime(time) {
-      return moment(time).format("YYYY-MM-DD HH:mm:ss");
+    formatTime(the_time) {
+      return moment(the_time).format("YYYY-MM-DD HH:mm:ss");
     },
     // 跳转至竞赛详情页
-    goContest(contestTitle, re) {
-      let title = contestTitle;
-      let region = re;
-      const that = this;
-      that.$router.push({
+    goContest(region) {
+      this.$router.push({
         name: "contestDetail",
-        params: { title: title, region: region },
+        params: { region: region },
       });
     },
   },
 };
 </script>
 <style lang="scss" scoped>
-#contest-list {
-  > li {
-    padding: 20px;
-    border-bottom: 1px solid rgba(187, 187, 187, 0.5);
-    list-style: none;
-    .trophy {
-      height: 52px;
-    }
-    .contest-main {
-      .title {
-        font-size: 18px;
-        a.entry {
-          color: #495060;
-          &:hover {
-            color: #2d8cf0;
-            border-bottom: 1px solid #2d8cf0;
-          }
-        }
-      }
-      li {
-        display: inline-block;
-        // padding: 10px 0 0 10px;
-        &:first-child {
-          padding: 10px 0 0 0;
-        }
-      }
-    }
+.contestWrap .contestItem {
+  padding: 20px;
+  border-bottom: 1px solid rgba(187, 187, 187, 0.5);
+  list-style: none;
+  &:hover {
+    background-color: $key_color_light;
   }
 }
+
+.trophy {
+  height: 52px;
+}
+
 .contest-main {
   display: flex;
   flex-direction: column;
 }
+
+.title {
+  font-size: 18px;
+}
+
 .detail {
   display: flex;
   flex-direction: row;
   margin-top: 10px;
 }
-.detailItem {
+.contestTime {
   display: flex;
   flex-direction: row;
   align-items: center;
   margin-right: 20px;
 }
-.detailItemWord {
-  color: #495060;
-  font-size: 15px;
-}
-.icon {
-  width: 15px;
-  margin-right: 5px;
+.contestTimeWord {
+  margin-left: 5px;
+  color: $ordinary_font_color;
+  font-size: 14px;
+  font-weight: 500;
 }
 </style>

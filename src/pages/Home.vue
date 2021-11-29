@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-carousel :interval="4000" type="card" height="200px">
+    <el-carousel :interval="4000" type="card" height="230px">
       <el-carousel-item v-for="(item, index) in imgList" :key="index">
         <img :src="item.src" style="width: 100%" />
         <!-- todo: 上传图片公告，点击跳转 @click="jumpToAnnounceDetail(item)" -->
@@ -23,7 +23,7 @@
         :current-page="currentPage"
         layout="prev, pager, next, jumper"
         :total="total"
-        style="margin-top: 30px; text-align: center"
+        class="table_pagination"
       >
       </el-pagination>
     </el-card>
@@ -45,7 +45,7 @@ export default {
     return {
       // 公告列表
       currentPage: 1,
-      pageSize: 4,
+      pageSize: 5,
       total: null,
       announceList: [],
       imgList: [
@@ -125,6 +125,6 @@ export default {
 
 .guideIcon {
   font-size: 30px;
-  color: $key_color_light;
+  color: $key_title_color;
 }
 </style>

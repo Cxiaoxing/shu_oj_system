@@ -170,7 +170,7 @@ export default {
     handleError(err, file, fileList) {
       this.$message.error("文件上传失败");
     },
-    // 创建用户函数
+    // 新建用户函数
     addUser() {
       this.$refs.addUserFormRef.validate((valid) => {
         if (valid) {
