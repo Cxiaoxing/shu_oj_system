@@ -11,19 +11,36 @@
       <div class="create-form-title">新建竞赛</div>
       <el-divider></el-divider>
 
-      <div class="create-form-row-wrap">
-        <div class="create-form-label-wrap">
-          <img class="required_img" src="@/assets/img/required_field.svg" />
-          <span class="text">竞赛域名</span>
-        </div>
-        <el-input
-          placeholder="请输入竞赛域名"
-          v-model="region"
-          class="create-form-value-wrap"
-        >
-          <template slot="prepend">contest_</template>
-        </el-input>
-      </div>
+      <el-row :gutter="30" class="create-form-row-wrap">
+        <el-col :span="18">
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">竞赛域名</span>
+          </div>
+          <el-input
+            placeholder="请输入竞赛域名"
+            v-model="region"
+            class="create-form-value-wrap"
+          >
+            <template slot="prepend">contest_</template>
+          </el-input>
+        </el-col>
+        <el-col :span="6">
+          <!-- <div class="create-form-switch-single">
+            <span class="text">比赛结束后能否查看测试数据</span>
+            <el-switch v-model="can_view_testcases"> </el-switch>
+          </div> -->
+          <div class="create-form-label-wrap">
+            <span class="text">比赛结束后能否查看测试数据</span>
+          </div>
+          <el-switch
+            v-model="can_view_testcases"
+            class="create-form-value-wrap"
+            style="margin-top: 20px"
+          >
+          </el-switch>
+        </el-col>
+      </el-row>
 
       <el-row :gutter="30" class="create-form-row-wrap">
         <el-col :span="8">
@@ -131,19 +148,19 @@
         <el-col :span="8">
           <div class="create-form-switch-item">
             <el-switch v-model="view_before_start"> </el-switch>
-            <span class="text">比赛开始前能查看题目</span>
+            <span class="text">比赛开始前能否查看题目</span>
           </div>
         </el-col>
         <el-col :span="8">
           <div class="create-form-switch-item">
             <el-switch v-model="register_after_start"> </el-switch>
-            <span class="text">比赛开始后能报名参加比赛</span>
+            <span class="text">比赛开始后能否报名参加比赛</span>
           </div>
         </el-col>
         <el-col :span="8">
           <div class="create-form-switch-item">
             <el-switch v-model="unrate_after_start"> </el-switch>
-            <span class="text">比赛开始后报名能参与排名</span>
+            <span class="text">比赛开始后报名能否参与排名</span>
           </div>
         </el-col>
       </el-row>
@@ -151,19 +168,19 @@
         <el-col :span="8">
           <div class="create-form-switch-item">
             <el-switch v-model="view_after_end"> </el-switch>
-            <span class="text">比赛结束后能查看题目</span>
+            <span class="text">比赛结束后能否查看题目</span>
           </div>
         </el-col>
         <el-col :span="8">
           <div class="create-form-switch-item">
             <el-switch v-model="submit_after_end"> </el-switch>
-            <span class="text">比赛结束后能提交</span>
+            <span class="text">比赛结束后能否提交</span>
           </div>
         </el-col>
         <el-col :span="8">
           <div class="create-form-switch-item">
             <el-switch v-model="public_after_end"> </el-switch>
-            <span class="text">比赛结束后题目公开</span>
+            <span class="text">比赛结束后题目是否公开</span>
           </div>
         </el-col>
       </el-row>
@@ -187,6 +204,7 @@ export default {
       startTime: "",
       endTime: "",
       sealTime: "",
+      can_view_testcases: false,
       register_after_start: true,
       unrate_after_start: true,
       view_before_start: false,
@@ -213,6 +231,7 @@ export default {
       const data = {
         region: "contest_" + this.region,
         title: this.title,
+        can_view_testcases: this.can_view_testcases,
         introduction: this.introduction,
         self_type: this.contestType,
         start_time: this.startTime,
@@ -232,7 +251,7 @@ export default {
         delete data["password"];
       }
       contestCreateRequest(data)
-        .then((response) => {
+        .then(() => {
           // 提示用户新建成功
           this.$message({
             message: "新建竞赛成功",

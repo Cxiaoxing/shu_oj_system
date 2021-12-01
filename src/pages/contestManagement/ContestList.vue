@@ -37,13 +37,13 @@
             {{ formatTime(scope.row.end_time) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="300px">
+        <el-table-column label="操作" width="250px">
           <template slot-scope="scope">
             <el-button
               type="primary"
               size="small"
               @click.stop="showEditDialog(scope.$index)"
-              >修改</el-button
+              >编辑</el-button
             >
             <el-button
               type="danger"
@@ -52,6 +52,7 @@
               >删除</el-button
             >
             <el-button
+              v-if="scope.row.self_type=== 'group_contest'"
               size="small"
               @click.stop="showLinkGroups(scope.row.region)"
               >查看小组</el-button
@@ -78,19 +79,31 @@
       :visible.sync="editContestDialogVisible"
       width="75%"
     >
-      <div class="create-form-row-wrap">
-        <div class="create-form-label-wrap">
-          <img class="required_img" src="@/assets/img/required_field.svg" />
-          <span class="text">竞赛域名</span>
-        </div>
-        <el-input
-          placeholder="请输入竞赛域名"
-          v-model="region"
-          class="create-form-value-wrap"
-        >
-          <template slot="prepend">contest_</template>
-        </el-input>
-      </div>
+      <el-row :gutter="30" class="create-form-row-wrap">
+        <el-col :span="18">
+          <div class="create-form-label-wrap">
+            <img class="required_img" src="@/assets/img/required_field.svg" />
+            <span class="text">竞赛域名</span>
+          </div>
+          <el-input v-model="region" disabled class="create-form-value-wrap">
+          </el-input>
+        </el-col>
+        <el-col :span="6">
+          <!-- <div class="create-form-switch-single">
+            <span class="text">比赛结束后能否查看测试数据</span>
+            <el-switch v-model="can_view_testcases"> </el-switch>
+          </div> -->
+          <div class="create-form-label-wrap">
+            <span class="text">比赛结束后能否查看测试数据</span>
+          </div>
+          <el-switch
+            v-model="can_view_testcases"
+            class="create-form-value-wrap"
+            style="margin-top: 20px"
+          >
+          </el-switch>
+        </el-col>
+      </el-row>
 
       <el-row :gutter="30" class="create-form-row-wrap">
         <el-col :span="8">
@@ -251,13 +264,14 @@
 </template>
 
 <script>
-import moment from "moment";
 import {
   contestListRequest,
   contestEditRequest,
   contestDeleteRequest,
 } from "@/request/contestRequest";
 import LinkGroupsDialog from "@/components/LinkGroupsDialog.vue";
+import { formatTime } from "@/assets/config";
+
 export default {
   components: {
     LinkGroupsDialog,
@@ -282,6 +296,7 @@ export default {
       sealTime: "",
       isUpdatePassword: false, // 是否修改密码
       password: "",
+      can_view_testcases: false,
       register_after_start: true,
       unrate_after_start: true,
       view_before_start: false,
@@ -345,6 +360,7 @@ export default {
       this.endTime = contestInfo.end_time;
       this.sealTime = contestInfo.seal_time;
       this.password = "";
+      this.can_view_testcases = contestInfo.can_view_testcases;
       this.register_after_start = contestInfo.settings.register_after_start;
       this.unrate_after_start = contestInfo.settings.unrate_after_start;
       this.view_before_start = contestInfo.settings.view_before_start;
@@ -365,6 +381,7 @@ export default {
         new_start_time: this.startTime,
         new_end_time: this.endTime,
         new_seal_time: this.sealTime,
+        new_can_view_testcases: this.can_view_testcases,
         new_settings: {
           register_after_start: this.register_after_start,
           unrate_after_start: this.unrate_after_start,
@@ -429,9 +446,7 @@ export default {
     },
 
     // 格式化展示时间
-    formatTime(time) {
-      return moment(time).format("YYYY-MM-DD HH:mm:ss");
-    },
+    formatTime,
   },
 };
 </script>

@@ -17,7 +17,6 @@ export function problemStatusChangeRequest(problem_id, data) {
 }
 
 export function problemTitleRequest(problem_id){
-    // todo: 改接口
     return _get(`problems/${problem_id}/title`)
 }
 

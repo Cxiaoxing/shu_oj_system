@@ -30,7 +30,25 @@
             <el-row type="flex" justify="space-between" align="middle">
               <img class="trophy" src="@/assets/img/trophy.svg" />
               <el-col :span="18" class="contest-main">
-                <div class="title">{{ contest.title }}</div>
+                <div class="flex_row">
+                  <span class="title">{{ contest.title }}</span>
+                  <el-tag
+                    v-if="contest.self_type === 'open_contest'"
+                    color="#9a1fff"
+                    :hit="true"
+                    size="mini"
+                    class="contest_type_tag"
+                    >公开赛</el-tag
+                  >
+                  <el-tag
+                    v-else
+                    color="#1fcbff"
+                    :hit="true"
+                    size="mini"
+                    class="contest_type_tag"
+                    >小组赛</el-tag
+                  >
+                </div>
                 <div class="detail">
                   <div class="contestTime">
                     <i class="el-icon-date" />
@@ -92,8 +110,8 @@
 </template>
 <script>
 import time from "@/utils/time";
-import moment from "moment";
 import { contestListRequest } from "@/request/contestRequest.js";
+import { formatTime } from "@/assets/config";
 
 export default {
   data() {
@@ -131,9 +149,8 @@ export default {
         });
     },
     // 格式化展示时间
-    formatTime(the_time) {
-      return moment(the_time).format("YYYY-MM-DD HH:mm:ss");
-    },
+    formatTime,
+
     // 跳转至竞赛详情页
     goContest(region) {
       this.$router.push({
@@ -164,7 +181,14 @@ export default {
 }
 
 .title {
-  font-size: 18px;
+  font-size: 20px;
+}
+
+.contest_type_tag {
+  border-radius: 50px;
+  border: none;
+  margin-left: 15px;
+  color: white;
 }
 
 .detail {
@@ -172,6 +196,7 @@ export default {
   flex-direction: row;
   margin-top: 10px;
 }
+
 .contestTime {
   display: flex;
   flex-direction: row;

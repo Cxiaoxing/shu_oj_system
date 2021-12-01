@@ -299,7 +299,7 @@ import {
   userSubmitListRequest,
 } from "../request/userRequest";
 require("echarts/theme/macarons"); //引入饼图主题
-import { BASE_URL, checkEmail } from "@/assets/config";
+import { BASE_URL, checkEmail, formatTime } from "@/assets/config";
 
 export default {
   components: { CalendarHeatmap },
@@ -528,9 +528,7 @@ export default {
         });
     },
     // 格式化展示时间
-    formatTime(time) {
-      return moment(time).format("YYYY-MM-DD HH:mm:ss");
-    },
+    formatTime,
 
     // 查看提交详情（外部）
     goSubmissionDetail(uid) {

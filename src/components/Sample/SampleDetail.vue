@@ -109,7 +109,8 @@
           <el-link
             type="primary"
             :underline="false"
-            target="_black"
+            target="_blank"
+            download
             style="margin-left: 12px; font-size: 14px"
             :href="`${BASE_URL}/problems/${problem_id}/test_case`"
             >下载到本地
@@ -170,7 +171,7 @@ import "codemirror/mode/python/python.js"; // python
 
 import { sampleInfoRequest } from "@/request/sampleRequest";
 import { problemInfoPrivateRequest } from "@/request/problemRequest";
-import { BASE_URL } from "@/assets/config";
+import { BASE_URL, formatTime } from "@/assets/config";
 
 export default {
   data() {
@@ -260,9 +261,8 @@ export default {
     },
 
     // 格式化展示时间
-    formatTime(time) {
-      return moment(time).format("YYYY-MM-DD HH:mm:ss");
-    },
+    formatTime,
+
     // 友好展示提交耗时
     submissionTimeFormat(time) {
       if (time === null) {

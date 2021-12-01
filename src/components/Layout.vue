@@ -8,11 +8,24 @@
           <el-dropdown @command="handleCommand">
             <i class="el-icon-user user_icon"></i>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="user" v-if="isLogin"
-                >个人中心</el-dropdown-item
-              >
               <el-dropdown-item command="login" v-if="!isLogin"
                 >登录</el-dropdown-item
+              >
+              <el-dropdown-item
+                command="internalManage"
+                v-if="isAdminRole && !isManagement"
+                >后台管理</el-dropdown-item
+              >
+              <el-dropdown-item
+                command="exitInternalManage"
+                v-if="isAdminRole && isManagement"
+                >退出后台管理</el-dropdown-item
+              >
+              <el-dropdown-item
+                command="userCenter"
+                v-if="isLogin"
+                :divided="isAdminRole"
+                >个人中心</el-dropdown-item
               >
               <el-dropdown-item command="logout" v-if="isLogin"
                 >退出</el-dropdown-item
@@ -25,7 +38,11 @@
       <el-container>
         <!-- 侧边栏菜单区域 -->
         <el-aside :width="isCollapse ? '64px' : '200px'">
-          <div id="collapse" class="collapse_icon" @click="toggleCollapse">
+          <div
+            id="collapse"
+            class="collapse_icon"
+            @click="isCollapse = !isCollapse"
+          >
             <i v-if="!isCollapse" class="el-icon-s-fold"></i>
             <i v-if="isCollapse" class="el-icon-s-unfold"></i>
           </div>
@@ -36,27 +53,43 @@
             :router="true"
           >
             <!-- 首页 -->
-            <el-menu-item index="/home">
+            <el-menu-item index="/home" v-show="!(isAdminRole && isManagement)">
               <i class="el-icon-s-home"></i>
               <span slot="title">首页</span>
             </el-menu-item>
             <!-- 题库（对外） -->
-            <el-menu-item index="/practice" id="practice">
+            <el-menu-item
+              index="/practice"
+              id="practice"
+              v-show="!(isAdminRole && isManagement)"
+            >
               <i class="el-icon-menu"></i>
               <span slot="title">题库</span>
             </el-menu-item>
             <!-- 题集（对外） -->
-            <el-menu-item index="/problemSet" id="problemSet">
+            <el-menu-item
+              index="/problemSet"
+              id="problemSet"
+              v-show="!(isAdminRole && isManagement)"
+            >
               <i class="el-icon-s-grid"></i>
               <span slot="title">题集</span>
             </el-menu-item>
             <!-- 竞赛（对外） -->
-            <el-menu-item index="/contest" id="contest">
+            <el-menu-item
+              index="/contest"
+              id="contest"
+              v-show="!(isAdminRole && isManagement)"
+            >
               <i class="el-icon-s-flag"></i>
               <span slot="title">竞赛</span>
             </el-menu-item>
             <!-- 提交状态（对外） -->
-            <el-menu-item index="/submissionStatus" id="submission">
+            <el-menu-item
+              index="/submissionStatus"
+              id="submission"
+              v-show="!(isAdminRole && isManagement)"
+            >
               <i class="el-icon-s-order"></i>
               <span slot="title">提交状态</span>
             </el-menu-item>
@@ -69,7 +102,7 @@
             </el-menu-item> -->
 
             <!-- 用户管理 -->
-            <el-submenu index="1" v-if="isAdminRole">
+            <el-submenu index="1" v-if="isAdminRole && isManagement">
               <template slot="title">
                 <i class="el-icon-user-solid"></i>
                 <span>用户管理</span>
@@ -80,24 +113,37 @@
                 >小组列表</el-menu-item
               >
             </el-submenu>
-            <!-- 题库管理-->
-            <el-submenu index="2" v-if="isAdminRole">
+            <!-- 题目管理-->
+            <el-submenu index="2" v-if="isAdminRole && isManagement">
               <template slot="title">
-                <i class="el-icon-s-help"></i>
+                <i class="el-icon-menu"></i>
                 <span>题目管理</span>
               </template>
               <el-menu-item index="/problemManage/list">题目列表</el-menu-item>
               <el-menu-item index="/problemManage/create"
                 >新建题目</el-menu-item
               >
-              <el-menu-item index="/problemManage/setList"
+              <el-menu-item index="/problemManage/tagList"
+                >标签列表</el-menu-item
+              >
+            </el-submenu>
+            <!-- 题集管理 -->
+            <el-submenu index="3" v-if="isAdminRole && isManagement">
+              <template slot="title">
+                <i class="el-icon-s-grid"></i>
+                <span>题集管理</span>
+              </template>
+              <el-menu-item index="/problemSetManage/list"
                 >题集列表</el-menu-item
+              >
+              <el-menu-item index="/problemSetManage/create"
+                >新建题集</el-menu-item
               >
             </el-submenu>
             <!-- 竞赛管理 -->
-            <el-submenu index="3" v-if="isAdminRole">
+            <el-submenu index="4" v-if="isAdminRole && isManagement">
               <template slot="title">
-                <i class="el-icon-s-data"></i>
+                <i class="el-icon-s-flag"></i>
                 <span>竞赛管理</span>
               </template>
               <el-menu-item index="/contestManage/list">竞赛列表</el-menu-item>
@@ -119,7 +165,7 @@
               >
             </el-submenu> -->
             <!-- 公告管理 -->
-            <el-submenu index="5" v-if="isAdminRole">
+            <el-submenu index="5" v-if="isAdminRole && isManagement">
               <template slot="title">
                 <i class="el-icon-message-solid"></i>
                 <span>公告管理</span>
@@ -151,6 +197,7 @@ export default {
       isLogin: false,
       isCollapse: false,
       isAdminRole: false,
+      isManagement: false,
     };
   },
 
@@ -163,29 +210,25 @@ export default {
   methods: {
     // 用户是否登陆
     checkIsLogin() {
-      const that = this;
       userCheckOnlineRequest()
-        .then(function (response) {
+        .then((response) => {
           if (response) {
-            that.isLogin = true;
-            that.isAdminRole =
+            this.isLogin = true;
+            this.isAdminRole =
               response.role === "sup" || response.role === "admin";
             window.localStorage.setItem("isLogin", true);
             window.localStorage.setItem("id", response.id);
             window.localStorage.setItem("role", response.role);
-            that.getUserInfo(response.id);
+            // todo: this.isManagement = window.localStorage.getItem("isInternalManage");
+            this.getUserInfo(response.id);
           }
         })
-        .catch(function () {
-          that.isLogin = false;
-          that.isAdminRole = false;
+        .catch(() => {
+          this.isLogin = false;
+          this.isAdminRole = false;
+          this.isManagement = false;
           window.localStorage.clear();
         });
-    },
-
-    // 菜单栏的折叠与展开
-    toggleCollapse() {
-      this.isCollapse = !this.isCollapse;
     },
 
     // 获取用户信息
@@ -202,7 +245,15 @@ export default {
     //退出登录
     handleCommand(command) {
       switch (command) {
-        case "user":
+        case "internalManage":
+          window.localStorage.setItem("isInternalManage", true);
+          this.isManagement = true;
+          break;
+        case "exitInternalManage":
+          window.localStorage.setItem("isInternalManage", false);
+          this.isManagement = false;
+          break;
+        case "userCenter":
           this.$router.push("/userCenter");
           break;
         case "login":
@@ -211,7 +262,6 @@ export default {
         case "logout":
           userLogoutRequest()
             .then(() => {
-              this.$router.push("/home");
               window.location.reload();
               this.$message({
                 message: "退出登陆成功",

@@ -24,6 +24,7 @@ const ProblemSetDetail = () => import(/* webpackChunkName: "ProblemSet" */ '../p
 const Contest = () => import(/* webpackChunkName: "Contest" */ '../pages/contest/Contest.vue')
 const ContestDetail = () => import(/* webpackChunkName: "Contest" */ '../pages/contest/ContestDetail.vue')
 const ContestProblemDetail = () => import(/* webpackChunkName: "Contest" */ '../pages/contest/ProblemDetail.vue')
+const ContestSubmissionDetail = () => import(/* webpackChunkName: "Contest" */ '../pages/contest/SubmissionDetail.vue')
 
 // 【提交状态】
 const Status = () => import(/* webpackChunkName: "Submission" */ '../pages/StatusList.vue')
@@ -52,8 +53,12 @@ const SampleDetail = () => import(/* webpackChunkName: "Sample" */ '../component
 // 【题目管理】
 const ProblemList = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/ProblemList.vue')
 const CreateProblem = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/CreateProblem.vue')
-const ProblemSetList = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/ProblemSetList.vue')
-const ProblemSetDetailList = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/ProblemSetDetailList.vue')
+const ProblemTagList = () => import(/* webpackChunkName: "ProblemManagement" */ '../pages/problemManagement/ProblemTagList.vue')
+
+// 【题集管理】
+const ProblemSetList = () => import(/* webpackChunkName: "ProblemSetManagement" */ '../pages/problemSetManagement/ProblemSetList.vue')
+const CreateProblemSet = () => import(/* webpackChunkName: "ProblemSetManagement" */ '../pages/problemSetManagement/CreateProblemSet.vue')
+const ProblemSetDetailList = () => import(/* webpackChunkName: "ProblemSetManagement" */ '../pages/problemSetManagement/ProblemSetDetailList.vue')
 
 // 【竞赛管理】
 const ContestList = () => import(/* webpackChunkName: "ContestManagement" */ '../pages/contestManagement/ContestList.vue')
@@ -103,6 +108,7 @@ const router = new VueRouter({
         { path: '/contest', component: Contest },
         { path: '/contestDetail/:region/list', component: ContestDetail, name: 'contestDetail' },
         { path: '/contest/:region/problemDetail/:inner_id/:total', component: ContestProblemDetail, name: 'contestProblemDetail' },
+        { path: '/contest/submissionDetail/:uuid', component: ContestSubmissionDetail, name: 'contestSubmissionDetail' },
         // 直播
         { path: '/playerLive', component: PlayerLive },
         { path: '/liveCard', component: LiveCard },
@@ -117,9 +123,12 @@ const router = new VueRouter({
         { path: '/problemManage', redirect: '/problemManage/list' },
         { path: '/problemManage/list', component: ProblemList },
         { path: '/problemManage/create', component: CreateProblem },
-        // 题目管理-题集管理
-        { path: '/problemManage/setList', component: ProblemSetList },
-        { path: '/problemManage/setDetail/:region/list', component: ProblemSetDetailList, name: 'problemSetDetailList' },
+        { path: '/problemManage/tagList', component: ProblemTagList },
+        // 题集管理
+        { path: '/problemSetManage', redirect: '/problemSetManage/list' },
+        { path: '/problemSetManage/list', component: ProblemSetList },
+        { path: '/problemSetManage/create', component: CreateProblemSet },
+        { path: '/problemSetManage/problemSetDetail/:region/list', component: ProblemSetDetailList, name: 'problemSetDetailList' },
         // 竞赛管理
         { path: '/contestManage', redirect: '/contestManage/list' },
         { path: '/contestManage/list', component: ContestList },
@@ -145,7 +154,7 @@ const router = new VueRouter({
 })
 
 // 无需登录的即可访问的路由列表
-const whiteList = ['/login', '/home', '/practice', '/contest']
+const whiteList = ['/login', '/home', '/practice', '/problemSet', '/contest']
 router.beforeEach((to, from, next) => {
   // to: 即将要进入的目标 路由对象
   // from: 当前导航正要离开的路由

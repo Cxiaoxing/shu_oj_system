@@ -31,4 +31,17 @@ const passingRateCalculate = function (row) {
         : 0;
 };
 
-export { BASE_URL, checkEmail, checkMobile, passingRateCalculate };
+import moment from "moment";
+// 计算经过时间
+const elapsedTimeCalculate = function (start, end, unit = "hours", fix = 1) {
+    const start_time = moment(start);
+    const end_time = moment(end);
+    return end_time.diff(start_time, unit, true).toFixed(fix);
+};
+
+// 格式化展示时间
+const formatTime = function (time) {
+    return moment(time).format("YYYY-MM-DD HH:mm:ss");
+};
+
+export { BASE_URL, checkEmail, checkMobile, passingRateCalculate, elapsedTimeCalculate, formatTime };

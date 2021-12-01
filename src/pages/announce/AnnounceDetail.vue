@@ -89,11 +89,11 @@
 </template>
 
 <script>
-import moment from "moment";
 import {
   announceInfoRequest,
   announceEditRequest,
 } from "@/request/announceRequest";
+import { formatTime } from "@/assets/config";
 
 export default {
   data() {
@@ -111,9 +111,7 @@ export default {
     this.getAnnounceInfo(this.id);
   },
   methods: {
-    formatTime(time) {
-      return moment(time).format("YYYY-MM-DD HH:mm:ss");
-    },
+    formatTime,
 
     getAnnounceInfo(id) {
       const that = this;

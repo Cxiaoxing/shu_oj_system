@@ -80,7 +80,7 @@
 
     <!-- 新建小组信息弹窗 -->
     <el-dialog
-      title="修改小组信息"
+      title="新建小组"
       :visible.sync="addGroupDialogVisible"
       width="50%"
     >

@@ -14,8 +14,13 @@
     </div>
     <!-- 列表区域 -->
     <el-table :data="statelist" @row-click="handleClickSubmission">
-      <el-table-column prop="problem_id" label="题目ID" width="100">
+      <el-table-column label="提交时间" width="200">
+        <template slot-scope="scope">
+          {{ formatTime(scope.row.submit_time) }}
+        </template>
       </el-table-column>
+      <el-table-column prop="problem_id" label="题目名称" width="100" />
+      <el-table-column prop="username" label="用户" width="200" />
       <el-table-column prop="state" label="判题状态">
         <template slot-scope="scope">
           <el-tag
@@ -34,7 +39,7 @@
           >
         </template>
       </el-table-column>
-      <el-table-column label="判题结果">
+      <el-table-column label="运行结果">
         <template slot-scope="scope">
           <el-tag
             v-if="scope.row.state === 'Finished'"
@@ -54,26 +59,19 @@
           >
         </template>
       </el-table-column>
-      <el-table-column label="用时">
+      <el-table-column prop="max_time" label="运行时间">
         <template slot-scope="scope">
-          {{ submissionTimeFormat(scope.row.max_time) }}
+          {{ scope.row.max_time ? `${scope.row.max_time} ms` : "--" }}
         </template>
       </el-table-column>
-      <el-table-column label="内存"
+      <el-table-column label="使用内存"
         ><template slot-scope="scope">
           {{ submissionMemoryFormat(scope.row.max_memory) }}
         </template>
       </el-table-column>
-      <el-table-column
-        prop="language"
-        label="语言"
-        width="100"
-      ></el-table-column>
-      <el-table-column prop="user_id" label="用户" width="100">
-      </el-table-column>
-      <el-table-column label="提交时间">
+      <el-table-column prop="language" label="使用语言" width="100">
         <template slot-scope="scope">
-          {{ formatTime(scope.row.submit_time) }}
+          {{ languageToLabel[scope.row.language] }}
         </template>
       </el-table-column>
     </el-table>
@@ -92,8 +90,8 @@
 </template>
 
 <script>
-import moment from "moment";
 import { submissionListRequest } from "@/request/submissionRequest";
+import { formatTime } from "@/assets/config";
 export default {
   props: {
     region: {
@@ -103,6 +101,10 @@ export default {
     problem_filter: {
       type: Number,
       default: null,
+    },
+    isContestRunning: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -114,6 +116,14 @@ export default {
       total: null,
       switchValue: null,
       user_id: "",
+
+      languageToLabel: {
+        c: "C语言",
+        py2: "python2",
+        py3: "python3",
+        java: "Java",
+        cpp: "C++",
+      },
     };
   },
   created() {
@@ -155,30 +165,32 @@ export default {
     },
 
     // 格式化展示时间
-    formatTime(time) {
-      return moment(time).format("YYYY-MM-DD HH:mm:ss");
-    },
-    // 友好展示提交耗时
-    submissionTimeFormat(time) {
-      if (time === null) {
-        return "--";
-      } else {
-        return time + " ms";
-      }
-    },
+    formatTime,
+
     // 友好展示提交内存
     submissionMemoryFormat(memory) {
-      if (memory === null) {
-        return "--";
+      if (memory) {
+        return `${Math.round(parseInt(memory) / 1024)} KB`;
       } else {
-        // 1048576 = 1024 * 1024
-        let t = parseInt(memory) / 1048576;
-        return String(t.toFixed(0)) + " MB";
+        return "--";
       }
     },
+
     // 跳转至提交结果详情
-    handleClickSubmission(row, column, event, cell) {
-      this.$router.push({ name: "submissionDetail", params: { uuid: row.id } });
+    handleClickSubmission(row) {
+      if (this.isContestRunning) {
+        const routeData = this.$router.resolve({
+          name: "contestSubmissionDetail",
+          params: { uuid: row.id },
+        });
+        window.open(routeData.href, "_blank");
+      } else {
+        const routeData = this.$router.resolve({
+          name: "submissionDetail",
+          params: { uuid: row.id },
+        });
+        window.open(routeData.href, "_blank");
+      }
     },
   },
 };

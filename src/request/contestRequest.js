@@ -34,13 +34,13 @@ export function contestProblemListRequest(region, params) {
 
 // 小组赛
 export function contestAddLinkGroupRequest(region, data) {
-    return _post(`/contests/${region}`, data)
+    return _post(`/contests/${region}/group`, data)
 }
 
 export function contestDeleteLinkGroupRequest(region, group_id) {
-    return _delete(`/contests/${region}/${group_id}`)
+    return _delete(`/contests/${region}/group/${group_id}`)
 }
 
 export function contestLinkGroupListRequest(region) {
-    return _get(`/contests/${region}/groups`)
+    return _get(`/contests/${region}/group`)
 }

@@ -196,10 +196,11 @@ export default {
 
     // 跳转至题目结果详情
     jumpToSubmissionDetail() {
-      this.$router.push({
+      const routeData = this.$router.resolve({
         name: "submissionDetail",
         params: { uuid: this.uuid },
       });
+      window.open(routeData.href, '"_blank"')
     },
 
     // 跳转到我的提交

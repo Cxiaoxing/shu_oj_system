@@ -15,7 +15,11 @@
         </el-col>
       </el-row>
 
-      <el-table :data="problemList" style="margin-top: 20px">
+      <el-table
+        :data="problemList"
+        style="margin-top: 20px"
+        @row-click="jumpToProblemDetail"
+      >
         <el-table-column prop="inner_id" label="ID" width="80" />
         <el-table-column
           prop="out_problem.info.title"
@@ -74,17 +78,12 @@
             ></el-progress>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150">
+        <el-table-column label="操作" width="100">
           <template slot-scope="scope">
-            <el-button
-              size="small"
-              @click="goProblemDetail(scope.row.out_problem.id)"
-              >查看</el-button
-            >
             <el-button
               type="danger"
               size="small"
-              @click="
+              @click.stop="
                 goDeleteProblem(
                   scope.row.out_problem.id,
                   scope.row.out_problem.info.title
@@ -186,10 +185,10 @@ export default {
     passingRateCalculate,
 
     // 点击题目跳转至题目详情
-    goProblemDetail(id) {
+    jumpToProblemDetail(row) {
       const routeData = this.$router.resolve({
         name: "problemDetail",
-        params: { id: id },
+        params: { id: row.out_problem.id },
       });
       window.open(routeData.href, "_blank");
     },

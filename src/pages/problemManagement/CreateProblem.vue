@@ -134,16 +134,6 @@
         </el-col>
       </el-row>
 
-      <div class="create-form-row-wrap">
-        <div class="create-form-label-wrap">
-          <img class="required_img" src="@/assets/img/required_field.svg" />
-          <span class="text">题目说明</span>
-        </div>
-        <div class="create-form-value-wrap">
-          <mavon-editor v-model="description"></mavon-editor>
-        </div>
-      </div>
-
       <el-row :gutter="30" class="create-form-row-wrap">
         <el-col :span="6">
           <div class="create-form-label-wrap">
@@ -194,6 +184,16 @@
           </el-input>
         </el-col>
       </el-row>
+
+      <div class="create-form-row-wrap">
+        <div class="create-form-label-wrap">
+          <img class="required_img" src="@/assets/img/required_field.svg" />
+          <span class="text">题目说明</span>
+        </div>
+        <div class="create-form-value-wrap">
+          <mavon-editor v-model="description"></mavon-editor>
+        </div>
+      </div>
 
       <div class="create-form-row-wrap">
         <div class="create-form-label-wrap">
@@ -309,7 +309,7 @@
         >新建标签</el-button
       >
       <el-table :data="tagOptions">
-        <el-table-column prop="id" label="ID"> </el-table-column>
+        <el-table-column prop="id" label="ID" width="80"> </el-table-column>
         <el-table-column prop="name" label="标签名"> </el-table-column>
         <el-table-column label="操作" width="200">
           <template slot-scope="scope">

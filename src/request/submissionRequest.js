@@ -11,8 +11,3 @@ export function submissionListRequest(params) {
 export function submissionInfoRequest(uuid){
     return _get(`/submissions/${uuid}`)
 }
-
-export function submissionLimitedInfoRequest(uuid){
-    // todo: 改接口
-    return _get(`/submissions/${uuid}`)
-}

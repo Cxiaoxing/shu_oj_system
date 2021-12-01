@@ -112,6 +112,7 @@ import "codemirror/theme/idea.css"; // 白色
 import "codemirror/mode/python/python.js"; // 代码高亮
 import { problemInfoFromRegionRequest } from "@/request/problemRequest";
 import { submissionCreateRequest } from "@/request/submissionRequest";
+import { contestInfoRequest } from "@/request/contestRequest";
 export default {
   data() {
     return {
@@ -119,6 +120,7 @@ export default {
       total: null, //题目总数
       region: "",
       contestTitle: "",
+      isContestRunning: false,
 
       problem_info: {}, //题目基础信息
       problem_contents: {}, //题目描述
@@ -164,10 +166,27 @@ export default {
     this.region = this.$route.params.region;
     this.inner_id = this.$route.params.inner_id;
     this.total = this.$route.params.total;
+    this.getContest();
     this.getProblem();
-    this.getContestTitle(); //todo
   },
   methods: {
+    // 获取比赛信息
+    getContest() {
+      contestInfoRequest(this.region)
+        .then((response) => {
+          this.contestTitle = response.title;
+          if (
+            response.state === "Running" ||
+            response.state === "SealedRunning"
+          ) {
+            this.isContestRunning = true;
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
+
     // 获取题目详情
     getProblem: function () {
       const that = this;
@@ -180,10 +199,12 @@ export default {
           console.log(error);
         });
     },
+
     // 选择编程语言
     changeLanguage: function (language) {
       this.language = language;
     },
+
     // 提交代码
     submitCode: function () {
       const data = {
@@ -197,10 +218,19 @@ export default {
             cancelButtonText: "知道了",
             type: "success",
           }).then(() => {
-            this.$router.push({
-              name: "submissionDetail",
-              params: { uuid: response },
-            });
+            if (this.isContestRunning) {
+              const routeData = this.$router.resolve({
+                name: "contestSubmissionDetail",
+                params: { uuid: response },
+              });
+              window.open(routeData.href, "_blank");
+            } else {
+              const routeData = this.$router.resolve({
+                name: "submissionDetail",
+                params: { uuid: response },
+              });
+              window.open(routeData.href, "_blank");
+            }
           });
         })
         .catch(() => {

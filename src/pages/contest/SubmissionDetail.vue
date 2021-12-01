@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>提交详情</el-breadcrumb-item>
@@ -17,7 +16,6 @@
         <div style="font-size: 14px">无权限查看此提交详情</div>
       </el-card>
     </div>
-
     <div v-else>
       <!-- 编译成功，提交通过提示 -->
       <el-alert
@@ -93,7 +91,6 @@
           </div>
         </div>
         <el-divider></el-divider>
-
         <!-- 暂未完成判题 -->
         <div class="noContextBlock" v-if="state !== 'Finished'">
           <div>
@@ -106,91 +103,18 @@
           <div style="color: #f54a45">编译错误原因：</div>
           <div style="font-size: 14px; margin-top: 5px">{{ error_reason }}</div>
         </div>
-        <!-- 已完成判题且编译正确，展示测试点信息 -->
-        <div v-else>
-          <div style="font-size: 20px; font-weight: 450">测试点详情</div>
-          <div
-            class="someTip"
-            v-html="'绿色: SUCCESS&emsp;&ensp;红色: WRONG_ANSWER'"
-          />
-          <div class="testCaseWrap scrollbar">
-            <div
-              v-for="(item, index) in testCase"
-              :index="index + ''"
-              :key="index"
-            >
-              <div
-                class="testCase"
-                :style="
-                  item.result === 'SUCCESS'
-                    ? { 'background-color': '#5fc931' }
-                    : { 'background-color': '#f05459' }
-                "
-              >
-                <div class="testCaseTitle"># Case {{ index + 1 }}</div>
-                <div class="testCaseContent">
-                  <span class="testCaseContentTitle"> CPU Time:</span>
-                  <span> {{ item.cpu_time }} ms</span>
-                </div>
-                <div class="testCaseContent">
-                  <span class="testCaseContentTitle">Memory:</span>
-                  <span> {{ submissionMemoryFormat(item.memory) }}</span>
-                </div>
-                <div class="testCaseDownload" v-if="item.result !== 'SUCCESS'">
-                  <el-popover title="标准输入数据" trigger="click">
-                    <div style="max-width: 500px">
-                      {{ standardTestCaseData }}
-                    </div>
-                    <el-link
-                      icon="el-icon-download"
-                      type="primary"
-                      :underline="false"
-                      target="_blank"
-                      download
-                      style="margin-top: 8px"
-                      :href="`${BASE_URL}/regions/${region}/${problem_id}/test_case/${item.test_case}?input=true`"
-                      >下载到本地</el-link
-                    >
-                    <el-link
-                      slot="reference"
-                      @click="downloadTestCase(item.test_case, 'true')"
-                      >标准输入</el-link
-                    ></el-popover
-                  >
-                  <el-popover
-                    placement="bottom"
-                    title="标准输出数据"
-                    trigger="click"
-                  >
-                    <div style="max-width: 500px">
-                      {{ standardTestCaseData }}
-                    </div>
-                    <el-link
-                      icon="el-icon-download"
-                      type="primary"
-                      :underline="false"
-                      target="_blank"
-                      download
-                      style="margin-top: 8px"
-                      :href="`${BASE_URL}/regions/${region}/${problem_id}/test_case/${item.test_case}?input=false`"
-                      >下载到本地</el-link
-                    >
-                    <el-link
-                      slot="reference"
-                      style="margin-left: 10px"
-                      @click="downloadTestCase(item.test_case, 'false')"
-                      >标准输出</el-link
-                    ></el-popover
-                  >
-                </div>
-              </div>
-            </div>
+        <!-- 但比赛期间不能查看提交详情 -->
+        <div class="noContextBlock" v-else>
+          <div>
+            <img class="noContextPic" src="@/assets/img/nocontext.svg" />
           </div>
+          <div style="font-size: 14px">比赛期间不能查看提交详情</div>
         </div>
       </el-card>
+
       <!-- 代码展示区域 -->
       <el-card style="margin-top: 20px; padding: 20px">
-        <div style="display: flex; justify-content: space-between">
+        <div class="row_space">
           <span style="font-size: 20px; font-weight: 500">源代码</span>
           <span>语言: {{ languageToLabel[language] }}</span>
         </div>
@@ -206,18 +130,14 @@ import { codemirror } from "vue-codemirror";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/idea.css"; // 白色
 import "codemirror/mode/python/python.js"; // python
-import {
-  problemTitleRequest,
-  problemSingleTestCaseInfoRequest,
-} from "@/request/problemRequest";
+import { problemTitleRequest } from "@/request/problemRequest";
 import { submissionInfoRequest } from "@/request/submissionRequest";
-import { BASE_URL, formatTime } from "@/assets/config";
+import { formatTime } from "@/assets/config";
 
 export default {
   data() {
     return {
-      isNoPermission: false,
-      BASE_URL,
+      isNoPermission: true,
       // 代码编辑器默认配置
       options: {
         tabSize: 2, // 缩进格式
@@ -233,8 +153,6 @@ export default {
       },
       code: "", // 所提交的代码值
       uuid: "",
-      region: "",
-      problem_id: "",
       problemTitle: "",
       subResult: "3", //提交结果：0-成功；1-失败；2-编译错误
       err: null,
@@ -250,8 +168,6 @@ export default {
         java: "Java",
         cpp: "C++",
       },
-      testCase: [],
-      standardTestCaseData: "",
     };
   },
   created() {
@@ -260,35 +176,33 @@ export default {
       this.getResult(this.uuid);
     }
   },
+
   methods: {
     // 获取结果
     getResult: function (uuid) {
-      const that = this;
       submissionInfoRequest(uuid)
-        .then(function (response) {
-          that.getProblemTitle(response.problem_id);
-          that.region = response.region;
-          that.problem_id = response.problem_id;
-          that.subTime = response.submit_time;
-          that.code = response.settings.src;
-          that.state = response.state;
-          that.language = response.language;
+        .then((response) => {
+          this.isNoPermission = false;
+          this.getProblemTitle(response.problem_id);
+          this.subTime = response.submit_time;
+          this.code = response.settings.src;
+          this.state = response.state;
+          this.language = response.language;
           if (response.state === "Finished") {
-            that.testCase = response.result.details;
             if (response.err !== null) {
               // 编译失败
-              that.subResult = 2;
-              that.err = response.err;
-              that.error_reason = response.result.err_reason;
+              this.subResult = 2;
+              this.err = response.err;
+              this.error_reason = response.result.err_reason;
             } else {
               // 编译成功
-              that.err = response.err;
+              this.err = response.err;
               if (response.is_accepted === true) {
                 // 提交通过
-                that.subResult = 0;
+                this.subResult = 0;
               } else {
                 // 提交未通过
-                that.subResult = 1;
+                this.subResult = 1;
               }
             }
           }
@@ -311,28 +225,6 @@ export default {
 
     // 格式化展示时间
     formatTime,
-
-    // 友好展示提交内存
-    submissionMemoryFormat(memory) {
-      if (memory === null) {
-        return "--";
-      } else {
-        // 1048576 = 1024 * 1024
-        let t = parseInt(memory) / 1048576;
-        return String(t.toFixed(0)) + " MB";
-      }
-    },
-
-    downloadTestCase(test_case_id, isInput) {
-      problemSingleTestCaseInfoRequest(
-        this.region,
-        this.problem_id,
-        test_case_id,
-        isInput
-      ).then((response) => {
-        this.standardTestCaseData = response;
-      });
-    },
   },
   components: {
     codemirror,
@@ -361,41 +253,5 @@ export default {
 }
 .noContextPic {
   width: 150px;
-}
-
-.testCaseWrap {
-  max-height: 300px;
-  display: flex;
-  flex-wrap: wrap;
-}
-.testCase {
-  margin: 8px;
-  width: 120px;
-  height: 130px;
-  display: flex;
-  flex-wrap: wrap;
-  align-content: center;
-  padding-left: 23px;
-  color: white;
-}
-.testCaseTitle {
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-.testCaseContent {
-  font-size: 12px;
-  letter-spacing: 0px;
-}
-.testCaseContentTitle {
-  font-weight: 450;
-  margin-right: 6px;
-}
-.testCaseDownload .el-link.el-link--default {
-  font-size: 5px;
-  color: #00fdfd;
-}
-.testCaseDownload .el-link.el-link--default:hover {
-  color: #275ac0;
 }
 </style>

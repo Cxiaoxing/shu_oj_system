@@ -30,7 +30,7 @@
     width: 100% !important;
 }
 
-// switch开关
+// 一整排switch开关
 .create-form-switch-item{
     margin: 15px 0px 5px 0px;
     display: flex;
@@ -38,6 +38,17 @@
     align-items: center;
     .text{
         margin-left: 15px;
+    }
+}
+
+// 单个switch开关
+.create-form-switch-single{
+    margin-top: 40px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    .text{
+        margin-right: 15px;
     }
 }
 

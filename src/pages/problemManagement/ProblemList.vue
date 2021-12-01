@@ -1,17 +1,13 @@
 <template>
   <div>
-    <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>题目管理</el-breadcrumb-item>
       <el-breadcrumb-item>题目列表</el-breadcrumb-item>
     </el-breadcrumb>
 
-    <!-- 卡片视图区域，展示题目列表 -->
     <el-card>
-      <!-- 搜索区域 -->
       <ProblemSearchBar :searchProblemList="searchProblemList" />
-      <!-- 列表区域 -->
       <el-table
         :data="problemlist"
         style="margin-top: 20px"
@@ -334,7 +330,8 @@
             <el-link
               type="primary"
               :underline="false"
-              target="_black"
+              target="_blank"
+              download
               style="margin-left: 12px; font-size: 8px"
               :href="`${BASE_URL}/problems/${problem_id}/test_case`"
               >下载到本地
