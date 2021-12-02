@@ -6,8 +6,10 @@
       <el-breadcrumb-item>{{ announceInfo.title }}</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card>
-      <div style="display: flex; justify-content: space-between">
-        <span class="title">{{ announceInfo.title }}</span>
+      <div class="flex_row">
+        <div class="title">
+          <span>{{ announceInfo.title }}</span>
+        </div>
         <el-button
           v-if="userRole === 'sup' || userRole === 'admin'"
           class="edit_button"
@@ -17,13 +19,15 @@
         >
       </div>
       <div class="inscribe">
-        <span>发布人: {{ announceInfo.author }}</span>
-        <span>|</span>
-        <span>发布时间: {{ formatTime(announceInfo.release_time) }}</span>
-        <span>|</span>
-        <span
-          >最后更新时间: {{ formatTime(announceInfo.last_update_time) }}</span
+        <span>
+          发布时间:
+          {{ formatTime(announceInfo.release_time) }}</span
         >
+        <span>
+          更新时间:
+          {{ formatTime(announceInfo.last_update_time) }}</span
+        >
+        <span>发布人: {{ announceInfo.author }}</span>
       </div>
       <div>
         <mavon-editor
@@ -80,7 +84,7 @@
           class="create-form-value-wrap"
         ></mavon-editor>
       </div>
-      
+
       <div class="create-form-button-wrap">
         <el-button type="primary" @click="submitForm()">更新公告</el-button>
       </div>
@@ -161,24 +165,25 @@ export default {
 
 <style lang="scss" >
 .title {
+  width: 100%;
+  text-align: center;
   font-size: 30px;
   font-weight: 400;
   color: $title_font_color;
 }
 
 .edit_button {
-  text-align: right;
+  float: right;
 }
 
 .inscribe {
   display: flex;
+  justify-content: center;
   margin-top: 10px;
   color: $unimportant_font_color;
-  border-top: $unimportant_font_color solid 1px;
-  border-bottom: $unimportant_font_color solid 1px;
-  width: fit-content;
+  width: 100%;
   span {
-    margin: 0px 6px;
+    margin: 0px 12px;
   }
 }
 </style>

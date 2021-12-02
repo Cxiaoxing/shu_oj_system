@@ -28,7 +28,7 @@
               >
             </div>
             <!-- 题目详情 -->
-            <div class="scrollbar" style="height: 560px">
+            <div class="scrollbar problemDetail" style="height: 560px">
               <div>
                 <mavon-editor
                   :value="problem_contents.description"
@@ -39,19 +39,53 @@
                 />
               </div>
               <!--样例 -->
-              <div v-if="problem_contents.example_count != 0" class="sample">
+              <div
+                v-if="problem_contents.example_count != 0"
+                class="sampleWrap"
+              >
+                <div class="sampleTitle">Sample</div>
                 <div
                   v-for="(example, index) in problem_contents.examples"
-                  v-bind:key="index"
-                  class="sampleDetail"
+                  :key="index"
                 >
-                  <div class="sampleTitle"># 样例 {{ index + 1 }}</div>
-                  <div class="sampleDisplay">
-                    <div class="sampleDetailWord">
-                      输入：{{ example.input }}
+                  <div style="margin-top: 24px">
+                    <div style="margin-top: 16px">
+                      <div class="row_space">
+                        <span class="sampleWordTitle"
+                          >Input #{{ index + 1 }}</span
+                        >
+                        <el-button
+                          type="primary"
+                          plain
+                          size="mini"
+                          :data-clipboard-text="example.input"
+                          class="copy"
+                          >复制</el-button
+                        >
+                      </div>
+                      <div
+                        v-html="`${SampleDataEncode(example.input)}`"
+                        class="sampleData"
+                      ></div>
                     </div>
-                    <div class="sampleDetailWord">
-                      输出：{{ example.output }}
+                    <div style="margin-top: 16px">
+                      <div class="row_space">
+                        <span class="sampleWordTitle">
+                          Output #{{ index + 1 }}
+                        </span>
+                        <el-button
+                          type="primary"
+                          plain
+                          size="mini"
+                          :data-clipboard-text="example.output"
+                          class="copy"
+                          >复制</el-button
+                        >
+                      </div>
+                      <div
+                        v-html="`${SampleDataEncode(example.output)}`"
+                        class="sampleData"
+                      ></div>
                     </div>
                   </div>
                 </div>
@@ -105,8 +139,29 @@ import "codemirror/mode/python/python.js"; // 代码高亮
 // import "codemirror/mode/clike/clike.js";
 import { sampleCreateRequest } from "@/request/sampleRequest";
 import { problemInfoPrivateRequest } from "@/request/problemRequest";
+import { SampleDataEncode } from "@/assets/config.js";
+
+// 复制文本
+import Clipboard from "clipboard";
+import { message } from "element-ui";
+const clipboard = new Clipboard(".copy");
+clipboard.on("success", () => {
+  message.success({
+    message: "复制成功",
+    type: "success",
+  });
+});
+clipboard.on("error", () => {
+  message.success({
+    message: "复制失败",
+    type: "warning",
+  });
+});
 
 export default {
+  components: {
+    codemirror,
+  },
   data() {
     return {
       id: 0, //接受前一个页面传来的id值
@@ -147,10 +202,7 @@ export default {
           label: "C++",
         },
       ],
-      // 默认语言
       language: "cpp",
-      // 查看结果定时器
-      timer: null,
     };
   },
   created() {
@@ -170,6 +222,8 @@ export default {
           console.log(error);
         });
     },
+    // 样例数据编码
+    SampleDataEncode,
     // 选择编程语言
     changeLanguage: function (language) {
       this.language = language;
@@ -206,67 +260,13 @@ export default {
         });
     },
   },
-  components: {
-    codemirror,
-  },
 };
 </script>
 
 <style lang="scss" >
-.problemHead {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.problemTitle {
-  font-size: 30px;
-  font-weight: 400;
-  color: #404040;
-}
-
-.sample {
-  margin-top: 30px;
-  padding: 8px 25px 15px 25px;
-  background-color: rgb(251, 251, 251);
-  border-radius: 4px;
-}
-.sampleDisplay {
-  margin-top: 16px;
-  margin-bottom: 24px;
-  margin-left: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.sampleDetail {
-  display: flex;
-  flex-direction: column;
-  margin-top: 24px;
-}
-.sampleTitle {
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 1.25;
-  padding-bottom: 0.3em;
-  font-size: 1.5em;
-  border-bottom: 1px solid #eaecef;
-}
-.sampleDetailWord {
-  font-size: 16px;
-  margin-top: 0px;
-  margin-bottom: 5px;
-  line-height: 1.5;
-}
+@import "../../assets/styles/problemDetail.scss";
 
 .CodeMirror {
-  border: 1px solid $codeMirror_border_color;
   height: 500px;
-}
-
-.CodeMirror-scroll {
-  height: 100%;
-  overflow-y: hidden;
-  overflow-x: auto;
 }
 </style>

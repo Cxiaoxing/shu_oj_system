@@ -1,0 +1,52 @@
+.problemHead {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .problemTitle {
+    font-size: 30px;
+    font-weight: 400;
+    color: $title_font_color;
+  }
+  
+  .problemDetail .v-note-wrapper {
+    border: none !important;
+  }
+  
+  .sampleWrap {
+    padding: 0px 25px 15px;
+    background-color: #fbfbfb;
+  }
+  
+  .sampleTitle {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.25;
+    padding-bottom: 0.3em;
+    font-size: 1.5em;
+    border-bottom: 1px solid #eaecef;
+  }
+  
+  .sampleWordTitle {
+    font-size: 18px;
+    font-weight: 450;
+  }
+  
+  .sampleData {
+    margin-top: 8px;
+    padding: 16px;
+    background-color: #f6f8fa;
+    font-size: 85%;
+    border-radius: 3px;
+  }
+
+  .CodeMirror {
+    border: 1px solid $codeMirror_border_color;
+  }
+
+  .CodeMirror-scroll {
+    height: 100%;
+    overflow-y: hidden;
+    overflow-x: auto;
+  }

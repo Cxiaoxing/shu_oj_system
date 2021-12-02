@@ -1,5 +1,5 @@
 // 上传文件时使用的基础url
-var BASE_URL = "http://111.229.161.159:8000";
+var BASE_URL = "http://172.24.178.29:8080";
 if (process.env.NODE_ENV == 'development') { BASE_URL = "/api"; }
 
 // 自定义邮箱规则
@@ -44,4 +44,9 @@ const formatTime = function (time) {
     return moment(time).format("YYYY-MM-DD HH:mm:ss");
 };
 
-export { BASE_URL, checkEmail, checkMobile, passingRateCalculate, elapsedTimeCalculate, formatTime };
+// 将空格、换行进行编码，便于前端展示
+const SampleDataEncode = function (data) {
+    return data.replace(/\n/g, '<br>').replace(/ /g, '&ensp;');
+}
+
+export { BASE_URL, checkEmail, checkMobile, passingRateCalculate, elapsedTimeCalculate, formatTime, SampleDataEncode };

@@ -1,12 +1,15 @@
 const path = require("path");
+const CompressionWebpackPlugin = require('compression-webpack-plugin');
+const productionGzipExtensions = ['js', 'css', 'html'];
 function resolve(dir) {
     return path.join(__dirname, dir);
 }
 
 module.exports = {
-    filenameHashing: false,
+    filenameHashing: true, // todo: ?是否使用hash
     lintOnSave: false,
     runtimeCompiler: true,
+    productionSourceMap: false,
     assetsDir: "static",
     devServer: {
         open: true,
@@ -16,7 +19,7 @@ module.exports = {
         //设置请求服务的代理
         proxy: {
             '/api': {
-                target: "http://111.229.161.159:8080", //代理地址（一般为API实际地址）
+                target: "http://172.24.178.29:8080", //代理地址（一般为API实际地址）
                 secure: false,
                 ws: true,
                 changeOrigin: true, // 是否允许跨域
@@ -45,6 +48,31 @@ module.exports = {
                 .end()
         })
     },
+
+    configureWebpack: config => {
+        config.plugins.push(
+            new CompressionWebpackPlugin({
+                algorithm: 'gzip',
+                test: new RegExp(
+                    '\\.(' +
+                    productionGzipExtensions.join('|') +
+                    ')$'
+                ),
+                threshold: 10240, // 只有大小大于该值的资源会被处理
+                minRatio: 0.8, // 只有压缩率小于这个值的资源才会被处理
+                deleteOriginalAssets: false, //删除源文件
+            })
+        )
+    }
+
+
+
+
+
+
+
+
+
     /*
     chainWebpack: config => {
           config.set('externals', {

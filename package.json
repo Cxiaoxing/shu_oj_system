@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "clipboard": "^2.0.8",
     "core-js": "^3.6.5",
     "driver": "^1.0.0",
     "driver.js": "^0.9.8",
@@ -45,6 +46,7 @@
     "babel-plugin-equire": "^1.1.1",
     "babel-plugin-import": "^1.13.3",
     "babel-plugin-transform-remove-console": "^6.9.4",
+    "compression-webpack-plugin": "^6.1.1",
     "element-ui": "^2.14.1",
     "eslint": "^6.7.2",
     "eslint-plugin-import": "^2.20.2",

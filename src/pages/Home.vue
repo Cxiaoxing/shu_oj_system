@@ -45,7 +45,7 @@ export default {
     return {
       // 公告列表
       currentPage: 1,
-      pageSize: 5,
+      pageSize: 6,
       total: null,
       announceList: [],
       imgList: [

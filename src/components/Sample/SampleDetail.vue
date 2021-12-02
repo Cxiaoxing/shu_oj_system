@@ -153,9 +153,12 @@
         </div>
       </div>
     </el-card>
-    <!-- 代码站址展示区域 -->
+    <!-- 代码展示区域 -->
     <el-card style="margin-top: 20px; padding: 20px">
-      <div style="font-size: 16px; font-weight: 500">语言: {{ language }}</div>
+      <div style="display: flex; justify-content: space-between">
+        <span style="font-size: 20px; font-weight: 500">源代码</span>
+        <span>语言: {{ languageToLabel[language] }}</span>
+      </div>
       <el-divider></el-divider>
       <codemirror v-model="code" :options="options"></codemirror>
     </el-card>
@@ -163,7 +166,6 @@
 </template>
 <script>
 import { codemirror } from "vue-codemirror";
-import moment from "moment";
 // 核心样式
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/idea.css"; // 白色
@@ -201,6 +203,13 @@ export default {
       subTime: "",
       state: "",
       language: "",
+      languageToLabel: {
+        c: "C语言",
+        py2: "python2",
+        py3: "python3",
+        java: "Java",
+        cpp: "C++",
+      },
       testCase: [],
       standardTestCaseData: "",
       submission: [], // 题目提交结果

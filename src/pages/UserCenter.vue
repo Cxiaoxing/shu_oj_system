@@ -531,10 +531,12 @@ export default {
     formatTime,
 
     // 查看提交详情（外部）
-    goSubmissionDetail(uid) {
-      let uuid = uid;
-      const that = this;
-      that.$router.push({ name: "submissionDetail", params: { uuid: uuid } });
+    goSubmissionDetail(uuid) {
+      const routeData = this.$router.resolve({
+        name: "submissionDetail",
+        params: { uuid },
+      });
+      window.open(routeData.href, "_blank");
     },
 
     // 绘制提交题目困难度分布饼图
