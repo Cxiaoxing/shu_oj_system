@@ -68,7 +68,7 @@
                   ? 'success'
                   : state == 'Pending'
                   ? ''
-                  : state == 'Wainting'
+                  : state == 'Waiting'
                   ? 'info'
                   : ''
               "

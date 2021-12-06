@@ -85,7 +85,7 @@
               size="small"
               @click.stop="
                 goDeleteProblem(
-                  scope.row.out_problem.id,
+                  scope.row.inner_id,
                   scope.row.out_problem.info.title
                 )
               "
@@ -194,14 +194,14 @@ export default {
     },
 
     // 删除region中的题目
-    goDeleteProblem(id, title) {
+    goDeleteProblem(inner_id, title) {
       this.$confirm("此操作将删除题目 【" + title + "】，是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       })
         .then(() => {
-          problemDeleteFromRegionRequest(this.region, id)
+          problemDeleteFromRegionRequest(this.region, inner_id)
             .then(() => {
               this.getProblemList(this.currentPage);
               this.$message({

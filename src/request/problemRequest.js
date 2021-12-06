@@ -38,8 +38,8 @@ export function ProblemAddFromRegionRequest(region, data) {
     return _post(`/regions/${region}`, data)
 }
 
-export function problemDeleteFromRegionRequest(region, problem_id) {
-    return _delete(`/regions/${region}/${problem_id}`)
+export function problemDeleteFromRegionRequest(region, inner_id) {
+    return _delete(`/regions/${region}/${inner_id}`)
 }
 
 export function problemListFromRegionRequest(region, params) {

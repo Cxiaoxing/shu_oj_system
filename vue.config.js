@@ -14,7 +14,7 @@ module.exports = {
     devServer: {
         open: true,
         host: '0.0.0.0',
-        port: 5000,
+        port: 80,
         https: false,
         //设置请求服务的代理
         proxy: {
