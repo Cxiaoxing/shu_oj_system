@@ -125,7 +125,7 @@
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="userInfo.email"></el-input>
         </el-form-item>
-        <el-form-item label="角色" prop="role">
+        <el-form-item label="角色" prop="role" v-if="isSup">
           <el-select v-model="userInfo.role" placeholder="请选择用户角色">
             <el-option
               v-for="item in options"
@@ -176,6 +176,7 @@ export default {
       total: null,
       userlist: [],
 
+      isSup: false,
       editDialogVisible: false,
       multipleSelection: [],
       userInfo: {},
@@ -288,6 +289,7 @@ export default {
     //展示修改用户信息弹窗
     showEditDialog(id) {
       this.getUserInfo(id);
+      this.isSup = window.localStorage.getItem("role") === "sup";
       this.editDialogVisible = true;
     },
 

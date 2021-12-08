@@ -351,6 +351,7 @@
           <el-upload
             ref="uploadTestCase"
             :action="`${BASE_URL}/problems/${problem_id}/test_case`"
+            :with-credentials="true"
             accept=".zip"
             :limit="1"
             :auto-upload="false"
@@ -471,7 +472,7 @@ export default {
     getProblemList: function (currentPage = 1) {
       const that = this;
       const params = {
-        inner_id_order: true,
+        id_order: true,
         title_filter: this.title_filter,
         tag_filter: this.tag_filter,
         difficulty_filter: this.difficulty_filter,

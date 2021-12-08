@@ -117,10 +117,16 @@
             <i class="el-icon-download" />
           </el-link>
         </div>
-        <div
-          class="someTip"
-          v-html="'绿色: SUCCESS&emsp;&ensp;红色: WRONG_ANSWER'"
-        />
+        <div class="someTip">
+          <div
+            class="flex_row"
+            v-for="(item, index) in resultColor"
+            :key="index"
+          >
+            <div class="tipColor" :style="`background-color: ${item.color}`" />
+            <div>{{ item.result }}</div>
+          </div>
+        </div>
         <div class="testCaseWrap scrollbar">
           <div
             v-for="(item, index) in testCase"
@@ -129,11 +135,7 @@
           >
             <div
               class="testCase"
-              :style="
-                item.result === 'SUCCESS'
-                  ? { 'background-color': '#5fc931' }
-                  : { 'background-color': '#f05459' }
-              "
+              :style="showTestCaseBackgroundColor(item.result)"
             >
               <div class="testCaseTitle"># Case {{ index + 1 }}</div>
               <div class="testCaseContent">
@@ -210,6 +212,32 @@ export default {
         java: "Java",
         cpp: "C++",
       },
+      resultColor: [
+        {
+          result: "SUCCESS",
+          color: "#5fc931",
+        },
+        {
+          result: "CPU_TIME_LIMIT_EXCEEDED",
+          color: "darkblue",
+        },
+        {
+          result: "REAL_TIME_LIMIT_EXCEEDED",
+          color: "darkgoldenrod",
+        },
+        {
+          result: "MEMORY_LIMIT_EXCEEDED",
+          color: "darkslategrey",
+        },
+        {
+          result: "RUNTIME_ERROR",
+          color: "darkmagenta",
+        },
+        {
+          result: "WRONG_ANSWER",
+          color: "#f05459",
+        },
+      ],
       testCase: [],
       standardTestCaseData: "",
       submission: [], // 题目提交结果
@@ -227,7 +255,6 @@ export default {
       const that = this;
       sampleInfoRequest(uuid)
         .then(function (response) {
-          console.log(response);
           that.getProblem(response.submission.problem_id);
           that.problem_id = response.submission.problem_id;
           that.subTime = response.submission.submit_time;
@@ -272,14 +299,14 @@ export default {
     // 格式化展示时间
     formatTime,
 
-    // 友好展示提交耗时
-    submissionTimeFormat(time) {
-      if (time === null) {
-        return "--";
-      } else {
-        return time + " ms";
-      }
+    // 测试点背景颜色
+    showTestCaseBackgroundColor(result) {
+      const color = this.resultColor.filter((item) => {
+        return item.result === result;
+      })[0].color;
+      return `background-color:${color}`;
     },
+
     // 友好展示提交内存
     submissionMemoryFormat(memory) {
       if (memory === null) {
@@ -320,6 +347,12 @@ export default {
   width: 150px;
 }
 
+.tipColor {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
 .testCaseWrap {
   max-height: 300px;
   display: flex;

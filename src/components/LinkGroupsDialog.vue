@@ -171,6 +171,7 @@ export default {
       };
       contestAddLinkGroupRequest(this.region, data)
         .then(() => {
+          this.getGroupList();
           this.$message.success("添加小组成功");
           this.addLinkGroupsDialogVisible = false;
         })
@@ -179,10 +180,10 @@ export default {
         });
     },
 
-    closeGroupDialog(){
+    closeGroupDialog() {
       this.closeDialog();
-      this.groupList = []
-    }
+      this.groupList = [];
+    },
   },
 };
 </script>

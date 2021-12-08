@@ -6,7 +6,7 @@ function resolve(dir) {
 }
 
 module.exports = {
-    filenameHashing: true, // todo: ?是否使用hash
+    filenameHashing: false ,
     lintOnSave: false,
     runtimeCompiler: true,
     productionSourceMap: false,
@@ -19,12 +19,12 @@ module.exports = {
         //设置请求服务的代理
         proxy: {
             '/api': {
-                target: "http://172.24.178.29:8080", //代理地址（一般为API实际地址）
-                secure: false,
-                ws: true,
-                changeOrigin: true, // 是否允许跨域
-                pathRewrite: {
-                    '^/api': ''//重定向地址
+                target: "http://172.24.178.29:8080", //请求的实际接口
+                secure: false, //如果是http接口，需要配置该参数
+                ws: true, //访问网关，使用http的连接方式进行socket信息推送
+                changeOrigin: true, //是否允许跨域
+                pathRewrite: { //路径重写，
+                    '^/api': ''//替换target中请求地址
                 }
             }
         }
@@ -41,9 +41,7 @@ module.exports = {
                 .options({
                     // 全局变量资源路径
                     resources: './src/assets/styles/global.scss'
-                    // 全局变量路径数组
-                    // resources: ['./path/to/vars.scss', './path/to/mixins.scss']
-                    // 或者将多个scss文件@import到一个main.scss用第一种方法
+                    // 全局变量路径数组 resources: ['.scss', '.scss']
                 })
                 .end()
         })

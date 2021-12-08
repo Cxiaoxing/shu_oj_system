@@ -281,9 +281,12 @@
           <el-upload
             ref="uploadTestCase"
             :action="`${BASE_URL}/problems/${problem_id}/test_case`"
+            :with-credentials="true"
             accept=".zip"
             :limit="1"
             :auto-upload="false"
+            :on-change="handleChange"
+            :on-remove="handleRemove"
             :on-success="handleSuccess"
             :on-error="handleError"
             :on-exceed="handleExceed"
@@ -365,6 +368,7 @@ export default {
           },
         ],
       },
+      needUploadTestCase: false,
       editTagsDialogVisible: false,
       tagOptions: [],
       difficultyOptions: [
@@ -535,6 +539,14 @@ export default {
           });
         });
     },
+    // 测试点文件上传
+    handleChange() {
+      this.needUploadTestCase = true;
+    },
+    handleRemove() {
+      this.needUploadTestCase = false;
+    },
+    // 两个文件上传
     handleSuccess() {
       this.$message.success("文件上传成功");
     },
@@ -579,13 +591,16 @@ export default {
       problemCreateRequest(data)
         .then((response) => {
           this.problem_id = response;
-          this.$message({
-            message: "添加题目成功，正在上传测试数据...",
-            type: "success",
-          });
-          setTimeout(() => {
-            this.$refs.uploadTestCase.submit();
-          }, 1000);
+          if (this.needUploadTestCase) {
+            this.$message.success("添加题目成功，正在上传测试数据...");
+            setTimeout(() => {
+              this.$refs.uploadTestCase.submit();
+            }, 1000);
+          } else {
+            this.editProblemDialogVisible = false;
+            this.getProblemList(this.currentPage);
+            this.$message.success("添加题目成功");
+          }
         })
         .catch((error) => {
           this.$message({

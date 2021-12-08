@@ -286,7 +286,6 @@
 </template>
 
 <script>
-import moment from "moment";
 import { CalendarHeatmap } from "vue-calendar-heatmap"; //热力图
 import echarts from "../utils/initEcharts";
 import {

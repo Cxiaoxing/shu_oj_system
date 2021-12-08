@@ -20,6 +20,10 @@ export function problemTitleRequest(problem_id){
     return _get(`problems/${problem_id}/title`)
 }
 
+export function problemCanTestCase(region){
+    return _get(`regions/${region}`)
+}
+
 export function problemSingleTestCaseInfoRequest(region, problem_id, test_case_id, isInput) {
     return _get(`/regions/${region}/${problem_id}/test_case/${test_case_id}?input=${isInput}`)
 }
@@ -43,7 +47,7 @@ export function problemDeleteFromRegionRequest(region, inner_id) {
 }
 
 export function problemListFromRegionRequest(region, params) {
-    return _get(`/regions/${region}`, params)
+    return _get(`/regions/${region}/problem`, params)
 }
 
 export function problemInfoFromRegionRequest(region, inner_id) {

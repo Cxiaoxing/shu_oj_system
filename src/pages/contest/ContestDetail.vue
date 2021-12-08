@@ -153,7 +153,9 @@
                     <span class="timeContentTitle">比赛时长</span>
                   </div>
                   <div class="itemContent">
-                    {{ elapsedTimeCalculate(contest.start_time, contest.end_time) }}
+                    {{
+                      elapsedTimeCalculate(contest.start_time, contest.end_time)
+                    }}
                     hours
                   </div>
                 </div>
@@ -313,10 +315,7 @@
       </el-tab-pane>
 
       <el-tab-pane label="提交状态" name="submission_list">
-        <SubmissionTable
-          :region="region"
-          :isContestRunning="isContestRunning"
-        />
+        <SubmissionTable :region="region" />
       </el-tab-pane>
     </el-tabs>
     <!-- 输入密码弹窗 -->
@@ -334,7 +333,6 @@
   </div>
 </template>
 <script>
-import moment from "moment";
 import {
   contestInfoRequest,
   contestRankRequest,
@@ -342,7 +340,11 @@ import {
   contestProblemListRequest,
 } from "@/request/contestRequest";
 import SubmissionTable from "@/components/submission/SubmissionTable.vue";
-import { formatTime, passingRateCalculate, elapsedTimeCalculate } from "@/assets/config";
+import {
+  formatTime,
+  passingRateCalculate,
+  elapsedTimeCalculate,
+} from "@/assets/config";
 
 export default {
   components: { SubmissionTable },
@@ -369,7 +371,6 @@ export default {
         minutes: 0,
         seconds: 0,
       },
-      isContestRunning: false,
     };
   },
   created() {
@@ -388,7 +389,6 @@ export default {
             response.state === "Running" ||
             response.state === "SealedRunning"
           ) {
-            this.isContestRunning = true;
             this.calculateCountdown(response.end_time);
           }
         })
@@ -412,29 +412,26 @@ export default {
         });
     },
 
-    // 倒计时
+    // 倒计时计算
     calculateCountdown(end_time) {
-      clearInterval(this.go);
-      let endDate = new Date(this.formatTime(end_time));
-      let end = endDate.getTime(); // 结束秒数
-      let timeFunction = () => {
-        let date = new Date();
-        let now = date.getTime();
-        let leftTime = end - now;
-        if (leftTime >= 0) {
+      clearInterval(timer);
+      const endDate = new Date(this.formatTime(end_time));
+      const end = endDate.getTime();
+      const timeFunction = () => {
+        const now = new Date().getTime();
+        const timeRemaining = end - now;
+        if (timeRemaining >= 0) {
           this.countdown = {
-            hours: Math.floor((leftTime / 1000 / 60 / 60) % 24),
-            minutes: Math.floor((leftTime / 1000 / 60) % 60),
-            seconds: Math.floor((leftTime / 1000) % 60),
+            hours: Math.floor((timeRemaining / 1000 / 60 / 60) % 24),
+            minutes: Math.floor((timeRemaining / 1000 / 60) % 60),
+            seconds: Math.floor((timeRemaining / 1000) % 60),
           };
         } else {
-          // 比赛结束
-          this.isContestRunning = false;
-          clearInterval(go);
+          clearInterval(timer);
         }
       };
       timeFunction();
-      let go = setInterval(function () {
+      const timer = setInterval(() => {
         timeFunction();
       }, 1000);
     },
@@ -463,11 +460,11 @@ export default {
 
     // 计算当前比赛是否开始
     judgeIsStart() {
-      let startDate = new Date(this.formatTime(this.contest.start_time));
-      let start = startDate.getTime(); // 结束秒数
-      let date = new Date();
-      let now = date.getTime();
-      let leftTime = now - start;
+      const startDate = new Date(this.formatTime(this.contest.start_time));
+      const start = startDate.getTime(); // 结束秒数
+      const date = new Date();
+      const now = date.getTime();
+      const leftTime = now - start;
       if (leftTime <= 0) {
         return true;
       }

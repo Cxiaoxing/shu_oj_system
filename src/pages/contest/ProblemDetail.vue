@@ -173,7 +173,6 @@ export default {
       total: null, //题目总数
       region: "",
       contestTitle: "",
-      isContestRunning: false,
 
       problem_info: {}, //题目基础信息
       problem_contents: {}, //题目描述
@@ -219,21 +218,15 @@ export default {
     this.region = this.$route.params.region;
     this.inner_id = this.$route.params.inner_id;
     this.total = this.$route.params.total;
-    this.getContest();
+    this.getContestTitle();
     this.getProblem();
   },
   methods: {
-    // 获取比赛信息
-    getContest() {
+    // 获取竞赛标题
+    getContestTitle() {
       contestInfoRequest(this.region)
         .then((response) => {
           this.contestTitle = response.title;
-          if (
-            response.state === "Running" ||
-            response.state === "SealedRunning"
-          ) {
-            this.isContestRunning = true;
-          }
         })
         .catch(function (error) {
           console.log(error);
@@ -273,19 +266,11 @@ export default {
             cancelButtonText: "知道了",
             type: "success",
           }).then(() => {
-            if (this.isContestRunning) {
-              const routeData = this.$router.resolve({
-                name: "contestSubmissionDetail",
-                params: { uuid: response },
-              });
-              window.open(routeData.href, "_blank");
-            } else {
-              const routeData = this.$router.resolve({
-                name: "submissionDetail",
-                params: { uuid: response },
-              });
-              window.open(routeData.href, "_blank");
-            }
+            const routeData = this.$router.resolve({
+              name: "submissionDetail",
+              params: { uuid: response },
+            });
+            window.open(routeData.href, "_blank");
           });
         })
         .catch(() => {

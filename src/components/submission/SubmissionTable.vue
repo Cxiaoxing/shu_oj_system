@@ -102,10 +102,6 @@ export default {
       type: Number,
       default: null,
     },
-    isContestRunning: {
-      type: Boolean,
-      default: false,
-    },
   },
   data() {
     return {
@@ -178,19 +174,11 @@ export default {
 
     // 跳转至提交结果详情
     handleClickSubmission(row) {
-      if (this.isContestRunning) {
-        const routeData = this.$router.resolve({
-          name: "contestSubmissionDetail",
-          params: { uuid: row.id },
-        });
-        window.open(routeData.href, "_blank");
-      } else {
-        const routeData = this.$router.resolve({
-          name: "submissionDetail",
-          params: { uuid: row.id },
-        });
-        window.open(routeData.href, "_blank");
-      }
+      const routeData = this.$router.resolve({
+        name: "submissionDetail",
+        params: { uuid: row.id },
+      });
+      window.open(routeData.href, "_blank");
     },
   },
 };

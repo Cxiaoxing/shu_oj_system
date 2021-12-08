@@ -1,14 +1,9 @@
 import axios from 'axios';
 import { BASE_URL } from "@/assets/config";
-// 1. 根据环境配置默认请求地址
 axios.defaults.baseURL = BASE_URL;
-// 2. 设置请求超时
 axios.defaults.timeout = 10000
-// 3. 自动携带cookie
 axios.defaults.withCredentials = true;
-// 3. 配置请求拦截
 axios.interceptors.request.use(config => { return config }, error => { return Promise.reject(error) })
-// 4. 配置响应拦截 
 axios.interceptors.response.use(
     response => {
         if (response.status === 200) { return Promise.resolve(response); } else { return Promise.reject(response); }
@@ -31,7 +26,7 @@ axios.interceptors.response.use(
         }
     }
 )
-// 5.封装get方法、post方法、delete方法、put方法
+// 封装get方法、post方法、delete方法、put方法
 /**
   * get方法，对应get请求
   * @param {String} url [请求的url地址]

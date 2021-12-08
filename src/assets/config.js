@@ -49,4 +49,12 @@ const SampleDataEncode = function (data) {
     return data.replace(/\n/g, '<br>').replace(/ /g, '&ensp;');
 }
 
-export { BASE_URL, checkEmail, checkMobile, passingRateCalculate, elapsedTimeCalculate, formatTime, SampleDataEncode };
+export {
+    BASE_URL,
+    checkEmail,
+    checkMobile,
+    passingRateCalculate,
+    elapsedTimeCalculate,
+    formatTime,
+    SampleDataEncode
+};

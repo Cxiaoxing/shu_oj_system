@@ -86,11 +86,6 @@ const router = new VueRouter({
           name: 'contestProblemDetail',
           component: () => import(/* webpackChunkName: "Contest" */ '../pages/contest/ProblemDetail.vue'),
         },
-        {
-          path: '/contest/submissionDetail/:uuid',
-          name: 'contestSubmissionDetail',
-          component: () => import(/* webpackChunkName: "Contest" */ '../pages/contest/SubmissionDetail.vue'),
-        },
         // 直播
         { path: '/playerLive', component: () => import(/* webpackChunkName: "Live" */ '../pages/live/PlayerLive.vue') },
         { path: '/liveCard', component: () => import(/* webpackChunkName: "Live" */ '../pages/live/LiveCard.vue') },
@@ -220,10 +215,6 @@ const router = new VueRouter({
 // 无需登录的即可访问的路由列表
 const whiteList = ['/login', '/home', '/practice', '/problemSet', '/contest']
 router.beforeEach((to, from, next) => {
-  // to: 即将要进入的目标 路由对象
-  // from: 当前导航正要离开的路由
-  // next: 放行函数
-  // to.path 在 whiteList 即可直接通行
   if (whiteList.includes(to.path)) {
     return next()
   } else {

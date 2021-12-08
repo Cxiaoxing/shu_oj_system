@@ -109,10 +109,19 @@
         <!-- 已完成判题且编译正确，展示测试点信息 -->
         <div v-else>
           <div style="font-size: 20px; font-weight: 450">测试点详情</div>
-          <div
-            class="someTip"
-            v-html="'绿色: SUCCESS&emsp;&ensp;红色: WRONG_ANSWER'"
-          />
+          <div class="someTip">
+            <div
+              class="flex_row"
+              v-for="(item, index) in resultColor"
+              :key="index"
+            >
+              <div
+                class="tipColor"
+                :style="`background-color: ${item.color}`"
+              />
+              <div>{{ item.result }}</div>
+            </div>
+          </div>
           <div class="testCaseWrap scrollbar">
             <div
               v-for="(item, index) in testCase"
@@ -121,11 +130,7 @@
             >
               <div
                 class="testCase"
-                :style="
-                  item.result === 'SUCCESS'
-                    ? { 'background-color': '#5fc931' }
-                    : { 'background-color': '#f05459' }
-                "
+                :style="showTestCaseBackgroundColor(item.result)"
               >
                 <div class="testCaseTitle"># Case {{ index + 1 }}</div>
                 <div class="testCaseContent">
@@ -136,7 +141,10 @@
                   <span class="testCaseContentTitle">Memory:</span>
                   <span> {{ submissionMemoryFormat(item.memory) }}</span>
                 </div>
-                <div class="testCaseDownload" v-if="item.result !== 'SUCCESS'">
+                <div
+                  class="testCaseDownload"
+                  v-if="item.result !== 'SUCCESS' && canShowTestCase"
+                >
                   <el-popover title="标准输入数据" trigger="click">
                     <div style="max-width: 500px">
                       {{ standardTestCaseData }}
@@ -208,6 +216,7 @@ import "codemirror/theme/idea.css"; // 白色
 import "codemirror/mode/python/python.js"; // python
 import {
   problemTitleRequest,
+  problemCanTestCase,
   problemSingleTestCaseInfoRequest,
 } from "@/request/problemRequest";
 import { submissionInfoRequest } from "@/request/submissionRequest";
@@ -250,7 +259,34 @@ export default {
         java: "Java",
         cpp: "C++",
       },
+      resultColor: [
+        {
+          result: "SUCCESS",
+          color: "#5fc931",
+        },
+        {
+          result: "CPU_TIME_LIMIT_EXCEEDED",
+          color: "darkblue",
+        },
+        {
+          result: "REAL_TIME_LIMIT_EXCEEDED",
+          color: "darkgoldenrod",
+        },
+        {
+          result: "MEMORY_LIMIT_EXCEEDED",
+          color: "darkslategrey",
+        },
+        {
+          result: "RUNTIME_ERROR",
+          color: "darkmagenta",
+        },
+        {
+          result: "WRONG_ANSWER",
+          color: "#f05459",
+        },
+      ],
       testCase: [],
+      canShowTestCase: false,
       standardTestCaseData: "",
     };
   },
@@ -267,6 +303,7 @@ export default {
       submissionInfoRequest(uuid)
         .then(function (response) {
           that.getProblemTitle(response.problem_id);
+          that.getCanShowTestCase(response.region);
           that.region = response.region;
           that.problem_id = response.problem_id;
           that.subTime = response.submit_time;
@@ -298,7 +335,7 @@ export default {
         });
     },
 
-    // 获取题目信息
+    // 获取题目标题
     getProblemTitle(problem_id) {
       problemTitleRequest(problem_id)
         .then((response) => {
@@ -309,8 +346,27 @@ export default {
         });
     },
 
+    // 获取能否展示测试点
+    getCanShowTestCase(region) {
+      problemCanTestCase(region)
+        .then((response) => {
+          this.canShowTestCase = response.can_view_testcases;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
+
     // 格式化展示时间
     formatTime,
+
+    // 测试点背景颜色
+    showTestCaseBackgroundColor(result) {
+      const color = this.resultColor.filter((item) => {
+        return item.result === result;
+      })[0].color;
+      return `background-color:${color}`;
+    },
 
     // 友好展示提交内存
     submissionMemoryFormat(memory) {
@@ -363,6 +419,12 @@ export default {
   width: 150px;
 }
 
+.tipColor {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
 .testCaseWrap {
   max-height: 300px;
   display: flex;

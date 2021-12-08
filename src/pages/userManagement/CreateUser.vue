@@ -50,7 +50,7 @@
             <el-form-item label="真实姓名" prop="real_name">
               <el-input v-model="addUserForm.real_name"></el-input>
             </el-form-item>
-            <el-form-item label="角色" prop="role">
+            <el-form-item label="角色" prop="role" v-if="isSup">
               <el-select
                 v-model="addUserForm.role"
                 placeholder="请选择用户角色"
@@ -80,7 +80,7 @@
           <el-divider></el-divider>
           <el-input
             type="textarea"
-            :rows="22"
+            :rows="isSup ? 22 : 19"
             :placeholder="batchAddPlaceholder"
             v-model="batchAddUserText"
           >
@@ -112,6 +112,7 @@ export default {
     return {
       // 上传的文件列表
       fileList: [],
+      isSup: false,
       // 添加用户的表单数据
       addUserForm: {
         username: "",
@@ -159,6 +160,9 @@ export default {
     };
   },
 
+  created() {
+    this.isSup = window.localStorage.getItem("role") === "sup";
+  },
   methods: {
     // 文件上传成功提示函数
     handleSuccess(res, file, fileList) {
@@ -204,21 +208,20 @@ export default {
     // 批量添加用户
     batchAddUser() {
       const data = {
-        list: this.batchAddUserText.split("\n").map((item, index) => {
+        list: this.batchAddUserText.split("\n").map((item) => {
           const [student_number, real_name] = item.split("\t");
           return { student_number, real_name };
         }),
       };
-      const that = this;
       userBatchRegisterRequest(data)
-        .then(function (response) {
-          that.$message({
+        .then((response) => {
+          this.$message({
             message: "批量添加用户成功",
             type: "success",
           });
         })
-        .catch(function (error) {
-          that.$message({
+        .catch((error) => {
+          this.$message({
             message: "批量添加用户失败",
             type: "warning",
           });
